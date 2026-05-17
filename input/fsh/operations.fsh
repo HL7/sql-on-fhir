@@ -444,7 +444,7 @@ Description: "Export SQLQuery Library results asynchronously using the FHIR Asyn
 * code = #sqlquery-export
 * system = true
 * type = true
-* instance = false
+* instance = true
 * resource[0] = #Library
 
 // Input parameters — query source (repeating, like view in $viewdefinition-export)
@@ -454,7 +454,7 @@ Description: "Export SQLQuery Library results asynchronously using the FHIR Asyn
 * parameter[0].max = "*"
 * parameter[0].scope[0] = #system
 * parameter[0].scope[1] = #type
-* parameter[0].documentation = "One or more SQLQuery Libraries to export. Each repetition identifies a single query."
+* parameter[0].documentation = "One or more SQLQuery Libraries to export. Each repetition identifies a single query. Applies at system and type level only; at instance level the bound Library identified by the request URL is the query source and this parameter does not apply."
 * parameter[0].part[0].name = #name
 * parameter[0].part[0].use = #in
 * parameter[0].part[0].min = 0

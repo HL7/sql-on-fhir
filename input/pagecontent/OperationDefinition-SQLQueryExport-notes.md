@@ -1,10 +1,11 @@
 #### HTTP Methods
 
-* **POST**: Required for providing export parameters and SQLQuery Libraries
+- **POST**: Required for providing export parameters and SQLQuery Libraries
 
 #### Asynchronous Pattern
 
 This operation follows the FHIR Asynchronous Interaction Request Pattern:
+
 1. Client sends request with `Prefer: respond-async` header and query source parameters
 2. Server returns `202 Accepted` with `Content-Location` header pointing to status URL
 3. Client polls the status URL for export progress
@@ -13,6 +14,7 @@ This operation follows the FHIR Asynchronous Interaction Request Pattern:
 6. Client GETs the result URL to retrieve final output (identical to synchronous response format)
 
 **Note**: This operation uses Parameters resource format instead of Bundle format to:
+
 - Provide structured status reporting and metadata
 - Allow extensible output metadata specific to export operations
 - Maintain consistency with other FHIR operations
@@ -86,31 +88,37 @@ sequenceDiagram
 #### Data Sources
 
 The operation can export data from:
+
 1. **Server resources** - From the server's data store (default)
 2. **External source** - Specified via `source` parameter
 
 #### Filtering
 
 Optional filtering parameters:
-* `patient` - Export only resources for this patient
-* `group` - Export only resources for this group
-* `_since` - Export only resources updated since this time
+
+- `patient` - Export only resources for this patient
+- `group` - Export only resources for this group
+- `_since` - Export only resources updated since this time
 
 #### Required Headers
 
 ##### Kick-off Request
-* `Prefer: respond-async` (required) - Specifies that the response should be asynchronous
-* `Accept` (recommended) - Specifies the format of the kick-off response
+
+- `Prefer: respond-async` (required) - Specifies that the response should be asynchronous
+- `Accept` (recommended) - Specifies the format of the kick-off response
 
 ##### Status Request
-* `Accept` (recommended) - Specifies the format of the status response
+
+- `Accept` (recommended) - Specifies the format of the status response
 
 ##### Result Request
-* `Accept` (recommended) - Specifies the format of the final result response
+
+- `Accept` (recommended) - Specifies the format of the final result response
 
 ##### Header Scope
 
 Request headers sent during status polling apply **only to the status response**, not to the final operation result. This separation:
+
 - Allows different content negotiation for status vs. result responses
 - Enables servers to use different formats for interim status (e.g., minimal JSON) vs. final results (e.g., detailed Parameters)
 - Eliminates ambiguity about which response the headers apply to
@@ -119,29 +127,33 @@ Request headers sent during status polling apply **only to the status response**
 
 #### Input Parameters
 
-##### Query Source — `query` Parameter (1..*, system+type scope)
+##### Query Source — `query` Parameter (1..\*, system+type scope)
 
 Each repetition identifies a single SQLQuery Library to export. At least one `query` is required at system/type level.
 
-| Part Name      | Type       | Min | Max | Description                                                                                 |
-|----------------|------------|-----|-----|---------------------------------------------------------------------------------------------|
-| name           | string     | 0   | 1   | Optional friendly name for the exported query output                                        |
-| queryReference | Reference  | 0¹  | 1   | Reference to a SQLQuery Library on the server. [Details](#queryreference-clarification)     |
-| queryResource  | Resource   | 0¹  | 1   | Inline SQLQuery Library resource                                                            |
-| parameters     | Parameters | 0   | 1   | Input parameters for this query. [Details](#parameter-passing)                              |
+At the instance level (`POST [base]/Library/[id]/$sqlquery-export`), the bound Library identified by the request URL serves as the single query source and the `query` parameter does not apply. The export targets that one Library, optionally combined with the export control, filtering, and data source parameters listed below. Instance-level invocation does not provide a slot for per-query parameter binding; clients that need to pass parameters should use the system or type level with a `query.parameters` part.
+
+| Part Name      | Type       | Min | Max | Description                                                                             |
+| -------------- | ---------- | --- | --- | --------------------------------------------------------------------------------------- |
+| name           | string     | 0   | 1   | Optional friendly name for the exported query output                                    |
+| queryReference | Reference  | 0¹  | 1   | Reference to a SQLQuery Library on the server. [Details](#queryreference-clarification) |
+| queryResource  | Resource   | 0¹  | 1   | Inline SQLQuery Library resource                                                        |
+| parameters     | Parameters | 0   | 1   | Input parameters for this query. [Details](#parameter-passing)                          |
+
 {:.table-data}
 
 ¹ Either queryReference or queryResource is required per `query` repetition.
 
-##### ViewDefinition Table Sources — `view` Parameter (0..*, system+type scope)
+##### ViewDefinition Table Sources — `view` Parameter (0..\*, system+type scope)
 
 Provides ViewDefinitions that serve as table sources for the SQL queries. These are the ViewDefinitions referenced in the Library's `relatedArtifact` entries. ViewDefinitions supplied here are materialized as tables for the SQL to query against — they do **not** produce separate output entries. Only the SQL query results appear in the export output.
 
-| Part Name     | Type      | Min | Max | Description                                            |
-|---------------|-----------|-----|-----|--------------------------------------------------------|
-| name          | string    | 0   | 1   | Optional friendly name for the ViewDefinition          |
-| viewReference | Reference | 0²  | 1   | Reference to a ViewDefinition stored on the server     |
-| viewResource  | Resource  | 0²  | 1   | Inline ViewDefinition resource                         |
+| Part Name     | Type      | Min | Max | Description                                        |
+| ------------- | --------- | --- | --- | -------------------------------------------------- |
+| name          | string    | 0   | 1   | Optional friendly name for the ViewDefinition      |
+| viewReference | Reference | 0²  | 1   | Reference to a ViewDefinition stored on the server |
+| viewResource  | Resource  | 0²  | 1   | Inline ViewDefinition resource                     |
+
 {:.table-data}
 
 ² Either viewReference or viewResource is required per `view` repetition.
@@ -149,26 +161,29 @@ Provides ViewDefinitions that serve as table sources for the SQL queries. These 
 ##### Export Control
 
 | Name             | Type    | Min | Max | Description                                                                                   |
-|------------------|---------|-----|-----|-----------------------------------------------------------------------------------------------|
+| ---------------- | ------- | --- | --- | --------------------------------------------------------------------------------------------- |
 | clientTrackingId | string  | 0   | 1   | Client-provided tracking ID for the export operation                                          |
-| _format          | code    | 0   | 1   | Output format: `csv`, `ndjson`, `parquet`, `json`. [Details](#format-parameter-clarification) |
+| \_format         | code    | 0   | 1   | Output format: `csv`, `ndjson`, `parquet`, `json`. [Details](#format-parameter-clarification) |
 | header           | boolean | 0   | 1   | Include CSV headers (default true). Applies only when csv output is requested                 |
+
 {:.table-data}
 
 ##### Filtering
 
 | Name    | Type      | Min | Max | Description                                                                              |
-|---------|-----------|-----|-----|------------------------------------------------------------------------------------------|
-| patient | Reference | 0   | *   | Filter by patient reference. [Details](#patient-parameter-clarification)                 |
-| group   | Reference | 0   | *   | Filter by group membership. [Details](#group-parameter-clarification)                    |
-| _since  | instant   | 0   | 1   | Export only resources updated since this time. [Details](#since-parameter-clarification) |
+| ------- | --------- | --- | --- | ---------------------------------------------------------------------------------------- |
+| patient | Reference | 0   | \*  | Filter by patient reference. [Details](#patient-parameter-clarification)                 |
+| group   | Reference | 0   | \*  | Filter by group membership. [Details](#group-parameter-clarification)                    |
+| \_since | instant   | 0   | 1   | Export only resources updated since this time. [Details](#since-parameter-clarification) |
+
 {:.table-data}
 
 ##### Data Source
 
 | Name   | Type   | Min | Max | Description                                                                |
-|--------|--------|-----|-----|----------------------------------------------------------------------------|
+| ------ | ------ | --- | --- | -------------------------------------------------------------------------- |
 | source | string | 0   | 1   | External data source (e.g., URI, bucket name). If absent, uses server data |
+
 {:.table-data}
 
 If server does not support a parameter, request should be rejected with `400 Bad Request`
@@ -178,9 +193,10 @@ Server should document which parameters it supports in its CapabilityStatement.
 ##### QueryReference Clarification
 
 The `queryReference` parameter MAY be specified using any of the following formats:
-* A relative URL on the server (e.g. "Library/patient-bp-query")
-* A canonical URL (e.g. "http://example.org/fhir/Library/patient-bp-query|1.0.0")
-* An absolute URL (e.g. "http://example.org/fhir/Library/patient-bp-query")
+
+- A relative URL on the server (e.g. "Library/patient-bp-query")
+- A canonical URL (e.g. "http://example.org/fhir/Library/patient-bp-query|1.0.0")
+- An absolute URL (e.g. "http://example.org/fhir/Library/patient-bp-query")
 
 Servers MAY choose which reference formats they support.
 Servers SHALL document which reference formats they support in their CapabilityStatement.
@@ -228,13 +244,13 @@ in the SQLQuery Library (`Library.parameter`).
 Use the appropriate `value[x]` type matching the Library's declared parameter type:
 
 | Library.parameter.type | Parameters.parameter value |
-|------------------------|----------------------------|
-| `string` | `valueString` |
-| `integer` | `valueInteger` |
-| `date` | `valueDate` |
-| `dateTime` | `valueDateTime` |
-| `boolean` | `valueBoolean` |
-| `decimal` | `valueDecimal` |
+| ---------------------- | -------------------------- |
+| `string`               | `valueString`              |
+| `integer`              | `valueInteger`             |
+| `date`                 | `valueDate`                |
+| `dateTime`             | `valueDateTime`            |
+| `boolean`              | `valueBoolean`             |
+| `decimal`              | `valueDecimal`             |
 
 #### Output Parameters
 
@@ -243,38 +259,42 @@ Output parameters appear in the **result response** (after following the `303 Se
 ##### Export Identifiers
 
 | Name             | Type   | Min | Max | Description                                                 |
-|------------------|--------|-----|-----|-------------------------------------------------------------|
+| ---------------- | ------ | --- | --- | ----------------------------------------------------------- |
 | exportId         | string | 1   | 1   | Server-generated export ID                                  |
 | clientTrackingId | string | 0   | 1   | Client-provided tracking ID (echoed from input if provided) |
+
 {:.table-data}
 
 ##### Export Metadata
 
-| Name                   | Type    | Min | Max | Description                                                             |
-|------------------------|---------|-----|-----|-------------------------------------------------------------------------|
-| _format                | code    | 0   | 1   | The format of the exported files (echoed from input if provided)        |
-| exportStartTime        | instant | 0   | 1   | When the export operation began                                         |
-| exportEndTime          | instant | 0   | 1   | When the export operation completed                                     |
-| exportDuration         | integer | 0   | 1   | The actual duration of the export in seconds                            |
+| Name            | Type    | Min | Max | Description                                                      |
+| --------------- | ------- | --- | --- | ---------------------------------------------------------------- |
+| \_format        | code    | 0   | 1   | The format of the exported files (echoed from input if provided) |
+| exportStartTime | instant | 0   | 1   | When the export operation began                                  |
+| exportEndTime   | instant | 0   | 1   | When the export operation completed                              |
+| exportDuration  | integer | 0   | 1   | The actual duration of the export in seconds                     |
+
 {:.table-data}
 
 ##### Export Results
 
-| Name            | Type    | Min | Max | Description                                                              |
-|-----------------|---------|-----|-----|--------------------------------------------------------------------------|
-| output          | complex | 0   | *   | Output information for each exported SQL query result (one per `query`; ViewDefinitions supplied via `view` do not produce output entries) |
-| output.name     | string  | 1   | 1   | The name of the exported output. [Details](#output-name-clarification)   |
-| output.location | uri     | 1   | *   | URL(s) to download the exported file(s). [Details](#output-partitioning) |
+| Name            | Type    | Min | Max | Description                                                                                                                                |
+| --------------- | ------- | --- | --- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| output          | complex | 0   | \*  | Output information for each exported SQL query result (one per `query`; ViewDefinitions supplied via `view` do not produce output entries) |
+| output.name     | string  | 1   | 1   | The name of the exported output. [Details](#output-name-clarification)                                                                     |
+| output.location | uri     | 1   | \*  | URL(s) to download the exported file(s). [Details](#output-partitioning)                                                                   |
+
 {:.table-data}
 
 ##### Status Polling Parameters (interim)
 
 During status polling (`202 Accepted` responses), servers MAY include the following in the response body:
 
-| Name                   | Type    | Min | Max | Description                                         |
-|------------------------|---------|-----|-----|-----------------------------------------------------|
-| exportId               | string  | 0   | 1   | Server-generated export ID                          |
-| estimatedTimeRemaining | integer | 0   | 1   | Estimated seconds until completion                  |
+| Name                   | Type    | Min | Max | Description                        |
+| ---------------------- | ------- | --- | --- | ---------------------------------- |
+| exportId               | string  | 0   | 1   | Server-generated export ID         |
+| estimatedTimeRemaining | integer | 0   | 1   | Estimated seconds until completion |
+
 {:.table-data}
 
 Servers MAY also include partial/interim results during polling. The format of interim responses is implementation-defined.
@@ -298,23 +318,24 @@ For large exports, servers MAY partition the output into multiple files. When pa
 3. **Complete Set**: All parts together represent the complete export for that query
 
 **Example of partitioned output:**
+
 ```json
 {
-  "name": "output",
-  "part": [
-    {
-      "name": "name",
-      "valueString": "patient_bp_results"
-    },
-    {
-      "name": "location",
-      "valueUri": "https://example.com/export/123/patient_bp_results.part1.csv"
-    },
-    {
-      "name": "location",
-      "valueUri": "https://example.com/export/123/patient_bp_results.part2.csv"
-    }
-  ]
+    "name": "output",
+    "part": [
+        {
+            "name": "name",
+            "valueString": "patient_bp_results"
+        },
+        {
+            "name": "location",
+            "valueUri": "https://example.com/export/123/patient_bp_results.part1.csv"
+        },
+        {
+            "name": "location",
+            "valueUri": "https://example.com/export/123/patient_bp_results.part2.csv"
+        }
+    ]
 }
 ```
 
@@ -327,13 +348,14 @@ Clients MUST download all parts to obtain the complete dataset.
 The $sqlquery-export operation uses standard HTTP status codes to indicate the outcome:
 
 | Status Code               | Description          | When to Use                                                          |
-|---------------------------|----------------------|----------------------------------------------------------------------|
+| ------------------------- | -------------------- | -------------------------------------------------------------------- |
 | 202 Accepted              | In Progress          | Export request accepted or still in progress during polling          |
 | 303 See Other             | Complete             | Export complete, follow `Location` header to retrieve results        |
 | 400 Bad Request           | Client Error         | Invalid parameters, unsupported parameters, missing required headers |
 | 404 Not Found             | Not Found            | SQLQuery Library not found, or cancelled export status URL           |
 | 422 Unprocessable Entity  | Business Logic Error | Valid request but query is invalid or cannot be executed             |
 | 500 Internal Server Error | Server Error         | Unexpected server error (at result URL indicates operation failure)  |
+
 {:.table-data}
 
 All error responses (4xx and 5xx) SHOULD include an `OperationOutcome` resource providing details about the error.
@@ -444,43 +466,43 @@ Content-Type: application/fhir+json
 
 1. **Kick-off Request**: Client sends `POST Library/$sqlquery-export` with `Prefer: respond-async` header and one or more `query` parameters.
 2. **Kick-off Response**: Server responds with:
-   - `202 Accepted` status code
-   - `Content-Location` header with the absolute URL for subsequent status requests (polling location)
-   - Parameters resource with `status` parameter set to `accepted` and `location` parameter
-   - If request is not valid or cannot be processed, server responds with `400 Bad Request` and `OperationOutcome` resource in the body.
+    - `202 Accepted` status code
+    - `Content-Location` header with the absolute URL for subsequent status requests (polling location)
+    - Parameters resource with `status` parameter set to `accepted` and `location` parameter
+    - If request is not valid or cannot be processed, server responds with `400 Bad Request` and `OperationOutcome` resource in the body.
 3. **Status Polling**: Client polls the polling location to get status of the export:
-   - **In Progress**: `202 Accepted` with optional Parameters resource for interim status
-   - **Progress Updates**: Server MAY include `X-Progress` header to indicate completion percentage
-   - **Retry-After**: Server SHOULD include `Retry-After` header to indicate when to retry
-   - **Interim Results**: Server MAY include partial/interim results in response body (implementation-defined)
+    - **In Progress**: `202 Accepted` with optional Parameters resource for interim status
+    - **Progress Updates**: Server MAY include `X-Progress` header to indicate completion percentage
+    - **Retry-After**: Server SHOULD include `Retry-After` header to indicate when to retry
+    - **Interim Results**: Server MAY include partial/interim results in response body (implementation-defined)
 4. **Completion**: When export is ready, server responds with:
-   - `303 See Other` status code
-   - `Location` header pointing to the result URL
-   - Response body is optional (MAY be empty or contain minimal status)
+    - `303 See Other` status code
+    - `Location` header pointing to the result URL
+    - Response body is optional (MAY be empty or contain minimal status)
 5. **Result Retrieval**: Client GETs the result URL from the `Location` header:
-   - `200 OK` status code with Parameters resource containing `output` locations
-   - Response format is identical to what a synchronous call would return
+    - `200 OK` status code with Parameters resource containing `output` locations
+    - Response format is identical to what a synchronous call would return
 6. **Error Handling**: If export fails:
-   - Status endpoint still returns `303 See Other` with `Location` header
-   - Result URL returns appropriate error status code (e.g., `500 Internal Server Error`)
-   - Result response contains `OperationOutcome` with error details
-   - This cleanly separates polling errors from operation errors
+    - Status endpoint still returns `303 See Other` with `Location` header
+    - Result URL returns appropriate error status code (e.g., `500 Internal Server Error`)
+    - Result response contains `OperationOutcome` with error details
+    - This cleanly separates polling errors from operation errors
 7. **Cancellation** (Recommended):
    Servers SHOULD support export cancellation via DELETE request to the status URL:
-   - Client sends `DELETE` request to the status polling URL
-   - Server responds with `202 Accepted`
-   - Subsequent status requests return `404 Not Found`
-   - Server SHOULD clean up any partial results
+    - Client sends `DELETE` request to the status polling URL
+    - Server responds with `202 Accepted`
+    - Subsequent status requests return `404 Not Found`
+    - Server SHOULD clean up any partial results
 8. **Result URL Lifetime**:
    Result URLs SHALL remain valid for at least 24 hours after export completion:
-   - Servers SHOULD support multiple retrievals of the same result
-   - Servers MAY include an `Expires` header to indicate result URL expiration
-   - Clients should retrieve results promptly but can retry within the validity window
+    - Servers SHOULD support multiple retrievals of the same result
+    - Servers MAY include an `Expires` header to indicate result URL expiration
+    - Clients should retrieve results promptly but can retry within the validity window
 9. **Access Control**:
    Servers SHALL protect status and result URLs with appropriate access controls:
-   - Same authorization context as the original request, OR
-   - Non-guessable URLs (e.g., cryptographically random tokens)
-   - Unauthorized access attempts return `401 Unauthorized` or `403 Forbidden`
+    - Same authorization context as the original request, OR
+    - Non-guessable URLs (e.g., cryptographically random tokens)
+    - Unauthorized access attempts return `401 Unauthorized` or `403 Forbidden`
 10. **File Download**: Client downloads the output from URLs in the `output.location` parameters.
 
 #### Examples
