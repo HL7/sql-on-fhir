@@ -74,6 +74,7 @@ menu:
     $viewdefinition-export: OperationDefinition-ViewDefinitionExport.html
     $viewdefinition-run: OperationDefinition-ViewDefinitionRun.html
     $sqlquery-run: OperationDefinition-SQLQueryRun.html
+    $sqlquery-export: OperationDefinition-SQLQueryExport.html
   Contributing: contributing.html
   # extra/playground.html does not work - TODO: use relative ulrs
   Playground: http://sql-on-fhir.org/extra/playground.html
