@@ -25,8 +25,9 @@
   },
   {
     "name": "IG Builder (HL7)",
-    "url": "TBD",
-    "description": "TBD"
+    "url": "https://github.com/hapifhir/org.hl7.fhir.core",
+    "description": "HL7 FHIR Core Libraries - Java implementation of SQL on FHIR",
+    "testResultsUrl": "https://sql-on-fhir.org/extra/hl7-fhir-core-test-results.json"
   },
   {
     "name": "NCQA Fhir Analytics",

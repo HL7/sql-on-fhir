@@ -1,0 +1,36 @@
+{
+  "resourceType": "Library",
+  "id": "patient-count",
+  "url": "http://myig.org/Library/patient-count",
+  "name": "PatientCount",
+  "title": "Patient Count",
+  "status": "active",
+  "type": {
+    "coding": [
+      {
+        "system": "https://sql-on-fhir.org/ig/CodeSystem/LibraryTypesCodes",
+        "code": "sql-query"
+      }
+    ]
+  },
+  "description": "Counts the rows in the patient_demographics view.",
+  "relatedArtifact": [
+    {
+      "type": "depends-on",
+      "resource": "http://myig.org/ViewDefinition/patient_demographics",
+      "label": "patient_demographics"
+    }
+  ],
+  "content": [
+    {
+      "contentType": "application/sql",
+      "data": "U0VMRUNUIENPVU5UKCopIEFTIHRvdGFsIEZST00gcGF0aWVudF9kZW1vZ3JhcGhpY3M=",
+      "extension": [
+        {
+          "url": "https://sql-on-fhir.org/ig/StructureDefinition/sql-text",
+          "valueString": "SELECT COUNT(*) AS total FROM patient_demographics"
+        }
+      ]
+    }
+  ]
+}

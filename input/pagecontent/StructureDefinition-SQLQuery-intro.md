@@ -81,16 +81,42 @@ For dialect-specific SQL, include separate attachments with a dialect parameter
 in `contentType` (e.g., `application/sql;dialect=postgresql`). Keep aliases and
 parameter names consistent across variants.
 
+A `contentType` of `application/sql` (with no `dialect` parameter) represents a
+default variant. It carries no dialect commitment and is intended to be broadly
+portable, so authors SHOULD restrict it to standard ANSI SQL constructs that
+work across the engines they expect to target. Implementations MAY treat the
+default variant as roughly equivalent to ANSI SQL when no dialect-specific
+variant matches.
+
+When a Library contains multiple `content` attachments, implementations choose
+which attachment to execute as follows:
+
+1. Prefer an attachment whose `contentType` declares a `dialect` parameter that
+   matches the executing engine (for example, an engine running PostgreSQL
+   selects `application/sql;dialect=postgresql`).
+2. If no matching dialect-specific attachment is present, fall back to the
+   default attachment with `contentType = "application/sql"`.
+3. If neither a matching dialect nor a default attachment is available,
+   implementations SHOULD return an error rather than guess at a translation
+   between dialects.
+
+Authors SHOULD include a default `application/sql` attachment whenever possible
+so that engines without a dedicated variant still have a portable fallback. All
+variants within a single Library SHALL be functionally equivalent: they SHALL
+expose the same parameters, reference the same table aliases, and produce the
+same logical result set.
+
 ### Conformance
 
 **Terminology:** `contentType` SHALL come from
 [All SQL Content Type Codes](ValueSet-AllSQLContentTypeCodes.html).
 
 **Constraints:**
-* Library type SHALL be `LibraryTypesCodes#sql-query`
-* `content.contentType` SHALL start with `application/sql`
-* `content.data` SHALL be present; the `sql-text` extension MAY carry a plain-text copy
-* Dependencies SHALL use `relatedArtifact` with `type = "depends-on"` and `label`
-* Parameters SHALL use `Library.parameter` with `use = "in"`
+
+- Library type SHALL be `LibraryTypesCodes#sql-query`
+- Every `content.contentType` SHALL start with `application/sql`
+- `content.data` SHALL be present; the `sql-text` extension MAY carry a plain-text copy
+- Dependencies SHALL use `relatedArtifact` with `type = "depends-on"` and `label`
+- Parameters SHALL use `Library.parameter` with `use = "in"`
 
 For examples and tooling guidance, see the Notes tab below.

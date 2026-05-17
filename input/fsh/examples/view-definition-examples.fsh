@@ -324,3 +324,86 @@ Usage: #example
     * path = "location.getReferenceKey(Location)"
     * name = "location_id"
 
+Instance: QuestionnaireResponseItems
+InstanceOf: ViewDefinition
+Description: """Demonstrates using the `repeat` directive to recursively flatten
+nested QuestionnaireResponse items. Unlike `forEach`, which only unnests a single
+level, `repeat` traverses all levels of nesting to produce one row per item
+regardless of depth. This is useful for analysing survey responses where questions
+may be grouped into nested sections."""
+Usage: #example
+* name = "questionnaire_response_items"
+* status = #draft
+* resource = #QuestionnaireResponse
+* select[+]
+  * column[+]
+    * path = "getResourceKey()"
+    * name = "id"
+    * description = "Unique questionnaire response identifier"
+  * column[+]
+    * path = "questionnaire"
+    * name = "questionnaire"
+    * description = "Canonical URL of the questionnaire"
+  * column[+]
+    * path = "subject.getReferenceKey(Patient)"
+    * name = "patient_id"
+    * description = "Patient identifier"
+  * column[+]
+    * path = "authored"
+    * name = "authored"
+    * description = "Date and time the response was authored"
+* select[+]
+  * repeat[+] = "item"
+  * column[+]
+    * path = "linkId"
+    * name = "item_link_id"
+    * description = "Unique identifier for this item within the questionnaire"
+  * column[+]
+    * path = "text"
+    * name = "item_text"
+    * description = "Question text"
+  * column[+]
+    * path = "answer.value.ofType(string)"
+    * name = "answer_value_string"
+    * description = "String answer value"
+  * column[+]
+    * path = "answer.value.ofType(integer)"
+    * name = "answer_value_integer"
+    * description = "Integer answer value"
+  * column[+]
+    * path = "answer.value.ofType(boolean)"
+    * name = "answer_value_boolean"
+    * description = "Boolean answer value"
+  * column[+]
+    * path = "answer.value.ofType(date)"
+    * name = "answer_value_date"
+    * description = "Date answer value"
+
+Instance: CodeSystemHierarchy
+InstanceOf: ViewDefinition
+Description: """Demonstrates using `repeat` with nested `select` to traverse a
+CodeSystem concept hierarchy. This produces parent-child code pairs by using
+`repeat` to walk down the concept tree and a nested `forEach` to extract each
+child concept at every level. Useful for building concept maps or analysing
+hierarchical terminologies."""
+Usage: #example
+* name = "code_system_hierarchy"
+* status = #draft
+* resource = #CodeSystem
+* select[+]
+  * column[+]
+    * path = "getResourceKey()"
+    * name = "id"
+    * description = "CodeSystem identifier"
+* select[+]
+  * repeat[+] = "concept"
+  * column[+]
+    * path = "code"
+    * name = "parent_code"
+    * description = "Code of the parent concept in the hierarchy"
+  * select[+]
+    * forEach = "concept"
+    * column[+]
+      * path = "code"
+      * name = "code"
+      * description = "Code of the child concept"

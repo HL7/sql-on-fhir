@@ -9,7 +9,7 @@ Context: Attachment
 Invariant: sql-must-be-sql-expressions
 Description: "The content of the Library must be SQL expressions."
 Severity: #error
-Expression: "content.contentType.startsWith('application/sql')"
+Expression: "content.all(contentType.startsWith('application/sql'))"
 
 Profile: SQLQuery
 Title: "SQL Query Library"

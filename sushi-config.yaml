@@ -169,6 +169,14 @@ resources:
     extension:
       - url: http://hl7.org/fhir/tools/StructureDefinition/implementationguide-resource-logical
         valueString: https://sql-on-fhir.org/ig/StructureDefinition/ViewDefinition
+  Binary/QuestionnaireResponseItems:
+    extension:
+      - url: http://hl7.org/fhir/tools/StructureDefinition/implementationguide-resource-logical
+        valueString: https://sql-on-fhir.org/ig/StructureDefinition/ViewDefinition
+  Binary/CodeSystemHierarchy:
+    extension:
+      - url: http://hl7.org/fhir/tools/StructureDefinition/implementationguide-resource-logical
+        valueString: https://sql-on-fhir.org/ig/StructureDefinition/ViewDefinition
 
 #
 # Groups can control certain aspects of the IG generation.  The IG

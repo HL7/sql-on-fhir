@@ -12,7 +12,9 @@
       "id": "d1",
       "udiCarrier": [
         {
-          "carrierAIDC": "aGVsbG8K"
+          "carrierAIDC": "aGVsbG8K",
+          "deviceIdentifier": "device-id",
+          "issuer": "issuer"
         }
       ]
     },
@@ -21,7 +23,9 @@
       "id": "d2",
       "udiCarrier": [
         {
-          "carrierAIDC": "YnllCg=="
+          "carrierAIDC": "YnllCg==",
+          "deviceIdentifier": "device-id",
+          "issuer": "issuer"
         }
       ]
     },
@@ -49,7 +53,7 @@
       "resourceType": "ClaimResponse",
       "id": "cr1",
       "use": "claim",
-      "patient": { "reference": "Patient/p1" },
+      "patient": { "reference": "Patient/pt1" },
       "created": "2021-09-02",
       "insurer": { "reference": "Organization/o1" },
       "type": { "text": "type" },
@@ -70,7 +74,7 @@
       "resourceType": "ClaimResponse",
       "id": "cr2",
       "use": "claim",
-      "patient": { "reference": "Patient/p1" },
+      "patient": { "reference": "Patient/pt1" },
       "created": "2021-09-02",
       "insurer": { "reference": "Organization/o1" },
       "type": { "text": "type" },
@@ -91,7 +95,7 @@
       "resourceType": "ClaimResponse",
       "id": "cr3",
       "use": "claim",
-      "patient": { "reference": "Patient/p1" },
+      "patient": { "reference": "Patient/pt1" },
       "created": "2021-09-02",
       "insurer": { "reference": "Organization/o1" },
       "type": { "text": "type" },
@@ -155,21 +159,21 @@
       "resourceType": "ImagingStudy",
       "id": "is1",
       "status": "available",
-      "subject": { "reference": "Patient/p1" },
+      "subject": { "reference": "Patient/pt1" },
       "numberOfSeries": 9
     },
     {
       "resourceType": "ImagingStudy",
       "id": "is2",
       "status": "available",
-      "subject": { "reference": "Patient/p1" },
+      "subject": { "reference": "Patient/pt1" },
       "numberOfSeries": 12
     },
     {
       "resourceType": "ImagingStudy",
       "id": "is3",
       "status": "available",
-      "subject": { "reference": "Patient/p1" }
+      "subject": { "reference": "Patient/pt1" }
     },
     {
       "resourceType": "Measure",
