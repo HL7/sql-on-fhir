@@ -234,23 +234,13 @@ the server MAY include these resources in a response irrespective of the `_since
 
 #### Parameter Passing
 
-Query parameters are passed as a nested `Parameters` resource within each `query` repetition (per-query binding via the `parameters` part).
-
-This follows the same pattern as [`$sqlquery-run`](OperationDefinition-SQLQueryRun.html) and the
+Query parameters are passed as a nested `Parameters` resource within each
+`query` repetition (per-query binding via the `parameters` part), following the
+same pattern as [`$sqlquery-run`](OperationDefinition-SQLQueryRun.html) and the
 [CQL `$evaluate` operation](https://build.fhir.org/ig/HL7/cql-ig/en/OperationDefinition-cql-library-evaluate.html).
-Each parameter in the `Parameters` resource is bound by name to a parameter declared
-in the SQLQuery Library (`Library.parameter`).
-
-Use the appropriate `value[x]` type matching the Library's declared parameter type:
-
-| Library.parameter.type | Parameters.parameter value |
-| ---------------------- | -------------------------- |
-| `string`               | `valueString`              |
-| `integer`              | `valueInteger`             |
-| `date`                 | `valueDate`                |
-| `dateTime`             | `valueDateTime`            |
-| `boolean`              | `valueBoolean`             |
-| `decimal`              | `valueDecimal`             |
+See [Parameter Types](StructureDefinition-SQLQuery.html#parameter-types) on the
+SQLQuery profile for the binding rules and the mapping from
+`Library.parameter.type` to the `value[x]` element to use.
 
 #### Output Parameters
 
