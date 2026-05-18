@@ -45,7 +45,6 @@ Description: "Export a view definition. User can provide view definition referen
 * parameter[0].part[2].max = "1"
 * parameter[0].part[2].type = #Resource
 * parameter[0].part[2].documentation = "Inline ViewDefinition resource to export."
-* parameter[0].part[2].extension[$allowedType].valueUri = "https://sql-on-fhir.org/ig/StructureDefinition/ViewDefinition"
 
 * parameter[1].name = #clientTrackingId
 * parameter[1].use = #in
@@ -267,7 +266,6 @@ Description: "Execute a view definition against supplied or server data."
 * parameter[3].type = #CanonicalResource
 * parameter[3].targetProfile = Canonical(ViewDefinition)
 * parameter[3].documentation = "Inline ViewDefinition resource to execute."
-* parameter[3].extension[$allowedType].valueUri = "https://sql-on-fhir.org/ig/StructureDefinition/ViewDefinition"
 
 * parameter[4].name = #patient
 * parameter[4].use = #in
@@ -396,7 +394,6 @@ Description: "Execute a SQLQuery Library against ViewDefinition tables."
 * parameter[3].scope[1] = #type
 * parameter[3].type = #Resource
 * parameter[3].documentation = "Inline SQLQuery Library resource to execute."
-* parameter[3].extension[$allowedType].valueUri = "https://sql-on-fhir.org/ig/StructureDefinition/SQLQuery"
 
 * parameter[4].name = #parameters
 * parameter[4].use = #in
@@ -424,6 +421,4 @@ Description: "Execute a SQLQuery Library against ViewDefinition tables."
 * parameter[6].min = 1
 * parameter[6].max = "1"
 * parameter[6].type = #Resource
-* parameter[6].extension[$allowedType][0].valueUri = "Binary"
-* parameter[6].extension[$allowedType][+].valueUri = "Parameters"
 * parameter[6].documentation = "Query results. Returns Binary for flat formats (csv, json, ndjson, parquet) or Parameters for _format=fhir."
