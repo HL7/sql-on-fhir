@@ -278,3 +278,108 @@ Usage: #example
 * location[+]
   * location = Reference(Location/2)
 * serviceProvider = Reference(Organization/1)
+
+// =============================================================================
+// CodeSystem resource (vehicle hierarchy)
+// =============================================================================
+// A small hierarchical CodeSystem to demonstrate the CodeSystemHierarchy view.
+// Mirrors the structure described in Binary-CodeSystemHierarchy-notes.md:
+//   vehicle
+//     car (sedan, suv, hatchback)
+//     truck (pickup, semi)
+//     motorbike
+
+Instance: ExampleVehicleCodeSystem
+InstanceOf: CodeSystem
+Usage: #example
+* id = "1"
+* url = "http://example.org/CodeSystem/vehicles"
+* status = #draft
+* content = #complete
+* concept[+]
+  * code = #vehicle
+  * display = "Vehicle"
+  * concept[+]
+    * code = #car
+    * display = "Car"
+    * concept[+]
+      * code = #sedan
+      * display = "Sedan"
+    * concept[+]
+      * code = #suv
+      * display = "SUV"
+    * concept[+]
+      * code = #hatchback
+      * display = "Hatchback"
+  * concept[+]
+    * code = #truck
+    * display = "Truck"
+    * concept[+]
+      * code = #pickup
+      * display = "Pickup"
+    * concept[+]
+      * code = #semi
+      * display = "Semi"
+  * concept[+]
+    * code = #motorbike
+    * display = "Motorbike"
+
+// =============================================================================
+// QuestionnaireResponse resources
+// =============================================================================
+// Two responses to demonstrate the QuestionnaireResponseItems view, which uses
+// `repeat` to recursively flatten nested items into a single table.
+
+Instance: ExampleQuestionnaireResponse1
+InstanceOf: QuestionnaireResponse
+Usage: #example
+* id = "1"
+* status = #completed
+* questionnaire = "http://example.org/q/phq9"
+* subject = Reference(Patient/1)
+* authored = "2024-03-15T10:30:00+10:00"
+* item[+]
+  * linkId = "q1"
+  * text = "Little interest or pleasure in doing things"
+  * answer[+]
+    * valueInteger = 2
+* item[+]
+  * linkId = "q2"
+  * text = "Feeling down, depressed, or hopeless"
+  * answer[+]
+    * valueInteger = 1
+
+Instance: ExampleQuestionnaireResponse2
+InstanceOf: QuestionnaireResponse
+Usage: #example
+* id = "2"
+* status = #completed
+* questionnaire = "http://example.org/q/health-history"
+* subject = Reference(Patient/2)
+* authored = "2024-03-16T14:20:00+10:00"
+* item[+]
+  * linkId = "demographics"
+  * text = "Demographics"
+  * item[+]
+    * linkId = "name"
+    * text = "Full name"
+    * answer[+]
+      * valueString = "John Smith"
+  * item[+]
+    * linkId = "dob"
+    * text = "Date of birth"
+    * answer[+]
+      * valueDate = "1980-05-22"
+* item[+]
+  * linkId = "conditions"
+  * text = "Medical conditions"
+  * item[+]
+    * linkId = "diabetes"
+    * text = "Diabetes"
+    * answer[+]
+      * valueBoolean = true
+  * item[+]
+    * linkId = "hypertension"
+    * text = "Hypertension"
+    * answer[+]
+      * valueBoolean = false
