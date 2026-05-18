@@ -276,13 +276,11 @@ Usage: #example
 Instance: EncounterFlat
 InstanceOf: ViewDefinition
 Description: """A simple view for flattening an Encounter resource. Some of the
-more commonly used fields are included in this flat view. Note this is valid
-for an R4 Encounter resource but not R5 (hence the `fhirVersion`)."""
+more commonly used fields are included in this flat view."""
 Usage: #example
 * name = "encounter_flat"
 * status = #draft
 * resource = #Encounter
-* fhirVersion[+] = #4.0
 * select[+]
   * column[+]
     * path = "getResourceKey()"
@@ -297,10 +295,10 @@ Usage: #example
     * path = "serviceProvider.getReferenceKey(Organization)"
     * name = "service_org_id"
   * column[+]
-    * path = "period.start"
+    * path = "actualPeriod.start"
     * name = "period_start"
   * column[+]
-    * path = "period.end"
+    * path = "actualPeriod.end"
     * name = "period_end"
   * column[+]
     * path = "episodeOfCare.getReferenceKey(EpisodeOfCare)"
@@ -316,7 +314,7 @@ Usage: #example
 * select[+]
   * forEachOrNull = "participant"
   * column[+]
-    * path = "individual.getReferenceKey(Practitioner)"
+    * path = "actor.getReferenceKey(Practitioner)"
     * name = "practitioner_id"
 * select[+]
   * forEachOrNull = "location"
