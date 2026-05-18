@@ -1,0 +1,22 @@
+{
+  "resourceType": "ViewDefinition",
+  "name": "patient_multiple_birth",
+  "url": "http://myig.org/ViewDefinition/patient_multiple_birth",
+  "resource": "Patient",
+  "select": [
+    {
+      "column": [
+        {
+          "path": "getResourceKey()",
+          "name": "id",
+          "type": "string"
+        },
+        {
+          "path": "multipleBirth.ofType(boolean)",
+          "name": "multiple_birth",
+          "type": "boolean"
+        }
+      ]
+    }
+  ]
+}

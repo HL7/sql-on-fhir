@@ -1,0 +1,44 @@
+{
+  "resourceType": "Library",
+  "id": "patient-by-id",
+  "url": "http://myig.org/Library/patient-by-id",
+  "name": "PatientById",
+  "title": "Patient by Id",
+  "status": "active",
+  "type": {
+    "coding": [
+      {
+        "system": "https://sql-on-fhir.org/ig/CodeSystem/LibraryTypesCodes",
+        "code": "sql-query"
+      }
+    ]
+  },
+  "description": "Returns the demographics row for a single patient identified by id.",
+  "parameter": [
+    {
+      "name": "patient_id",
+      "type": "string",
+      "use": "in",
+      "documentation": "Patient resource id (matches patient_demographics.id)."
+    }
+  ],
+  "relatedArtifact": [
+    {
+      "type": "depends-on",
+      "resource": "http://myig.org/ViewDefinition/patient_demographics",
+      "label": "patient_demographics"
+    }
+  ],
+  "content": [
+    {
+      "contentType": "application/sql",
+      "data": "U0VMRUNUIGlkLCBkYXRlX29mX2JpcnRoLCBnZW5kZXIgRlJPTSBwYXRpZW50X2RlbW9ncmFwaGljcyBXSEVSRSBpZCA9IDpwYXRpZW50X2lk",
+      "extension": [
+        {
+          "url": "https://sql-on-fhir.org/ig/StructureDefinition/sql-text",
+          "valueString": "SELECT id, date_of_birth, gender FROM patient_demographics WHERE id = :patient_id"
+        }
+      ]
+    }
+  ]
+}

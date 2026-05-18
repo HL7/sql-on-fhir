@@ -80,11 +80,12 @@ menu:
   View Definition: StructureDefinition-ViewDefinition.html
   SQL Query: StructureDefinition-SQLQuery.html
   Artifacts: artifacts.html
-  Operations: 
+  Operations:
     Overview: operations.html
     CapabilityStatement: operations-capability.html
     $viewdefinition-export: OperationDefinition-ViewDefinitionExport.html
     $viewdefinition-run: OperationDefinition-ViewDefinitionRun.html
+    $sqlquery-run: OperationDefinition-SQLQueryRun.html
   Contributing: contributing.html
   # extra/playground.html does not work - TODO: use relative ulrs
   Playground: http://sql-on-fhir.org/extra/playground.html
@@ -176,6 +177,14 @@ resources:
       - url: http://hl7.org/fhir/tools/StructureDefinition/implementationguide-resource-logical
         valueString: https://sql-on-fhir.org/ig/StructureDefinition/ViewDefinition
   Binary/EncounterFlat:
+    extension:
+      - url: http://hl7.org/fhir/tools/StructureDefinition/implementationguide-resource-logical
+        valueString: https://sql-on-fhir.org/ig/StructureDefinition/ViewDefinition
+  Binary/QuestionnaireResponseItems:
+    extension:
+      - url: http://hl7.org/fhir/tools/StructureDefinition/implementationguide-resource-logical
+        valueString: https://sql-on-fhir.org/ig/StructureDefinition/ViewDefinition
+  Binary/CodeSystemHierarchy:
     extension:
       - url: http://hl7.org/fhir/tools/StructureDefinition/implementationguide-resource-logical
         valueString: https://sql-on-fhir.org/ig/StructureDefinition/ViewDefinition

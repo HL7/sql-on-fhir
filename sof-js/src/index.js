@@ -33,37 +33,42 @@ export function row_product(parts) {
   return rows
 }
 
-function forEach(select_expr, node, def) {
+function forEach(select_expr, node, def, envVars = {}) {
   assert(select_expr.forEach, 'forEach required')
-  let nodes = fhirpath_evaluate(node, select_expr.forEach, def.constant)
-  return nodes.flatMap((node) => {
-    return select({ select: select_expr.select }, node, def)
+  let nodes = fhirpath_evaluate(node, select_expr.forEach, def.constant, envVars)
+  return nodes.flatMap((node, index) => {
+    // Each element gets its own rowIndex within this iteration level.
+    const childEnvVars = { ...envVars, rowIndex: index }
+    return select({ select: select_expr.select }, node, def, childEnvVars)
   })
 }
 
-function forEachOrNull(select_expr, node, def) {
+function forEachOrNull(select_expr, node, def, envVars = {}) {
   assert(select_expr.forEachOrNull, 'forEachOrNull required')
-  let nodes = fhirpath_evaluate(node, select_expr.forEachOrNull, def.constant)
+  let nodes = fhirpath_evaluate(node, select_expr.forEachOrNull, def.constant, envVars)
   if (nodes.length == 0) {
+    // For empty collections, produce a single null row with rowIndex 0.
     nodes = [{}]
   }
-  return nodes.flatMap((node) => {
-    return select({ select: select_expr.select }, node, def)
+  return nodes.flatMap((node, index) => {
+    // Each element gets its own rowIndex within this iteration level.
+    const childEnvVars = { ...envVars, rowIndex: index }
+    return select({ select: select_expr.select }, node, def, childEnvVars)
   })
 }
 
-function recursiveTraverse(paths, node, def) {
+function recursiveTraverse(paths, node, def, envVars = {}) {
   const result = []
-  
+
   const traverse = (currentNode, isRoot = false) => {
     // Don't add the root node to results, only its children.
     if (!isRoot) {
       result.push(currentNode)
     }
-    
+
     // Recursively traverse using each path expression.
     paths.forEach((path) => {
-      const childNodes = fhirpath_evaluate(currentNode, path, def.constant)
+      const childNodes = fhirpath_evaluate(currentNode, path, def.constant, envVars)
       childNodes.forEach((childNode) => {
         if (childNode && typeof childNode === 'object') {
           traverse(childNode, false)
@@ -71,29 +76,31 @@ function recursiveTraverse(paths, node, def) {
       })
     })
   }
-  
+
   traverse(node, true)
-  
+
   return result
 }
 
-function repeat(select_expr, node, def) {
+function repeat(select_expr, node, def, envVars = {}) {
   assert(select_expr.repeat, 'repeat required')
   assert(Array.isArray(select_expr.repeat), 'repeat must be an array')
-  
+
   // Use recursiveTraverse to get all nodes at all depths.
-  const nodes = recursiveTraverse(select_expr.repeat, node, def)
-  
-  return nodes.flatMap((node) => {
-    return select({ select: select_expr.select }, node, def)
+  const nodes = recursiveTraverse(select_expr.repeat, node, def, envVars)
+
+  return nodes.flatMap((node, index) => {
+    // Each element in the flattened repeat gets its own rowIndex.
+    const childEnvVars = { ...envVars, rowIndex: index }
+    return select({ select: select_expr.select }, node, def, childEnvVars)
   })
 }
 
-function column(select_expr, node, def) {
+function column(select_expr, node, def, envVars = {}) {
   assert(select_expr.column, 'column required')
   let record = {}
   select_expr.column.forEach((c) => {
-    let vs = fhirpath_evaluate(node, c.path, def.constant)
+    let vs = fhirpath_evaluate(node, c.path, def.constant, envVars)
     if (c.collection) {
       record[c.name || c.path] = vs
     } else if (vs.length <= 1) {
@@ -136,11 +143,11 @@ function arrays_unique(arrays) {
   }, [])
 }
 
-function unionAll(select_expr, node, def) {
+function unionAll(select_expr, node, def, envVars = {}) {
   assert(select_expr.unionAll, 'unionAll')
-  const result = select_expr.unionAll.flatMap((d) => do_eval(d, node, def))
+  const result = select_expr.unionAll.flatMap((d) => do_eval(d, node, def, envVars))
 
-  // TODO ideally, this should be done during the validation
+  // TODO ideally, this should be done during the validation.
   const unique = arrays_unique(result.map((x) => Object.keys(x)))
   // TODO how can unique be === []?
   assert(unique.length <= 1, new Error(`Union columns mismatch: ${JSON.stringify(unique)}`))
@@ -148,11 +155,11 @@ function unionAll(select_expr, node, def) {
   return result
 }
 
-function select(select_expr, node, def) {
+function select(select_expr, node, def, envVars = {}) {
   assert(select_expr.select, 'select')
   if (select_expr.where) {
     let include = select_expr.where.every((w) => {
-      const val = fhirpath_evaluate(node, w.path, def.constant)[0]
+      const val = fhirpath_evaluate(node, w.path, def.constant, envVars)[0]
       assert(val === undefined || typeof val === 'boolean', "'where' expression path should return 'boolean'")
       return val
     })
@@ -167,7 +174,7 @@ function select(select_expr, node, def) {
   }
   return row_product(
     select_expr.select.map((s) => {
-      return do_eval(s, node, def)
+      return do_eval(s, node, def, envVars)
     }),
   )
 }
@@ -298,9 +305,9 @@ let fns = {
   },
 }
 
-function do_eval(select_expr, node, def) {
+function do_eval(select_expr, node, def, envVars = {}) {
   let f = fns[select_expr.type] || fns['unknown']
-  return f(select_expr, node, def)
+  return f(select_expr, node, def, envVars)
 }
 
 function collect_columns(acc, def) {
@@ -357,5 +364,7 @@ export function evaluate(def, node, for_test = true) {
   // console.log("=======  NORM =========")
   // console.dir(normal_def, {depth: null})
 
-  return node.flatMap((n) => do_eval(normal_def, n, def))
+  // Initialise rowIndex to 0 at the top level (resource level).
+  const initialEnvVars = { rowIndex: 0 }
+  return node.flatMap((n) => do_eval(normal_def, n, def, initialEnvVars))
 }

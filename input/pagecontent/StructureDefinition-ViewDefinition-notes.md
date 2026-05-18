@@ -13,8 +13,8 @@ All View Runners must implement these functions that extend the FHIRPath
 specification. Despite not being in the [FHIRPath](https://hl7.org/fhirpath/)
 specification, they are necessary in the context of defining views:
 
--   [getResourceKey](#getresourcekey--keytype) function
--   [getReferenceKey](#getreferencekeyresource-type-specifier--keytype) function
+- [getResourceKey](#getresourcekey--keytype) function
+- [getReferenceKey](#getreferencekeyresource-type-specifier--keytype) function
 
 #### getResourceKey() : _KeyType_
 
@@ -57,13 +57,13 @@ storage. Integers, strings, UUIDs, and other primitive types may be appropriate.
 
 The getReferenceKey function has both required and optional functionality:
 
--   Implementations MUST support the relative literal form of reference (
-    e.g., `Patient/123`), and MAY support other types of references. If the
-    implementation does not support the reference type, or is unable to resolve
-    the reference, it MUST return the empty collection (i.e., `{}`).
--   Implementations MAY generate a list of unprocessable references through query
-    responses, logging or reporting. The details of how this information would be
-    provided to the user is implementation specific.
+- Implementations MUST support the relative literal form of reference (
+  e.g., `Patient/123`), and MAY support other types of references. If the
+  implementation does not support the reference type, or is unable to resolve
+  the reference, it MUST return the empty collection (i.e., `{}`).
+- Implementations MAY generate a list of unprocessable references through query
+  responses, logging or reporting. The details of how this information would be
+  provided to the user is implementation specific.
 
 See the [Joins with Resource and Reference Keys](#joins-with-resource-and-reference-keys) section below for details.
 
@@ -172,10 +172,10 @@ parts of the resources.
 The multiple rows produced using `forEach` or `forEachOrNull` from a `select`are
 joined to others with the following rules:
 
--   Parent/child `select`s will repeat values from the parent `select` for each
-    item in the child `select`.
--   Sibling `select`s are effectively cross joined, where each row in
-    each `select` is duplicated for every row in sibling `select`s.
+- Parent/child `select`s will repeat values from the parent `select` for each
+  item in the child `select`.
+- Sibling `select`s are effectively cross joined, where each row in
+  each `select` is duplicated for every row in sibling `select`s.
 
 The [examples](StructureDefinition-ViewDefinition-examples.html) illustrate this
 behavior.
@@ -187,7 +187,7 @@ flattening hierarchical data to any depth. This is particularly useful for resou
 with recursive nesting patterns like QuestionnaireResponse items, where the depth of
 nesting is not known in advance.
 
-The `repeat` directive takes an array of [FHIRPath](https://hl7.org/fhirpath/) 
+The `repeat` directive takes an array of [FHIRPath](https://hl7.org/fhirpath/)
 expressions that define paths to recursively traverse. The view runner will:
 
 1. Start at the current context node
@@ -202,53 +202,53 @@ Consider a QuestionnaireResponse with nested groups and questions:
 
 ```json
 {
-  "resourceType": "QuestionnaireResponse",
-  "item": [
-    {
-      "linkId": "1",
-      "text": "Demographics",
-      "item": [
+    "resourceType": "QuestionnaireResponse",
+    "item": [
         {
-          "linkId": "1.1",
-          "text": "Age",
-          "answer": [
-            {
-              "valueInteger": 45
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "linkId": "2",
-      "text": "Medical History",
-      "answer": [
-        {
-          "item": [
-            {
-              "linkId": "2.1",
-              "text": "Conditions",
-              "answer": [
+            "linkId": "1",
+            "text": "Demographics",
+            "item": [
                 {
-                  "item": [
-                    {
-                      "linkId": "2.1.1",
-                      "text": "Diabetes Type",
-                      "answer": [
+                    "linkId": "1.1",
+                    "text": "Age",
+                    "answer": [
                         {
-                          "valueString": "Type 2"
+                            "valueInteger": 45
                         }
-                      ]
-                    }
-                  ]
+                    ]
                 }
-              ]
-            }
-          ]
+            ]
+        },
+        {
+            "linkId": "2",
+            "text": "Medical History",
+            "answer": [
+                {
+                    "item": [
+                        {
+                            "linkId": "2.1",
+                            "text": "Conditions",
+                            "answer": [
+                                {
+                                    "item": [
+                                        {
+                                            "linkId": "2.1.1",
+                                            "text": "Diabetes Type",
+                                            "answer": [
+                                                {
+                                                    "valueString": "Type 2"
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
         }
-      ]
-    }
-  ]
+    ]
 }
 ```
 
@@ -256,37 +256,35 @@ Using the repeat directive:
 
 ```json
 {
-  "resource": "QuestionnaireResponse",
-  "select": [
-    {
-      "repeat": [
-        "item",
-        "answer.item"
-      ],
-      "column": [
+    "resource": "QuestionnaireResponse",
+    "select": [
         {
-          "path": "linkId",
-          "name": "item_id"
-        },
-        {
-          "path": "text",
-          "name": "question_text"
+            "repeat": ["item", "answer.item"],
+            "column": [
+                {
+                    "path": "linkId",
+                    "name": "item_id"
+                },
+                {
+                    "path": "text",
+                    "name": "question_text"
+                }
+            ]
         }
-      ]
-    }
-  ]
+    ]
 }
 ```
 
 This would produce a flat table with all items regardless of nesting depth:
 
 | item_id | question_text   |
-|---------|-----------------|
+| ------- | --------------- |
 | 1       | Demographics    |
 | 1.1     | Age             |
 | 2       | Medical History |
 | 2.1     | Conditions      |
 | 2.1.1   | Diabetes Type   |
+
 {:.table-data}
 
 ## Unions
@@ -559,6 +557,203 @@ This is an example of a constant used in the `where` constraint of a view:
 }
 ```
 
+## Environment Variables
+
+In addition to user-defined constants, SQL on FHIR provides built-in environment
+variables that can be referenced in [FHIRPath](https://hl7.org/fhirpath/)
+expressions using the `%name` syntax.
+
+### %rowIndex
+
+The `%rowIndex` environment variable returns the 0-based index of the current
+element within the collection being iterated. This is useful for:
+
+- **Preserving ordering semantics**: SQL result sets are unordered by default;
+  including the original index allows users to restore FHIR ordering.
+- **Disambiguation**: When a resource has multiple repeating elements (e.g.,
+  multiple names), knowing which is the first, second, etc. can be
+  semantically important.
+- **Surrogate keys**: Combining the resource ID with the element index creates
+  a unique identifier for each row.
+
+#### Behaviour
+
+- Within `forEach`, `forEachOrNull`, and `repeat` contexts, `%rowIndex`
+  returns the position of the current element in the collection (starting
+  from 0).
+- At the top level (no iteration context), `%rowIndex` evaluates to `0`.
+- Each nesting level has its own independent `%rowIndex` value. For nested
+  iterations, users can capture the parent-level index in a column before
+  entering the child iteration.
+- `unionAll` does not create a new `%rowIndex` scope. Within a `unionAll`,
+  each branch inherits `%rowIndex` from the enclosing context unless the
+  branch contains its own iteration expression (`forEach`, `forEachOrNull`,
+  or `repeat`).
+- Each branch of a `unionAll` that contains an iteration expression
+  establishes its own independent `%rowIndex` sequence, starting from 0.
+- The type of `%rowIndex` is `integer`.
+
+#### Example: Capturing element position
+
+```json
+{
+    "resource": "Patient",
+    "select": [
+        {
+            "column": [{ "name": "id", "path": "id", "type": "id" }]
+        },
+        {
+            "forEach": "name",
+            "column": [
+                {
+                    "name": "name_index",
+                    "path": "%rowIndex",
+                    "type": "integer"
+                },
+                { "name": "family", "path": "family", "type": "string" }
+            ]
+        }
+    ]
+}
+```
+
+For a Patient with two names, this would produce:
+
+| id  | name_index | family |
+| --- | ---------- | ------ |
+| pt1 | 0          | Smith  |
+| pt1 | 1          | Jones  |
+
+{:.table-data}
+
+#### Example: Nested iteration with independent indices
+
+```json
+{
+    "resource": "Patient",
+    "select": [
+        {
+            "column": [{ "name": "id", "path": "id", "type": "id" }]
+        },
+        {
+            "forEach": "contact",
+            "column": [
+                {
+                    "name": "contact_index",
+                    "path": "%rowIndex",
+                    "type": "integer"
+                }
+            ],
+            "select": [
+                {
+                    "forEach": "telecom",
+                    "column": [
+                        {
+                            "name": "telecom_index",
+                            "path": "%rowIndex",
+                            "type": "integer"
+                        },
+                        { "name": "system", "path": "system", "type": "code" }
+                    ]
+                }
+            ]
+        }
+    ]
+}
+```
+
+For a Patient with two contacts, where the first contact has two telecom entries
+(phone and email) and the second contact has one telecom entry (phone), this
+would produce:
+
+| id  | contact_index | telecom_index | system |
+| --- | ------------- | ------------- | ------ |
+| pt1 | 0             | 0             | phone  |
+| pt1 | 0             | 1             | email  |
+| pt1 | 1             | 0             | phone  |
+
+{:.table-data}
+
+In this example, `contact_index` captures the position in the outer `contact`
+collection, while `telecom_index` captures the position in the inner `telecom`
+collection. Each iteration level maintains its own independent index.
+
+#### Example: Row index with unionAll
+
+When `unionAll` appears inside an iteration, branches with their own `forEach`
+get an independent `%rowIndex` sequence, while branches without iteration
+inherit `%rowIndex` from the enclosing context.
+
+```json
+{
+    "resource": "Patient",
+    "select": [
+        {
+            "column": [{ "name": "id", "path": "id", "type": "id" }]
+        },
+        {
+            "forEach": "name",
+            "column": [
+                { "name": "name_index", "path": "%rowIndex", "type": "integer" }
+            ],
+            "select": [
+                {
+                    "unionAll": [
+                        {
+                            "forEach": "given",
+                            "column": [
+                                {
+                                    "name": "given_index",
+                                    "path": "%rowIndex",
+                                    "type": "integer"
+                                },
+                                {
+                                    "name": "value",
+                                    "path": "$this",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        {
+                            "column": [
+                                {
+                                    "name": "given_index",
+                                    "path": "%rowIndex",
+                                    "type": "integer"
+                                },
+                                {
+                                    "name": "value",
+                                    "path": "family",
+                                    "type": "string"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
+```
+
+For a Patient with two names &mdash; Smith (given: John, James) and Jones
+(given: Jane) &mdash; this produces:
+
+| id  | name_index | given_index | value |
+| --- | ---------- | ----------- | ----- |
+| pt1 | 0          | 0           | John  |
+| pt1 | 0          | 1           | James |
+| pt1 | 0          | 0           | Smith |
+| pt1 | 1          | 0           | Jane  |
+| pt1 | 1          | 1           | Jones |
+
+{:.table-data}
+
+In the first branch, `forEach: "given"` creates its own `%rowIndex` sequence
+(0, 1 for John and James under Smith; 0 for Jane under Jones). In the second
+branch, there is no iteration expression, so `%rowIndex` inherits from the
+enclosing `forEach: "name"` context (0 for Smith, 1 for Jones).
+
 ## Joins with Resource and Reference Keys
 
 While ViewDefinitions do not directly implement joins across resources, the
@@ -719,7 +914,7 @@ each of these types to the closest equivalent in their output format.
 #### FHIR Type to SQL Type Mapping
 
 | FHIR type    | ISO/IEC 9075 SQL type    |
-|--------------|--------------------------|
+| ------------ | ------------------------ |
 | base64Binary | BINARY                   |
 | boolean      | BOOLEAN                  |
 | canonical    | CHARACTER VARYING        |
@@ -740,12 +935,13 @@ each of these types to the closest equivalent in their output format.
 | uri          | CHARACTER VARYING        |
 | url          | CHARACTER VARYING        |
 | uuid         | CHARACTER VARYING        |
+
 {:.table-data}
 
 #### FHIRPath Type to SQL Type Mapping
 
 | FHIRPath type | ISO/IEC 9075 SQL type |
-|---------------|-----------------------|
+| ------------- | --------------------- |
 | Boolean       | BOOLEAN               |
 | String        | CHARACTER VARYING     |
 | Integer       | INT                   |
@@ -753,10 +949,11 @@ each of these types to the closest equivalent in their output format.
 | Date          | CHARACTER VARYING     |
 | Time          | CHARACTER VARYING     |
 | DateTime      | CHARACTER VARYING     |
+
 {:.table-data}
 
 Where the representation is `CHARACTER VARYING`, the format MUST comply with
-the string representation of that type within the 
+the string representation of that type within the
 [FHIR spec](https://www.hl7.org/fhir/R4/datatypes.html#primitive).
 
 Where a path has both a FHIR type and a FHIRPath type, the FHIR type mapping
@@ -821,7 +1018,7 @@ model produces.
 
 **Inputs**
 
--   `V`: a `ViewDefinition` to validate
+- `V`: a `ViewDefinition` to validate
 
 1. Call `ValidateColumns(V, C)` according to the recursive step below.
 
@@ -831,33 +1028,30 @@ model produces.
 
 **Inputs**
 
--   `S`: a single Selection Structure
--   `C`: a list of Columns that exist prior to this call
+- `S`: a single Selection Structure
+- `C`: a list of Columns that exist prior to this call
 
 **Outputs**
 
--   `Ret`: a list of Columns
+- `Ret`: a list of Columns
 
 **Errors**
 
--   Column Already Defined
--   Union Branches Inconsistent
+- Column Already Defined
+- Union Branches Inconsistent
 
 0. Initialize `Ret` to equal `C`
 
 1. For each Column `col` in `S.column[]`
-
     - If a Column with name `col.name` already exists in `Ret`, throw "Column Already Defined"
     - Otherwise, append `col` to `Ret`
 
 2. For each Selection Structure `sel` in `S.select[]`
-
     - For each Column `c` in `Validate(sel, Ret)`
         - If a Column with name `c.name` already exists in `Ret`, throw "Column Already Defined"
         - Otherwise, append `c` to the end of `Ret`
 
 3. If `S.unionAll[]` is present
-
     1. Define `u0` as `Validate(S.unionAll[0], Ret)`
     2. For each Selection Structure `sel` in `S.unionAll[]`
         - Define `u` as `ValidateColumns(sel, Ret)`
@@ -875,8 +1069,8 @@ Resource, by setting up a recursive call.
 
 **Inputs**
 
--   `V`: a `ViewDefinition`
--   `R`: a FHIR Resource to process with `V`
+- `V`: a `ViewDefinition`
+- `R`: a FHIR Resource to process with `V`
 
 **Emits:** one output row at a time
 
@@ -890,7 +1084,9 @@ Resource, by setting up a recursive call.
         - If `R` is not a candidate for `V`, return immediately without emitting
           any rows
         - Otherwise, continue
-3. Emit all rows from `Process(S, V)`
+3. Initialise `%rowIndex` to `0` (the top-level row index)
+4. Emit all rows from `Process(S, V)` with `%rowIndex` available in the
+   evaluation context
 
 ### `Process(S, N)` (recursive step)
 
@@ -899,8 +1095,8 @@ We first generate sets of "partial rows" (i.e., sets of incomplete column
 bindings from the various clauses of `V`) and combine them to emit complete
 rows. For example, if there are two sets of partial rows:
 
--   `[{"a": 1},{"a": 2}]` with bindings for the variable `a`
--   `[{"b": 3},{"b": 4}]` with bindings for the variable `b`
+- `[{"a": 1},{"a": 2}]` with bindings for the variable `a`
+- `[{"b": 3},{"b": 4}]` with bindings for the variable `b`
 
 Then the Cartesian product of these sets consists of four complete rows:
 
@@ -915,18 +1111,17 @@ Then the Cartesian product of these sets consists of four complete rows:
 
 **Inputs**
 
--   `S`: a Selection Structure
--   `N`: a Node (element) from a FHIR resource
+- `S`: a Selection Structure
+- `N`: a Node (element) from a FHIR resource
 
 **Errors**
 
--   Multiple values found but not expected for column
+- Multiple values found but not expected for column
 
 **Emits:** One output row at a time
 
 1. Define a list of Nodes `foci` as
-
-    - If `S.repeat` is defined: 
+    - If `S.repeat` is defined:
         1. Initialize an empty list `result`
         2. Define a recursive function `traverse(node, isRoot)`:
             - If not `isRoot`, add `node` to `result`
@@ -940,15 +1135,13 @@ Then the Cartesian product of these sets consists of four complete rows:
     - Else if `S.forEachOrNull` is defined: `fhirpath(S.forEachOrNull, N)`
     - Otherwise: `[N]` (a list with just the input node)
 
-2. For each element `f` of `foci`
-
+2. For each element `f` of `foci` (with 0-based index `i`) 0. Set `%rowIndex` to `i` for this iteration level (each nesting level has
+   its own independent `%rowIndex` value)
     1. Initialize an empty list `parts` (each element of `parts` will be a list
        of partial rows)
     2. Process Columns:
-
         - For each Column `col` of `S.column`, define `val`
           as `fhirpath(col.path, f)`
-
             1. Define `b` as a row whose column named `col.name` takes the value
                 - If `val` was the empty set: `null`
                 - Else if `val` has a single element `e`: `e`
@@ -956,29 +1149,23 @@ Then the Cartesian product of these sets consists of four complete rows:
                 - Else: throw "Multiple values found but not expected for
                   column"
             2. Append `[b]` to `parts`
-
             - (Note: append a list so the final element of `parts` is now a list
               containing the single row `b`).
 
     3. Process Selects:
-
         - For each selection structure `sel` of `S.select`
-
             1. Define `rows` as the collection of all rows emitted
                by `Process(sel, f)`
             2. Append `rows` to `parts`
-
             - (Note: do not append the elements but the whole list, so the final
               element of `parts` is now the list `rows`)
 
     4. Process UnionAlls:
-
         1. Initialize `urows` as an empty list of rows
         2. For each selection structure `u` of `S.unionAll`
             - For each row `r` in `Process(u, f)`
                 - Append `r` to `urows`
         3. Append `urows` to `parts`
-
         - (Note: do not append the elements but the whole list, so the final
           element of `parts` is now the list `urows`)
 
@@ -996,10 +1183,12 @@ Then the Cartesian product of these sets consists of four complete rows:
 
 3. If `foci` is an empty list and `S.forEachOrNull` is defined (Note: when this
    condition is met, no rows have been emitted so far)
-    1. Initialize a blank row `r`
-    2. For each Column `c` in `ValidateColumns(V, [])`
-        - Bind the column `c.name` to `null` in the row `r`
-    3. Emit the row `r`
+    1. Set `%rowIndex` to `0` for this empty collection case
+    2. Initialize a blank row `r`
+    3. For each Column `c` in `ValidateColumns(V, [])`
+        - Bind the column `c.name` to `null` in the row `r` (except for columns
+          with path `%rowIndex`, which should be bound to `0`)
+    4. Emit the row `r`
 
 ## Functional Model
 

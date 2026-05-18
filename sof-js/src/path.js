@@ -72,8 +72,21 @@ function process_constants(constants) {
   }, {})
 }
 
-export function fhirpath_evaluate(data, path, constants = []) {
-  return fhirpath.evaluate(data, rewrite_path(path), process_constants(constants), null, fhirpath_options)
+/**
+ * Evaluates a FHIRPath expression against data with support for constants and
+ * environment variables.
+ *
+ * @param {object} data - The FHIR data to evaluate against.
+ * @param {string} path - The FHIRPath expression to evaluate.
+ * @param {Array} constants - Array of constant definitions from the ViewDefinition.
+ * @param {object} envVars - Additional environment variables (e.g., { rowIndex: 0 }).
+ * @returns {Array} The result of the FHIRPath evaluation.
+ */
+export function fhirpath_evaluate(data, path, constants = [], envVars = {}) {
+  const context = process_constants(constants)
+  // Merge environment variables into context.
+  Object.assign(context, envVars)
+  return fhirpath.evaluate(data, rewrite_path(path), context, null, fhirpath_options)
 }
 
 export function fhirpath_validate(path) {
