@@ -418,15 +418,25 @@ Description: "Execute a SQLQuery Library against ViewDefinition tables."
 * parameter[5].type = #string
 * parameter[5].documentation = "External data source containing the ViewDefinition tables."
 
-// Output parameter
-* parameter[6].name = #return
-* parameter[6].use = #out
-* parameter[6].min = 1
+* parameter[6].name = #_limit
+* parameter[6].use = #in
+* parameter[6].min = 0
 * parameter[6].max = "1"
-* parameter[6].type = #Resource
-* parameter[6].extension[$allowedType][0].valueUri = "Binary"
-* parameter[6].extension[$allowedType][+].valueUri = "Parameters"
-* parameter[6].documentation = "Query results. Returns Binary for flat formats (csv, json, ndjson, parquet) or Parameters for _format=fhir."
+* parameter[6].scope[0] = #system
+* parameter[6].scope[1] = #type
+* parameter[6].scope[2] = #instance
+* parameter[6].type = #integer
+* parameter[6].documentation = "Maximum number of rows to return."
+
+// Output parameter
+* parameter[7].name = #return
+* parameter[7].use = #out
+* parameter[7].min = 1
+* parameter[7].max = "1"
+* parameter[7].type = #Resource
+* parameter[7].extension[$allowedType][0].valueUri = "Binary"
+* parameter[7].extension[$allowedType][+].valueUri = "Parameters"
+* parameter[7].documentation = "Query results. Returns Binary for flat formats (csv, json, ndjson, parquet) or Parameters for _format=fhir."
 
 Instance: SQLQueryExport
 Usage: #definition

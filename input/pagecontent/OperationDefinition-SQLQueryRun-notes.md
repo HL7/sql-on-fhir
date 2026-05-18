@@ -1,3 +1,47 @@
+### Input Parameters
+
+The operation is invoked with POST. The following input parameters are passed
+inside a `Parameters` resource in the request body.
+
+| Name           | Type       | Scope                  | Required     | Max | Description                                                                       |
+| -------------- | ---------- | ---------------------- | ------------ | --- | --------------------------------------------------------------------------------- |
+| \_format       | code       | system, type, instance | Yes          | 1   | Output format: `json`, `ndjson`, `csv`, `parquet`, `fhir`                         |
+| header         | boolean    | system, type, instance | No           | 1   | Include CSV headers (default: true). Only applies to `csv` format                 |
+| queryReference | Reference  | system, type           | Conditional¹ | 1   | Reference to a SQLQuery Library stored on the server                              |
+| queryResource  | Resource   | system, type           | Conditional¹ | 1   | Inline SQLQuery Library resource to execute                                       |
+| parameters     | Parameters | system, type, instance | No           | 1   | Input parameters bound by name to parameters declared in the SQLQuery Library     |
+| source         | string     | system, type, instance | No           | 1   | External data source containing the ViewDefinition tables (e.g. URI, bucket name) |
+| \_limit        | integer    | system, type, instance | No           | 1   | Maximum number of rows to return                                                  |
+
+{:.table-data}
+
+¹ Either `queryReference` or `queryResource` is required at the system and type
+levels; neither is allowed at the instance level (the Library is identified by
+the path).
+
+#### Output Parameter
+
+| Name   | Type     | Description                                                                                          |
+| ------ | -------- | ---------------------------------------------------------------------------------------------------- |
+| return | Resource | Query results. Returns Binary for flat formats (csv, json, ndjson, parquet) or Parameters for `fhir` |
+
+{:.table-data}
+
+#### Row Limit
+
+When supplied, `_limit` is the maximum number of rows the server returns to the
+client.
+
+Servers MAY enforce a maximum value, silently capping client-supplied limits at
+a smaller server-defined maximum. The cap is applied to the final result set
+after the SQL query (including any in-query `LIMIT`) has been evaluated;
+implementations are free to push the limit down into the query as an
+optimisation, but the observable behaviour is post-evaluation.
+
+Returning fewer rows than the client requested - whether because the query
+yielded fewer rows or because the server applied its own cap - is not treated
+as an error.
+
 ### Examples
 
 #### Instance-Level (Library on Server)
@@ -101,6 +145,25 @@ Content-Type: application/fhir+json
       { "name": "name", "valueString": "patient_id" },
       { "name": "value", "valueString": "Patient/123" }
     ]}
+  ]
+}
+```
+
+#### Capping Result Rows with `_limit`
+
+Use `_limit` to ask the server to return at most a given number of rows. The
+server may return fewer rows if the query yields fewer or if its configured
+maximum is smaller; see [Row Limit](#row-limit) for the full semantics.
+
+```http
+POST /Library/patient-bp-query/$sqlquery-run HTTP/1.1
+Content-Type: application/fhir+json
+
+{
+  "resourceType": "Parameters",
+  "parameter": [
+    { "name": "_format", "valueCode": "csv" },
+    { "name": "_limit", "valueInteger": 100 }
   ]
 }
 ```
