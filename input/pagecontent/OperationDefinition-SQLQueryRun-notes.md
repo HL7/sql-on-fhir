@@ -145,25 +145,19 @@ Response:
 
 ```json
 {
-    "resourceType": "Parameters",
-    "parameter": [
-        {
-            "name": "row",
-            "part": [
-                { "name": "patient_id", "valueString": "Patient/123" },
-                { "name": "systolic", "valueInteger": 120 },
-                { "name": "effective_date", "valueDate": "2024-01-15" }
-            ]
-        },
-        {
-            "name": "row",
-            "part": [
-                { "name": "patient_id", "valueString": "Patient/123" },
-                { "name": "systolic", "valueInteger": 118 },
-                { "name": "effective_date", "valueDate": "2024-02-20" }
-            ]
-        }
-    ]
+  "resourceType": "Parameters",
+  "parameter": [
+    { "name": "row", "part": [
+      { "name": "patient_id", "valueString": "Patient/123" },
+      { "name": "systolic", "valueInteger": 120 },
+      { "name": "effective_date", "valueDate": "2024-01-15" }
+    ]},
+    { "name": "row", "part": [
+      { "name": "patient_id", "valueString": "Patient/123" },
+      { "name": "systolic", "valueInteger": 118 },
+      { "name": "effective_date", "valueDate": "2024-02-20" }
+    ]}
+  ]
 }
 ```
 
@@ -172,7 +166,7 @@ When a query returns zero rows, the response is a Parameters resource with no
 
 ```json
 {
-    "resourceType": "Parameters"
+  "resourceType": "Parameters"
 }
 ```
 
@@ -184,7 +178,7 @@ type. The following table defines the mapping from
 parameter value types.
 
 | ISO/IEC 9075 SQL type                                | FHIR value type     |
-| ---------------------------------------------------- | ------------------- |
+|------------------------------------------------------|---------------------|
 | BOOLEAN                                              | `valueBoolean`      |
 | TINYINT, SMALLINT, INT, INTEGER                      | `valueInteger`      |
 | BIGINT                                               | `valueInteger64`    |
@@ -197,7 +191,6 @@ parameter value types.
 | TIME, TIME WITH TIME ZONE                            | `valueTime`         |
 | TIMESTAMP                                            | `valueDateTime`     |
 | TIMESTAMP WITH TIME ZONE                             | `valueInstant`      |
-
 {:.table-data}
 
 SQL NULL values are represented by omitting the corresponding part from the row
@@ -225,17 +218,26 @@ type within the SQL query.
 
 ### Parameter Passing
 
-Query parameters are passed as a nested `Parameters` resource, following the
-same pattern as the
-[CQL `$evaluate` operation](https://build.fhir.org/ig/HL7/cql-ig/en/OperationDefinition-cql-library-evaluate.html).
-See [Parameter Types](StructureDefinition-SQLQuery.html#parameter-types) on the
-SQLQuery profile for the binding rules and the mapping from
-`Library.parameter.type` to the `value[x]` element to use.
+Query parameters are passed as a nested `Parameters` resource, following the same
+pattern as the [CQL `$evaluate` operation](https://build.fhir.org/ig/HL7/cql-ig/en/OperationDefinition-cql-library-evaluate.html).
+Each parameter in the `Parameters` resource is bound by name to a parameter declared
+in the SQLQuery Library (`Library.parameter`).
+
+Use the appropriate `value[x]` type matching the Library's declared parameter type:
+
+| Library.parameter.type | Parameters.parameter value |
+|------------------------|----------------------------|
+| `string` | `valueString` |
+| `integer` | `valueInteger` |
+| `date` | `valueDate` |
+| `dateTime` | `valueDateTime` |
+| `boolean` | `valueBoolean` |
+| `decimal` | `valueDecimal` |
 
 ### Error Handling
 
-| Status                     | Condition                                                                                                                     |
-| -------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| `400 Bad Request`          | Missing required parameter, unknown parameter name, or value type mismatch                                                    |
-| `404 Not Found`            | Library or ViewDefinition not found                                                                                           |
+| Status | Condition |
+|--------|-----------|
+| `400 Bad Request` | Missing required parameter, unknown parameter name, or value type mismatch |
+| `404 Not Found` | Library or ViewDefinition not found |
 | `422 Unprocessable Entity` | SQL execution error, or unsupported SQL column type when using `_format=fhir` (see [type mapping](#sql-to-fhir-type-mapping)) |

@@ -1,0 +1,161 @@
+{
+    "resourceType": "OperationDefinition",
+    "url": "http://sql-on-fhir.org/OperationDefinition/$viewdefinition-export",
+    "version": "0.0.1",
+    "id": "$viewdefinition-export",
+    "name": "$viewdefinition-export",
+    "status": "active",
+    "kind": "operation",
+    "code": "viewdefinition-export",
+    "system": false,
+    "type": true,
+    "instance": true,
+    "resource": [ "ViewDefinition" ],
+    "description": "Export a view definition. User can provide viewdefintion references adn/or resources as part of the input parameters.",
+    "parameter": [
+        {
+            "name": "clientId",
+            "use": "in",
+            "min": 0,
+            "max": "1",
+            "type": "string",
+            "documentation": "The Client ID of the export. Optional, but if server supports it, it can be used to track the export."
+        },
+        {
+            "name": "viewReference",
+            "use": "in",
+            "min": 0,
+            "max": "*",
+            "scope": ["type"],
+            "type": "Reference",
+            "documentation": "The reference to the view definition on the server"
+        },
+        {
+            "name": "viewResource",
+            "use": "in",
+            "min": 0,
+            "max": "*",
+            "scope": ["type"],
+            "type": "ViewDefinition",
+            "documentation": "The view definition to export"
+        },
+        { 
+            "name": "view",
+            "min": 0,
+            "max": "*",
+            "scope": ["type"],
+            "type": "complex",
+            "documentation": "The view definition to export",
+            "part": [
+                {
+                    "name": "reference",
+                    "use": "in",
+                    "min": 0,
+                     "max": "1",
+                    "type": "Reference",
+                    "documentation": "The reference to the view definition on the server"
+                },
+                {
+                    "name": "resource",
+                    "use": "in",
+                    "min": 0,
+                     "max": "1",
+                    "type": "Resource",
+                    "documentation": "The view definition resource to export"
+                },
+                {
+                    "name": "format",
+                    "use": "in",
+                    "min": 0,
+                    "max": "1",
+                    "type": "code"
+                }
+            ]
+        },
+        {
+            "name": "_format",
+            "use": "in",
+            "min": 1,
+            "max": "1",
+            "type": "code",
+            "scope": ["type"],
+            "binding": {
+                "strength": "extensible",
+                "valueSet": "http://sql-on-fhir.org/ValueSet/output-format"
+            },
+            "documentation": "The format of the output, could be csv, parquet, json, etc."
+        },
+        { 
+            "name": "clientId",
+            "use": "out",
+            "min": 0,
+            "max": "1",
+            "type": "string",
+            "documentation": "If server supports and client provided clientId, it will be returned in the response"
+        },
+        { 
+            "name": "exportId",
+            "use": "out",
+            "min": 0,
+            "max": "1",
+            "type": "string",
+            "documentation": "The ID of the export"
+        },
+        {
+            "name": "location",
+            "use": "out",
+            "min": 1,
+            "max": "1",
+            "type": "uri",
+            "documentation": "The URL to poll for the status of the export"
+        },
+        {
+            "name": "status",
+            "use": "out",
+            "min": 1,
+            "max": "1",
+            "type": "code",
+            "binding": {
+                "strength": "required",
+                "valueSet": "http://sql-on-fhir.org/ValueSet/export-status"
+            },
+            "documentation": "The status of the export, could be accepted, in-progress, completed, cancelled, failed"
+        },
+        {
+            "name": "output",
+            "use": "out",
+            "min": 0,
+            "max": "*",
+            "part": [
+                {
+                    "name": "name",
+                    "use": "out",
+                    "min": 1,
+                    "max": "1",
+                    "type": "string",
+                    "documentation": "The name of ViewDefinition"
+                },
+                {
+                    "name": "location",
+                    "use": "out",
+                    "min": 1,
+                    "max": "1",
+                    "type": "uri",
+                    "documentation": "The URL to poll the results of export"
+                },
+                {
+                    "name": "format",
+                    "use": "out",
+                    "min": 1,
+                    "max": "1",
+                    "type": "code",
+                    "binding": {
+                        "strength": "extensible",
+                        "valueSet": "http://sql-on-fhir.org/ValueSet/output-format"
+                    },
+                    "documentation": "The format of the output, could be csv, parquet, json, etc."
+                }
+            ]
+        }
+    ]
+}

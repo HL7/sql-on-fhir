@@ -4,48 +4,42 @@ A minimal SQLQuery Library:
 
 ```json
 {
-    "resourceType": "Library",
-    "meta": {
-        "profile": ["https://sql-on-fhir.org/ig/StructureDefinition/SQLQuery"]
+  "resourceType": "Library",
+  "meta": {
+    "profile": ["https://sql-on-fhir.org/ig/StructureDefinition/SQLQuery"]
+  },
+  "type": {
+    "coding": [{
+      "system": "https://sql-on-fhir.org/ig/CodeSystem/LibraryTypesCodes",
+      "code": "sql-query"
+    }]
+  },
+  "name": "PatientBloodPressure",
+  "status": "active",
+  "relatedArtifact": [
+    {
+      "type": "depends-on",
+      "resource": "https://example.org/ViewDefinition/patient_view",
+      "label": "patient"
     },
-    "type": {
-        "coding": [
-            {
-                "system": "https://sql-on-fhir.org/ig/CodeSystem/LibraryTypesCodes",
-                "code": "sql-query"
-            }
-        ]
-    },
-    "name": "PatientBloodPressure",
-    "status": "active",
-    "relatedArtifact": [
-        {
-            "type": "depends-on",
-            "resource": "https://example.org/ViewDefinition/patient_view",
-            "label": "patient"
-        },
-        {
-            "type": "depends-on",
-            "resource": "https://example.org/ViewDefinition/bp_view",
-            "label": "bp"
-        }
-    ],
-    "parameter": [
-        { "name": "patient_id", "type": "string", "use": "in" },
-        { "name": "from_date", "type": "date", "use": "in" }
-    ],
-    "content": [
-        {
-            "contentType": "application/sql",
-            "extension": [
-                {
-                    "url": "https://sql-on-fhir.org/ig/StructureDefinition/sql-text",
-                    "valueString": "SELECT patient.id, bp.systolic FROM ..."
-                }
-            ],
-            "data": "U0VMRUNUIHBhdGllbnQu..."
-        }
-    ]
+    {
+      "type": "depends-on",
+      "resource": "https://example.org/ViewDefinition/bp_view",
+      "label": "bp"
+    }
+  ],
+  "parameter": [
+    { "name": "patient_id", "type": "string", "use": "in" },
+    { "name": "from_date", "type": "date", "use": "in" }
+  ],
+  "content": [{
+    "contentType": "application/sql",
+    "extension": [{
+      "url": "https://sql-on-fhir.org/ig/StructureDefinition/sql-text",
+      "valueString": "SELECT patient.id, bp.systolic FROM ..."
+    }],
+    "data": "U0VMRUNUIHBhdGllbnQu..."
+  }]
 }
 ```
 
@@ -58,26 +52,6 @@ JOIN bp ON patient.id = bp.patient_id
 WHERE patient.id = :patient_id
   AND bp.effective_date >= :from_date
 ```
-
-### Parameter Types
-
-Each `Library.parameter` declares a `type` that callers must honour when
-supplying values. When parameters are passed at invocation time via a
-`Parameters` resource (for example to [`$sqlquery-run`](OperationDefinition-SQLQueryRun.html)
-or [`$sqlquery-export`](OperationDefinition-SQLQueryExport.html)), each entry
-is bound by name to the matching `Library.parameter`, and the appropriate
-`value[x]` element must be used for the declared type:
-
-| Library.parameter.type | Parameters.parameter value |
-| ---------------------- | -------------------------- |
-| `string`               | `valueString`              |
-| `integer`              | `valueInteger`             |
-| `date`                 | `valueDate`                |
-| `dateTime`             | `valueDateTime`            |
-| `boolean`              | `valueBoolean`             |
-| `decimal`              | `valueDecimal`             |
-
-{:.table-data}
 
 ### SQL Annotations
 
@@ -107,17 +81,17 @@ WHERE patient.id = :patient_id AND bp.effective_date >= :from_date
 
 Annotation reference:
 
-| Annotation           | FHIR Mapping          | Format                                            |
-| -------------------- | --------------------- | ------------------------------------------------- |
-| `@name`              | `Library.name`        | `@name: identifier`                               |
-| `@title`             | `Library.title`       | `@title: Human Title`                             |
-| `@description`       | `Library.description` | `@description: text`                              |
-| `@version`           | `Library.version`     | `@version: semver`                                |
-| `@status`            | `Library.status`      | `@status: draft\|active\|retired`                 |
-| `@author`            | `Library.author.name` | `@author: Name` (repeatable)                      |
-| `@publisher`         | `Library.publisher`   | `@publisher: Org`                                 |
-| `@param`             | `Library.parameter`   | `@param: name type [description]` (repeatable)    |
-| `@relatedDependency` | `relatedArtifact`     | `@relatedDependency: URL [as label]` (repeatable) |
+| Annotation | FHIR Mapping | Format |
+|------------|--------------|--------|
+| `@name` | `Library.name` | `@name: identifier` |
+| `@title` | `Library.title` | `@title: Human Title` |
+| `@description` | `Library.description` | `@description: text` |
+| `@version` | `Library.version` | `@version: semver` |
+| `@status` | `Library.status` | `@status: draft\|active\|retired` |
+| `@author` | `Library.author.name` | `@author: Name` (repeatable) |
+| `@publisher` | `Library.publisher` | `@publisher: Org` |
+| `@param` | `Library.parameter` | `@param: name type [description]` (repeatable) |
+| `@relatedDependency` | `relatedArtifact` | `@relatedDependency: URL [as label]` (repeatable) |
 
 ### Tooling
 
