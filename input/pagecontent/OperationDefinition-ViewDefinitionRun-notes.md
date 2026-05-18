@@ -1,38 +1,38 @@
 #### HTTP Methods
 
-* **GET**: For simple invocations without request body
-* **POST**: Required when providing ViewDefinition resource or resources to transform
+- **GET**: For simple invocations without request body
+- **POST**: Required when providing ViewDefinition resource or resources to transform
 
 #### GET Method Limitations
 
 When using the GET method, the following limitations apply:
 
 1. **No Request Body Parameters**: GET requests cannot include parameters that require a request body:
-   - Cannot provide `viewResource` parameter (inline ViewDefinition)
-   - Cannot provide `resource` parameter (direct resources to transform)
-   
+    - Cannot provide `viewResource` parameter (inline ViewDefinition)
+    - Cannot provide `resource` parameter (direct resources to transform)
 2. **Available Parameters**: Only parameters that can be passed as query parameters are supported:
-   - `_format` - Output format specification
-   - `header` - Include CSV headers (for CSV format)
-   - `patient` - Filter by patient reference
-   - `group` - Filter by group membership
-   - `_since` - Filter by last updated time
-   - `_limit` - Limit number of result rows
-   - `source` - External data source
+    - `_format` - Output format specification
+    - `header` - Include CSV headers (for CSV format)
+    - `patient` - Filter by patient reference
+    - `group` - Filter by group membership
+    - `_since` - Filter by last updated time
+    - `_limit` - Limit number of result rows
+    - `source` - External data source
 
 3. **Use Cases**: GET is suitable for:
-   - Instance-level invocations where the ViewDefinition is identified by the URL path
-   - Simple filtering and formatting of server data
-   - Quick queries without complex configuration
+    - Instance-level invocations where the ViewDefinition is identified by the URL path
+    - Simple filtering and formatting of server data
+    - Quick queries without complex configuration
 
 4. **When POST is Required**: Use POST instead of GET when you need to:
-   - Provide an inline ViewDefinition via `viewResource` parameter
-   - Supply resources directly via `resource` parameter for transformation
-   - Pass complex parameter values that cannot be represented as query strings
+    - Provide an inline ViewDefinition via `viewResource` parameter
+    - Supply resources directly via `resource` parameter for transformation
+    - Pass complex parameter values that cannot be represented as query strings
 
 #### Data Sources
 
 The operation can process data from:
+
 1. **Direct resources** - Provided via `resource` parameter in the request
 2. **Server resources** - From the server's data store (default)
 3. **External source** - Specified via `source` parameter
@@ -47,6 +47,7 @@ The response format is determined by (in order of precedence):
 - **`Accept` header**: Use standard MIME types (`application/json`, `application/x-ndjson`, `text/csv`, `application/octet-stream`)
 
 Examples:
+
 - `_format=json` or `Accept: application/json`
 - `_format=ndjson` or `Accept: application/x-ndjson`
 - `_format=csv` or `Accept: text/csv`
@@ -55,17 +56,18 @@ Examples:
 #### Filtering
 
 Optional filtering parameters:
-* `patient` - Filter by patient reference
-* `group` - Filter by group membership  
-* `_since` - Filter by last updated time
-* `_limit` - Limit number of result rows
+
+- `patient` - Filter by patient reference
+- `group` - Filter by group membership
+- `_since` - Filter by last updated time
+- `_limit` - Limit number of result rows
 
 #### Response Format
 
-* **Success (200 OK)**: Returns data in requested format
-* **Error (4xx/5xx)**: Returns `OperationOutcome` resource
-* **Streaming**: MAY use chunked transfer encoding for large result sets
-* **JSON format**: Returns an array of objects
+- **Success (200 OK)**: Returns data in requested format
+- **Error (4xx/5xx)**: Returns `OperationOutcome` resource
+- **Streaming**: MAY use chunked transfer encoding for large result sets
+- **JSON format**: Returns an array of objects
 
 #### Parameters
 
@@ -74,44 +76,49 @@ Optional filtering parameters:
 ##### Core Parameters
 
 | Name          | Type           | Scope          | Required     | Max | Description                                                                        |
-|---------------|----------------|----------------|--------------|-----|------------------------------------------------------------------------------------|
+| ------------- | -------------- | -------------- | ------------ | --- | ---------------------------------------------------------------------------------- |
 | viewReference | Reference      | type, instance | Conditional¹ | 1   | Reference to ViewDefinition on the server. [Details](#viewreference-clarification) |
 | viewResource  | ViewDefinition | type           | Conditional¹ | 1   | Inline ViewDefinition resource                                                     |
+
 {:.table-data}
 
 ¹ Either viewReference or viewResource is required at type level; neither allowed at instance level
 
 ##### Output Control
 
-| Name    | Type    | Scope          | Required | Max | Description                                                       |
-|---------|---------|----------------|----------|-----|-------------------------------------------------------------------|
-| _format | code    | type, instance | Yes      | 1   | Output format: `json`, `ndjson`, `csv`, `parquet`                 |
-| header  | boolean | type, instance | No       | 1   | Include CSV headers (default: true). Only applies to `csv` format |
+| Name     | Type    | Scope          | Required | Max | Description                                                       |
+| -------- | ------- | -------------- | -------- | --- | ----------------------------------------------------------------- |
+| \_format | code    | type, instance | No       | 1   | Output format: `json`, `ndjson`, `csv`, `parquet`                 |
+| header   | boolean | type, instance | No       | 1   | Include CSV headers (default: true). Only applies to `csv` format |
+
 {:.table-data}
 
 ##### Filtering
 
 | Name    | Type      | Scope          | Required | Max | Description                                                                                |
-|---------|-----------|----------------|----------|-----|--------------------------------------------------------------------------------------------|
+| ------- | --------- | -------------- | -------- | --- | ------------------------------------------------------------------------------------------ |
 | patient | Reference | type, instance | No       | 1   | Filter by patient reference. [Details](#patient-parameter-clarification)                   |
-| group   | Reference | type, instance | No       | *   | Filter by group membership. [Details](#group-parameter-clarification)                      |
-| _since  | instant   | type, instance | No       | 1   | Include only resources modified after this time. [Details](#since-parameter-clarification) |
-| _limit  | integer   | type, instance | No       | 1   | Maximum number of rows to return                                                           |
+| group   | Reference | type, instance | No       | \*  | Filter by group membership. [Details](#group-parameter-clarification)                      |
+| \_since | instant   | type, instance | No       | 1   | Include only resources modified after this time. [Details](#since-parameter-clarification) |
+| \_limit | integer   | type, instance | No       | 1   | Maximum number of rows to return                                                           |
+
 {:.table-data}
 
 ##### Data Source
 
 | Name     | Type     | Scope          | Required | Max | Description                                              |
-|----------|----------|----------------|----------|-----|----------------------------------------------------------|
-| resource | Resource | type, instance | No       | *   | FHIR resources to transform (alternative to server data) |
+| -------- | -------- | -------------- | -------- | --- | -------------------------------------------------------- |
+| resource | Resource | type, instance | No       | \*  | FHIR resources to transform (alternative to server data) |
 | source   | string   | type, instance | No       | 1   | External data source (e.g., URI, bucket name)            |
+
 {:.table-data}
 
 ##### Output Parameter
 
 | Name   | Type   | Description                                  |
-|--------|--------|----------------------------------------------|
+| ------ | ------ | -------------------------------------------- |
 | return | Binary | The transformed data in the requested format |
+
 {:.table-data}
 
 ##### View Reference/Resource Clarification
@@ -120,11 +127,12 @@ Only one of the `viewReference` or `viewResource` parameters can be provided.
 When invoking this operation at the instance level (e.g. ViewDefinition/{id}/$run), the server SHALL automatically infer the `viewReference` parameter from the path parameter.
 
 The `viewReference` parameter MAY be specified using any of the following formats:
-* A relative URL on the server (e.g. "ViewDefinition/123")
-* A canonical URL (e.g. "http://specification.org/fhir/ViewDefinition/123|1.0.0") 
-* An absolute URL (e.g. "http://example.org/fhir/ViewDefinition/123")
 
-Servers MAY choose which reference formats they support. 
+- A relative URL on the server (e.g. "ViewDefinition/123")
+- A canonical URL (e.g. "http://specification.org/fhir/ViewDefinition/123|1.0.0")
+- An absolute URL (e.g. "http://example.org/fhir/ViewDefinition/123")
+
+Servers MAY choose which reference formats they support.
 Servers SHALL document which reference formats they support in their CapabilityStatement.
 
 For servers that want to support all types of references, it is recommended to use the following algorithm:
@@ -139,31 +147,35 @@ For servers that want to support all types of references, it is recommended to u
 It is RECOMMENDED to support 'json', 'ndjson' and 'csv' formats by default.
 Servers may support other formats, but they should be explicitly documented in the CapabilityStatement.
 
+If `_format` is omitted, the server SHALL return the result in `ndjson` format.
+
+Servers MAY honour the HTTP `Accept` header to negotiate an alternative format when `_format` is not supplied. When `_format` is supplied, its value SHALL take precedence over `Accept`.
+
 ##### Patient Parameter Clarification
 
-When provided, the server SHALL NOT return resources 
-in the patient compartments belonging to patients outside of this list. 
+When provided, the server SHALL NOT return resources
+in the patient compartments belonging to patients outside of this list.
 
 If a client requests patients who are not present on the server,
 the server SHOULD return details via a FHIR `OperationOutcome` resource in an error response to the request.
 
 ##### Group Parameter Clarification
 
-When provided, the server SHALL NOT return resources that are not a member of the supplied `Group`. 
+When provided, the server SHALL NOT return resources that are not a member of the supplied `Group`.
 
 If a client requests groups that are not present on the server,
 the server SHOULD return details via a FHIR `OperationOutcome` resource in an error response to the request.
 
 ##### Since Parameter Clarification
 
-Resources will be included in the response if their state has changed after the supplied time 
-(e.g., if Resource.meta.lastUpdated is later than the supplied `_since` time). 
-In the case of a Group level export, the server MAY return additional resources modified prior to the supplied time 
+Resources will be included in the response if their state has changed after the supplied time
+(e.g., if Resource.meta.lastUpdated is later than the supplied `_since` time).
+In the case of a Group level export, the server MAY return additional resources modified prior to the supplied time
 if the resources belong to the patient compartment of a patient added to the Group after the supplied time (this behavior SHOULD be clearly documented by the server).
-For Patient- and Group-level requests, the server MAY return resources that are referenced by the resources being returned 
-regardless of when the referenced resources were last updated. 
-For resources where the server does not maintain a last updated time, 
-the server MAY include these resources in a response irrespective of the `_since` value supplied by a client. 
+For Patient- and Group-level requests, the server MAY return resources that are referenced by the resources being returned
+regardless of when the referenced resources were last updated.
+For resources where the server does not maintain a last updated time,
+the server MAY include these resources in a response irrespective of the `_since` value supplied by a client.
 
 #### Examples
 
@@ -310,12 +322,13 @@ Transfer-Encoding: chunked
 The operation uses standard HTTP status codes to indicate the outcome:
 
 | Status Code               | Description          | When to Use                                                        |
-|---------------------------|----------------------|--------------------------------------------------------------------|
+| ------------------------- | -------------------- | ------------------------------------------------------------------ |
 | 200 OK                    | Success              | Operation completed successfully, results returned                 |
 | 400 Bad Request           | Client Error         | Invalid parameters, unsupported parameters, or malformed request   |
 | 404 Not Found             | Not Found            | ViewDefinition resource not found (instance-level invocation)      |
 | 422 Unprocessable Entity  | Business Logic Error | Valid request but ViewDefinition is invalid or cannot be processed |
 | 500 Internal Server Error | Server Error         | Unexpected server error during processing                          |
+
 {:.table-data}
 
 All error responses (4xx and 5xx) SHOULD include an `OperationOutcome` resource providing details about the error.

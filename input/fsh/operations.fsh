@@ -65,7 +65,7 @@ Description: "Export a view definition. User can provide view definition referen
 * parameter[2].type = #code
 * parameter[2].binding.strength = #extensible
 * parameter[2].binding.valueSet = Canonical(OutputFormatCodes)
-* parameter[2].documentation = "Bulk export output format (for example csv, ndjson, parquet, json)."
+* parameter[2].documentation = "Bulk export output format (for example csv, ndjson, parquet, json). Optional; if omitted, the server returns ndjson by default."
 
 * parameter[2].name = #header
 * parameter[2].use = #in
@@ -228,7 +228,7 @@ Description: "Execute a view definition against supplied or server data."
 // Input parameters
 * parameter[0].name = #_format
 * parameter[0].use = #in
-* parameter[0].min = 1
+* parameter[0].min = 0
 * parameter[0].max = "1"
 * parameter[0].scope[0] = #system
 * parameter[0].scope[1] = #type
@@ -236,7 +236,7 @@ Description: "Execute a view definition against supplied or server data."
 * parameter[0].type = #code
 * parameter[0].binding.strength = #extensible
 * parameter[0].binding.valueSet = Canonical(OutputFormatCodes)
-* parameter[0].documentation = "Output format for the result (for example json, ndjson, csv, parquet)."
+* parameter[0].documentation = "Output format for the result (for example json, ndjson, csv, parquet). Optional; if omitted, the server returns ndjson by default."
 
 * parameter[1].name = #header
 * parameter[1].use = #in
@@ -359,7 +359,7 @@ Description: "Execute a SQLQuery Library against ViewDefinition tables."
 // Input parameters
 * parameter[0].name = #_format
 * parameter[0].use = #in
-* parameter[0].min = 1
+* parameter[0].min = 0
 * parameter[0].max = "1"
 * parameter[0].scope[0] = #system
 * parameter[0].scope[1] = #type
@@ -367,7 +367,7 @@ Description: "Execute a SQLQuery Library against ViewDefinition tables."
 * parameter[0].type = #code
 * parameter[0].binding.strength = #extensible
 * parameter[0].binding.valueSet = Canonical(SQLQueryRunOutputFormatCodes)
-* parameter[0].documentation = "Output format for the result (json, ndjson, csv, parquet, fhir). Use fhir to return results as a FHIR Parameters resource."
+* parameter[0].documentation = "Output format for the result (json, ndjson, csv, parquet, fhir). Use fhir to return results as a FHIR Parameters resource. Optional; if omitted, the server returns ndjson by default."
 
 * parameter[1].name = #header
 * parameter[1].use = #in

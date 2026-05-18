@@ -3,15 +3,15 @@
 The operation is invoked with POST. The following input parameters are passed
 inside a `Parameters` resource in the request body.
 
-| Name           | Type       | Scope                  | Required     | Max | Description                                                                       |
-| -------------- | ---------- | ---------------------- | ------------ | --- | --------------------------------------------------------------------------------- |
-| \_format       | code       | system, type, instance | Yes          | 1   | Output format: `json`, `ndjson`, `csv`, `parquet`, `fhir`                         |
-| header         | boolean    | system, type, instance | No           | 1   | Include CSV headers (default: true). Only applies to `csv` format                 |
-| queryReference | Reference  | system, type           | Conditional¹ | 1   | Reference to a SQLQuery Library stored on the server                              |
-| queryResource  | Resource   | system, type           | Conditional¹ | 1   | Inline SQLQuery Library resource to execute                                       |
-| parameters     | Parameters | system, type, instance | No           | 1   | Input parameters bound by name to parameters declared in the SQLQuery Library     |
-| source         | string     | system, type, instance | No           | 1   | External data source containing the ViewDefinition tables (e.g. URI, bucket name) |
-| \_limit        | integer    | system, type, instance | No           | 1   | Maximum number of rows to return                                                  |
+| Name           | Type       | Scope                  | Required     | Max | Description                                                                                           |
+| -------------- | ---------- | ---------------------- | ------------ | --- | ----------------------------------------------------------------------------------------------------- |
+| \_format       | code       | system, type, instance | No           | 1   | Output format: `json`, `ndjson`, `csv`, `parquet`, `fhir`. [Details](#format-parameter-clarification) |
+| header         | boolean    | system, type, instance | No           | 1   | Include CSV headers (default: true). Only applies to `csv` format                                     |
+| queryReference | Reference  | system, type           | Conditional¹ | 1   | Reference to a SQLQuery Library stored on the server                                                  |
+| queryResource  | Resource   | system, type           | Conditional¹ | 1   | Inline SQLQuery Library resource to execute                                                           |
+| parameters     | Parameters | system, type, instance | No           | 1   | Input parameters bound by name to parameters declared in the SQLQuery Library                         |
+| source         | string     | system, type, instance | No           | 1   | External data source containing the ViewDefinition tables (e.g. URI, bucket name)                     |
+| \_limit        | integer    | system, type, instance | No           | 1   | Maximum number of rows to return                                                                      |
 
 {:.table-data}
 
@@ -41,6 +41,18 @@ optimisation, but the observable behaviour is post-evaluation.
 Returning fewer rows than the client requested - whether because the query
 yielded fewer rows or because the server applied its own cap - is not treated
 as an error.
+
+#### Format Parameter Clarification
+
+It is RECOMMENDED to support `json`, `ndjson` and `csv` formats by default.
+Servers may support other formats, but they should be explicitly documented in
+the CapabilityStatement.
+
+If `_format` is omitted, the server SHALL return the result in `ndjson` format.
+
+Servers MAY honour the HTTP `Accept` header to negotiate an alternative format
+when `_format` is not supplied. When `_format` is supplied, its value SHALL
+take precedence over `Accept`.
 
 ### Examples
 
@@ -147,6 +159,35 @@ Content-Type: application/fhir+json
     ]}
   ]
 }
+```
+
+#### Default Format (`_format` omitted)
+
+When `_format` is omitted, the server returns the result in `ndjson` format:
+
+```http
+POST /Library/patient-bp-query/$sqlquery-run HTTP/1.1
+Content-Type: application/fhir+json
+
+{
+  "resourceType": "Parameters",
+  "parameter": [
+    { "name": "parameters", "resource": {
+      "resourceType": "Parameters",
+      "parameter": [
+        { "name": "patient_id", "valueString": "Patient/123" }
+      ]
+    }}
+  ]
+}
+```
+
+```http
+HTTP/1.1 200 OK
+Content-Type: application/x-ndjson
+
+{"patient_id":"Patient/123","systolic":120,"effective_date":"2024-01-15"}
+{"patient_id":"Patient/123","systolic":118,"effective_date":"2024-02-20"}
 ```
 
 #### Capping Result Rows with `_limit`
