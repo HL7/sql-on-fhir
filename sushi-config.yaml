@@ -52,6 +52,9 @@ dependencies:
 parameters:
   excludettl: true
   path-test: tests
+  special-url:
+    - http://sql-on-fhir.org/OperationDefinition/$export
+    - http://sql-on-fhir.org/OperationDefinition/$viewdefinition-run
 
 #   validation: [allow-any-extensions, no-broken-links]
 #
