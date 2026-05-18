@@ -1,3 +1,3 @@
-This will result in a "patient_demographics" table that looks like this:
+This will result in a "shareable_patient_demographics" table that looks like this:
 
-{% sql SELECT * FROM patient_demographics %}
+{% sql SELECT * FROM shareable_patient_demographics %}

@@ -30,7 +30,7 @@ Creates the same view as the 'PatientDemographics' example, but applies both the
 ShareableViewDefinition and TabularViewDefinition profiles.
 """
 Usage:  #example
-* name = "patient_demographics"
+* name = "shareable_patient_demographics"
 * url = "https://sql-on-fhir.org/ig/StructureDefinition/ShareablePatientDemographics"
 * fhirVersion[+] = #4.0
 * fhirVersion[+] = #5.0
