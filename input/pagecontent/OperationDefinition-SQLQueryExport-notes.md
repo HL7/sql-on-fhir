@@ -99,6 +99,7 @@ Optional filtering parameters:
 - `patient` - Export only resources for this patient
 - `group` - Export only resources for this group
 - `_since` - Export only resources updated since this time
+- `_limit` - Cap the number of rows returned per query
 
 #### Required Headers
 
@@ -175,6 +176,7 @@ Provides ViewDefinitions that serve as table sources for the SQL queries. These 
 | patient | Reference | 0   | \*  | Filter by patient reference. [Details](#patient-parameter-clarification)                 |
 | group   | Reference | 0   | \*  | Filter by group membership. [Details](#group-parameter-clarification)                    |
 | \_since | instant   | 0   | 1   | Export only resources updated since this time. [Details](#since-parameter-clarification) |
+| \_limit | integer   | 0   | 1   | Maximum number of rows to return per query. [Details](#row-limit-clarification)          |
 
 {:.table-data}
 
@@ -231,6 +233,22 @@ For Patient- and Group-level requests, the server MAY return resources that are 
 regardless of when the referenced resources were last updated.
 For resources where the server does not maintain a last updated time,
 the server MAY include these resources in a response irrespective of the `_since` value supplied by a client.
+
+##### Row Limit Clarification
+
+When supplied, `_limit` is the maximum number of rows the server returns to the
+client per query. When multiple queries are exported in a single request, the
+limit applies independently to each query's output.
+
+Servers MAY enforce a maximum value, silently capping client-supplied limits at
+a smaller server-defined maximum. The cap is applied to each query's final
+result set after the SQL (including any in-query `LIMIT`) has been evaluated;
+implementations are free to push the limit down into the query as an
+optimisation, but the observable behaviour is post-evaluation.
+
+Returning fewer rows than the client requested - whether because the query
+yielded fewer rows or because the server applied its own cap - is not treated
+as an error.
 
 #### Parameter Passing
 

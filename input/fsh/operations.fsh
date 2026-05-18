@@ -567,105 +567,115 @@ Description: "Export SQLQuery Library results asynchronously using the FHIR Asyn
 * parameter[7].type = #instant
 * parameter[7].documentation = "Export only resources updated since this instant."
 
-// Input parameters — data source
-* parameter[8].name = #source
+* parameter[8].name = #_limit
 * parameter[8].use = #in
 * parameter[8].min = 0
 * parameter[8].max = "1"
 * parameter[8].scope[0] = #system
 * parameter[8].scope[1] = #type
-* parameter[8].type = #string
-* parameter[8].documentation = "External data source containing the ViewDefinition tables."
+* parameter[8].scope[2] = #instance
+* parameter[8].type = #integer
+* parameter[8].documentation = "Maximum number of rows to return per query."
+
+// Input parameters — data source
+* parameter[9].name = #source
+* parameter[9].use = #in
+* parameter[9].min = 0
+* parameter[9].max = "1"
+* parameter[9].scope[0] = #system
+* parameter[9].scope[1] = #type
+* parameter[9].type = #string
+* parameter[9].documentation = "External data source containing the ViewDefinition tables."
 
 // Output parameters (same as $viewdefinition-export)
-* parameter[9].name = #exportId
-* parameter[9].use = #out
-* parameter[9].min = 1
-* parameter[9].max = "1"
-* parameter[9].type = #string
-* parameter[9].documentation = "Server-generated identifier assigned to the export request."
-
-* parameter[10].name = #clientTrackingId
+* parameter[10].name = #exportId
 * parameter[10].use = #out
-* parameter[10].min = 0
+* parameter[10].min = 1
 * parameter[10].max = "1"
 * parameter[10].type = #string
-* parameter[10].documentation = "Echoed client tracking identifier when provided."
+* parameter[10].documentation = "Server-generated identifier assigned to the export request."
 
-* parameter[11].name = #status
+* parameter[11].name = #clientTrackingId
 * parameter[11].use = #out
-* parameter[11].min = 1
+* parameter[11].min = 0
 * parameter[11].max = "1"
-* parameter[11].type = #code
-* parameter[11].binding.strength = #required
-* parameter[11].binding.valueSet = Canonical(ExportStatusCodes)
-* parameter[11].documentation = "Status of the export (accepted, in-progress, completed, cancelled, failed)."
+* parameter[11].type = #string
+* parameter[11].documentation = "Echoed client tracking identifier when provided."
 
-* parameter[12].name = #location
+* parameter[12].name = #status
 * parameter[12].use = #out
 * parameter[12].min = 1
 * parameter[12].max = "1"
-* parameter[12].type = #uri
-* parameter[12].documentation = "URL to poll for export status updates."
+* parameter[12].type = #code
+* parameter[12].binding.strength = #required
+* parameter[12].binding.valueSet = Canonical(ExportStatusCodes)
+* parameter[12].documentation = "Status of the export (accepted, in-progress, completed, cancelled, failed)."
 
-* parameter[13].name = #cancelUrl
+* parameter[13].name = #location
 * parameter[13].use = #out
-* parameter[13].min = 0
+* parameter[13].min = 1
 * parameter[13].max = "1"
 * parameter[13].type = #uri
-* parameter[13].documentation = "Optional URL for cancelling the export."
+* parameter[13].documentation = "URL to poll for export status updates."
 
-* parameter[14].name = #_format
+* parameter[14].name = #cancelUrl
 * parameter[14].use = #out
 * parameter[14].min = 0
 * parameter[14].max = "1"
-* parameter[14].type = #code
-* parameter[14].binding.strength = #extensible
-* parameter[14].binding.valueSet = Canonical(OutputFormatCodes)
-* parameter[14].documentation = "Format of the exported files (echoed from input if supplied)."
+* parameter[14].type = #uri
+* parameter[14].documentation = "Optional URL for cancelling the export."
 
-* parameter[15].name = #exportStartTime
+* parameter[15].name = #_format
 * parameter[15].use = #out
 * parameter[15].min = 0
 * parameter[15].max = "1"
-* parameter[15].type = #instant
-* parameter[15].documentation = "Timestamp when the export operation began."
+* parameter[15].type = #code
+* parameter[15].binding.strength = #extensible
+* parameter[15].binding.valueSet = Canonical(OutputFormatCodes)
+* parameter[15].documentation = "Format of the exported files (echoed from input if supplied)."
 
-* parameter[16].name = #exportEndTime
+* parameter[16].name = #exportStartTime
 * parameter[16].use = #out
 * parameter[16].min = 0
 * parameter[16].max = "1"
 * parameter[16].type = #instant
-* parameter[16].documentation = "Timestamp when the export operation completed."
+* parameter[16].documentation = "Timestamp when the export operation began."
 
-* parameter[17].name = #exportDuration
+* parameter[17].name = #exportEndTime
 * parameter[17].use = #out
 * parameter[17].min = 0
 * parameter[17].max = "1"
-* parameter[17].type = #integer
-* parameter[17].documentation = "Duration of the export in seconds."
+* parameter[17].type = #instant
+* parameter[17].documentation = "Timestamp when the export operation completed."
 
-* parameter[18].name = #estimatedTimeRemaining
+* parameter[18].name = #exportDuration
 * parameter[18].use = #out
 * parameter[18].min = 0
 * parameter[18].max = "1"
 * parameter[18].type = #integer
-* parameter[18].documentation = "Estimated seconds remaining until completion."
+* parameter[18].documentation = "Duration of the export in seconds."
 
-* parameter[19].name = #output
+* parameter[19].name = #estimatedTimeRemaining
 * parameter[19].use = #out
 * parameter[19].min = 0
-* parameter[19].max = "*"
-* parameter[19].documentation = "Output information for each exported SQL query result. One entry per query; ViewDefinitions supplied via the view parameter do not produce output entries."
-* parameter[19].part[0].name = #name
-* parameter[19].part[0].use = #out
-* parameter[19].part[0].min = 1
-* parameter[19].part[0].max = "1"
-* parameter[19].part[0].type = #string
-* parameter[19].part[0].documentation = "Name assigned to the exported output."
-* parameter[19].part[1].name = #location
-* parameter[19].part[1].use = #out
-* parameter[19].part[1].min = 1
-* parameter[19].part[1].max = "*"
-* parameter[19].part[1].type = #uri
-* parameter[19].part[1].documentation = "Download URL(s) for the exported file(s)."
+* parameter[19].max = "1"
+* parameter[19].type = #integer
+* parameter[19].documentation = "Estimated seconds remaining until completion."
+
+* parameter[20].name = #output
+* parameter[20].use = #out
+* parameter[20].min = 0
+* parameter[20].max = "*"
+* parameter[20].documentation = "Output information for each exported SQL query result. One entry per query; ViewDefinitions supplied via the view parameter do not produce output entries."
+* parameter[20].part[0].name = #name
+* parameter[20].part[0].use = #out
+* parameter[20].part[0].min = 1
+* parameter[20].part[0].max = "1"
+* parameter[20].part[0].type = #string
+* parameter[20].part[0].documentation = "Name assigned to the exported output."
+* parameter[20].part[1].name = #location
+* parameter[20].part[1].use = #out
+* parameter[20].part[1].min = 1
+* parameter[20].part[1].max = "*"
+* parameter[20].part[1].type = #uri
+* parameter[20].part[1].documentation = "Download URL(s) for the exported file(s)."
