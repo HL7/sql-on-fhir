@@ -392,7 +392,7 @@ Description: "Execute a SQLQuery Library against ViewDefinition tables."
 * parameter[3].max = "1"
 * parameter[3].scope[0] = #system
 * parameter[3].scope[1] = #type
-* parameter[3].type = #Resource
+* parameter[3].type = #Library
 * parameter[3].documentation = "Inline SQLQuery Library resource to execute."
 
 * parameter[4].name = #parameters
