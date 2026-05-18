@@ -4,13 +4,15 @@
 
 ### Requirement: Reference metadata mirrors the spec FSH
 
-The reference server's `OperationDefinition` for `$viewdefinition-run` (at `sof-js/metadata/OperationDefinition/$viewdefinition-run.json`) SHALL be equivalent to the `ViewDefinitionRun` instance declared in `input/fsh/operations.fsh`, with one deliberate divergence: the `resource` element SHALL be `[ "ViewDefinition" ]` rather than the `[ "CanonicalResource" ]` hack value the FSH uses. All other identification, parameter, and metadata fields SHALL match the spec FSH.
+The reference server's `OperationDefinition` for `$viewdefinition-run` (at `sof-js/metadata/OperationDefinition/$viewdefinition-run.json`) SHALL be equivalent to the `ViewDefinitionRun` instance declared in `input/fsh/operations.fsh`, with two deliberate divergences: the `resource` element SHALL be `[ "ViewDefinition" ]` rather than the `[ "CanonicalResource" ]` hack value the FSH uses, and the `id` SHALL be `$viewdefinition-run` (matching the reference-server filename-as-id convention) rather than the FSH `ViewDefinitionRun`. All other identification, parameter, and metadata fields SHALL match the spec FSH.
 
 #### Scenario: Identification fields match the spec
 
 - **GIVEN** the reference metadata file
 - **WHEN** an implementer reads identifying fields
-- **THEN** `id` SHALL be `ViewDefinitionRun`
+- **THEN** `id` SHALL be `$viewdefinition-run` (matching the
+  reference-server filename-as-id convention used by every other file
+  under `sof-js/metadata/OperationDefinition/`)
 - **AND** `name` SHALL be `ViewDefinitionRun`
 - **AND** `url` SHALL be
   `http://sql-on-fhir.org/OperationDefinition/$viewdefinition-run`
