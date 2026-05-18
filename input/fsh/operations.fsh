@@ -44,7 +44,6 @@ Description: "Export a view definition. User can provide view definition referen
 * parameter[0].part[2].max = "1"
 * parameter[0].part[2].type = #Resource
 * parameter[0].part[2].documentation = "Inline ViewDefinition resource to export."
-* parameter[0].part[2].extension[$allowedType].valueUri = "https://sql-on-fhir.org/ig/StructureDefinition/ViewDefinition"
 
 * parameter[1].name = #clientTrackingId
 * parameter[1].use = #in
@@ -248,7 +247,6 @@ Description: "Execute a view definition against supplied or server data."
 * parameter[3].type = #CanonicalResource
 * parameter[3].targetProfile = Canonical(ViewDefinition)
 * parameter[3].documentation = "Inline ViewDefinition resource to execute."
-* parameter[3].extension[$allowedType].valueUri = "https://sql-on-fhir.org/ig/StructureDefinition/ViewDefinition"
 
 * parameter[4].name = #patient
 * parameter[4].use = #in
