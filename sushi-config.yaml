@@ -24,7 +24,10 @@ publisher:
 # use cases, the value can be an object with keys for id, uri, and version.
 #
 dependencies:
-  hl7.fhir.uv.extensions.r5: 5.2.0
+  hl7.fhir.uv.extensions.r5:
+    id: extensions
+    uri: http://hl7.org/fhir/extensions/ImplementationGuide/hl7.fhir.uv.extensions
+    version: 5.3.0
 #
 # The pages property corresponds to IG.definition.page. SUSHI can
 # auto-generate the page list, but if the author includes pages in
@@ -71,7 +74,7 @@ menu:
   View Definition: StructureDefinition-ViewDefinition.html
   SQL Query: StructureDefinition-SQLQuery.html
   Artifacts: artifacts.html
-  Operations: 
+  Operations:
     Overview: operations.html
     CapabilityStatement: operations-capability.html
     $export: OperationDefinition-ViewDefinitionExport.html
