@@ -37,11 +37,15 @@
     {
       "resourceType": "Observation",
       "id": "o1",
+      "status": "final",
+      "code": { "text": "code" },
       "valueInteger": 12
     },
     {
       "resourceType": "Observation",
       "id": "o2",
+      "status": "final",
+      "code": { "text": "code" },
       "valueInteger": 10
     }
   ],

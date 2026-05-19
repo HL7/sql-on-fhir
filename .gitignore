@@ -27,3 +27,4 @@ out/
 custom-template
 .vscode
 .claude/settings.local.json
+Requirements-fromNarrative.json

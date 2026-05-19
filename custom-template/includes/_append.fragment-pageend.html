@@ -1,0 +1,19 @@
+
+  <!-- Mermaid diagram support -->
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"> </script>
+  <script type="text/javascript">
+    document.addEventListener('DOMContentLoaded', function() {
+      var codes = document.querySelectorAll('code.language-mermaid');
+      for (var i = 0; i < codes.length; i++) {
+        var code = codes[i];
+        var pre = code.parentNode;
+        var div = document.createElement('div');
+        div.className = 'mermaid';
+        div.textContent = code.textContent;
+        pre.parentNode.replaceChild(div, pre);
+      }
+      if (typeof mermaid !== 'undefined') {
+        mermaid.initialize({ securityLevel: 'sandbox' });
+      }
+    });
+  </script>

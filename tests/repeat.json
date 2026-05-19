@@ -6,6 +6,8 @@
     {
       "resourceType": "QuestionnaireResponse",
       "id": "qr1",
+      "questionnaire": "http://example.com/Questionnaire/q1",
+      "status": "completed",
       "item": [
         {
           "linkId": "1",

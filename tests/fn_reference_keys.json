@@ -8,6 +8,7 @@
       "id": "p1",
       "link": [
         {
+          "type": "seealso",
           "other": {
             "reference": "Patient/p1"
           }
@@ -19,6 +20,7 @@
       "id": "p2",
       "link": [
         {
+          "type": "seealso",
           "other": {
             "reference": "Patient/p3"
           }

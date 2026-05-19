@@ -37,7 +37,8 @@
       "code": {
         "text": "code"
       },
-      "valueTime": "12:34"
+      "status": "final",
+      "valueTime": "12:34:00"
     },
     {
       "resourceType": "Patient",
@@ -354,7 +355,7 @@
         },
         {
           "id": "o4",
-          "time": "12:34:59.999"
+          "time": "12:34:00.999"
         }
       ]
     }

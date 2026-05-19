@@ -4,6 +4,11 @@
   "fhirVersion": ["5.0.0", "4.0.1"],
   "resources": [
     {
+      "resourceType": "Organization",
+      "id": "o1",
+      "name": "Test Organization"
+    },
+    {
       "resourceType": "Patient",
       "id": "pt1",
       "managingOrganization": {
