@@ -24,7 +24,7 @@ publisher:
 # use cases, the value can be an object with keys for id, uri, and version.
 #
 dependencies:
-  hl7.fhir.uv.extensions.r5: 5.2.0
+  hl7.fhir.uv.extensions.r5: 5.3.0
 #
 # The pages property corresponds to IG.definition.page. SUSHI can
 # auto-generate the page list, but if the author includes pages in
@@ -52,6 +52,10 @@ dependencies:
 parameters:
   excludettl: true
   path-test: tests
+  special-url:
+    - http://sql-on-fhir.org/OperationDefinition/$sqlquery-run
+    - http://sql-on-fhir.org/OperationDefinition/$viewdefinition-export
+    - http://sql-on-fhir.org/OperationDefinition/$viewdefinition-run
 
 #   validation: [allow-any-extensions, no-broken-links]
 #
@@ -143,39 +147,39 @@ resources:
   Binary/PatientDemographics:
     extension:
       - url: http://hl7.org/fhir/tools/StructureDefinition/implementationguide-resource-logical
-        valueString: https://sql-on-fhir.org/ig/StructureDefinition/ViewDefinition
+        valueCanonical: https://sql-on-fhir.org/ig/StructureDefinition/ViewDefinition
   Binary/ShareablePatientDemographics:
     extension:
       - url: http://hl7.org/fhir/tools/StructureDefinition/implementationguide-resource-logical
-        valueString: https://sql-on-fhir.org/ig/StructureDefinition/ViewDefinition
+        valueCanonical: https://sql-on-fhir.org/ig/StructureDefinition/ViewDefinition
   Binary/PatientAddresses:
     extension:
       - url: http://hl7.org/fhir/tools/StructureDefinition/implementationguide-resource-logical
-        valueString: https://sql-on-fhir.org/ig/StructureDefinition/ViewDefinition
+        valueCanonical: https://sql-on-fhir.org/ig/StructureDefinition/ViewDefinition
   Binary/PatientAndContactAddressUnion:
     extension:
       - url: http://hl7.org/fhir/tools/StructureDefinition/implementationguide-resource-logical
-        valueString: https://sql-on-fhir.org/ig/StructureDefinition/ViewDefinition
+        valueCanonical: https://sql-on-fhir.org/ig/StructureDefinition/ViewDefinition
   Binary/UsCoreBloodPressures:
     extension:
       - url: http://hl7.org/fhir/tools/StructureDefinition/implementationguide-resource-logical
-        valueString: https://sql-on-fhir.org/ig/StructureDefinition/ViewDefinition
+        valueCanonical: https://sql-on-fhir.org/ig/StructureDefinition/ViewDefinition
   Binary/ConditionFlat:
     extension:
       - url: http://hl7.org/fhir/tools/StructureDefinition/implementationguide-resource-logical
-        valueString: https://sql-on-fhir.org/ig/StructureDefinition/ViewDefinition
+        valueCanonical: https://sql-on-fhir.org/ig/StructureDefinition/ViewDefinition
   Binary/EncounterFlat:
     extension:
       - url: http://hl7.org/fhir/tools/StructureDefinition/implementationguide-resource-logical
-        valueString: https://sql-on-fhir.org/ig/StructureDefinition/ViewDefinition
+        valueCanonical: https://sql-on-fhir.org/ig/StructureDefinition/ViewDefinition
   Binary/QuestionnaireResponseItems:
     extension:
       - url: http://hl7.org/fhir/tools/StructureDefinition/implementationguide-resource-logical
-        valueString: https://sql-on-fhir.org/ig/StructureDefinition/ViewDefinition
+        valueCanonical: https://sql-on-fhir.org/ig/StructureDefinition/ViewDefinition
   Binary/CodeSystemHierarchy:
     extension:
       - url: http://hl7.org/fhir/tools/StructureDefinition/implementationguide-resource-logical
-        valueString: https://sql-on-fhir.org/ig/StructureDefinition/ViewDefinition
+        valueCanonical: https://sql-on-fhir.org/ig/StructureDefinition/ViewDefinition
 
 #
 # Groups can control certain aspects of the IG generation.  The IG
