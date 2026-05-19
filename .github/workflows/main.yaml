@@ -1,7 +1,7 @@
 name: build
 on:
   push:
-    branches: [ '*' ]
+    branches: ["*"]
   workflow_dispatch:
 permissions:
   contents: read
@@ -28,7 +28,7 @@ jobs:
       # Install Ruby for Jekyll
       - uses: ruby/setup-ruby@v1
         with:
-          ruby-version: '3.0'
+          ruby-version: "3.0"
 
       - run: |
           export GEM_HOME="$HOME/gems"
@@ -44,7 +44,7 @@ jobs:
       - name: install java
         uses: actions/setup-java@v3
         with:
-          distribution: 'adopt'
+          distribution: "adopt"
           java-version: 17
 
       # Set up Node.js
@@ -93,14 +93,15 @@ jobs:
           export PATH="$HOME/gems/bin:$HOME/.bun/bin:$PATH"
           bun i -g fsh-sushi
           ./scripts/_updatePublisher.sh -y
-          ./scripts/_genonce.sh
+          ./scripts/_genonce.sh -no-errors
         # Copy IG output to the ig/latest directory in the base content
       - run: |
           mkdir -p base_content/ig/latest
           cp -R current_branch/output/* base_content/ig/latest/
-          
+
       # Save current_branch/output/qa.html as a build artifact
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: qa.html
           path: current_branch/output/qa.html
@@ -115,7 +116,7 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         if: ${{ github.ref == 'refs/heads/master' }}
         with:
-          path: 'base_content'
+          path: "base_content"
 
       # Deploy to GitHub Pages
       - name: Deploy to GitHub Pages

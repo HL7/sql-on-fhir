@@ -121,7 +121,7 @@ Optional filtering parameters:
 
 {:.table-data}
 
-##### View Reference/Resource Clarification
+##### View Reference/Resource Clarification {#viewreference-clarification}
 
 Only one of the `viewReference` or `viewResource` parameters can be provided.
 When invoking this operation at the instance level (e.g. ViewDefinition/{id}/$run), the server SHALL automatically infer the `viewReference` parameter from the path parameter.
