@@ -26,7 +26,10 @@ versioning.
 * content 1..* MS
 * content.contentType 1..1 MS
 * content.contentType ^short = "application/sql or application/sql;dialect=..."
-* content.contentType from AllSQLContentTypeCodes (required)
+* content.contentType from http://hl7.org/fhir/ValueSet/mimetypes (required)
+* content.contentType ^binding.additional[+].purpose = #extensible
+* content.contentType ^binding.additional[=].valueSet = Canonical(AllSQLContentTypeCodes)
+* content.contentType ^binding.additional[=].documentation = "SQLQuery content types, including dialect-specific variants. Authors SHOULD use a code from this value set when one applies; codes outside this value set MAY be used for SQL dialects not yet enumerated, subject to the sql-must-be-sql-expressions invariant."
 * content.extension contains sql-text named sqlText 0..1 MS
 * content.extension[sqlText] ^short = "Plain-text SQL for readability"
 * content.data 1..1 MS

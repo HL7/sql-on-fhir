@@ -108,8 +108,11 @@ same logical result set.
 
 ### Conformance
 
-**Terminology:** `contentType` SHALL come from
-[All SQL Content Type Codes](ValueSet-AllSQLContentTypeCodes.html).
+**Terminology:** `contentType` SHOULD come from
+[All SQL Content Type Codes](ValueSet-AllSQLContentTypeCodes.html). The binding
+is extensible: when one of these codes covers the dialect, that code SHALL be
+used; otherwise, an alternative code MAY be supplied (subject to the constraint
+that every `contentType` starts with `application/sql`).
 
 **Constraints:**
 
