@@ -38,6 +38,7 @@ versioning.
 // ViewDefinition dependencies
 * relatedArtifact MS
 * relatedArtifact.type 1..1 MS
+* relatedArtifact.type = #depends-on
 * relatedArtifact.type ^short = "depends-on for ViewDefinition references"
 * relatedArtifact.resource 1..1 MS
 * relatedArtifact.resource ^short = "Canonical URL of ViewDefinition"
