@@ -98,7 +98,8 @@ InstanceOf: Observation
 Usage: #example
 * id = "1"
 * status = #final
-* code = http://loinc.org#85354-9 "Blood pressure panel"
+* code = http://loinc.org#85354-9 "Blood pressure panel with all children optional"
+* category = http://terminology.hl7.org/CodeSystem/observation-category#vital-signs "Vital Signs"
 * subject = Reference(Patient/1)
 * effectiveDateTime = "2020-01-01T00:00:00Z"
 * component[+]
@@ -107,21 +108,22 @@ Usage: #example
     * value = 120
     * unit = "mm[Hg]"
     * system = "http://unitsofmeasure.org"
-    * code = #mmHg
+    * code = #"mm[Hg]"
 * component[+]
   * code = http://loinc.org#8462-4 "Diastolic blood pressure"
   * valueQuantity
     * value = 80
     * unit = "mm[Hg]"
     * system = "http://unitsofmeasure.org"
-    * code = #mmHg
+    * code = #"mm[Hg]"
 
 Instance: ExampleBloodPressure2
 InstanceOf: Observation
 Usage: #example
 * id = "2"
 * status = #final
-* code = http://loinc.org#85354-9 "Blood pressure panel"
+* code = http://loinc.org#85354-9 "Blood pressure panel with all children optional"
+* category = http://terminology.hl7.org/CodeSystem/observation-category#vital-signs "Vital Signs"
 * subject = Reference(Patient/1)
 * effectiveDateTime = "2020-01-02T00:00:00Z"
 * component[+]
@@ -130,21 +132,22 @@ Usage: #example
     * value = 130
     * unit = "mm[Hg]"
     * system = "http://unitsofmeasure.org"
-    * code = #mmHg
+    * code = #"mm[Hg]"
 * component[+]
   * code = http://loinc.org#8462-4 "Diastolic blood pressure"
   * valueQuantity
     * value = 90
     * unit = "mm[Hg]"
     * system = "http://unitsofmeasure.org"
-    * code = #mmHg
+    * code = #"mm[Hg]"
 
 Instance: ExampleBloodPressure3
 InstanceOf: Observation
 Usage: #example
 * id = "3"
 * status = #final
-* code = http://loinc.org#85354-9 "Blood pressure panel"
+* code = http://loinc.org#85354-9 "Blood pressure panel with all children optional"
+* category = http://terminology.hl7.org/CodeSystem/observation-category#vital-signs "Vital Signs"
 * subject = Reference(Patient/2)
 * effectiveDateTime = "2020-01-03T00:00:00Z"
 * component[+]
@@ -153,21 +156,22 @@ Usage: #example
     * value = 140
     * unit = "mm[Hg]"
     * system = "http://unitsofmeasure.org"
-    * code = #mmHg
+    * code = #"mm[Hg]"
 * component[+]
   * code = http://loinc.org#8462-4 "Diastolic blood pressure"
   * valueQuantity
     * value = 100
     * unit = "mm[Hg]"
     * system = "http://unitsofmeasure.org"
-    * code = #mmHg
+    * code = #"mm[Hg]"
 
 Instance: ExampleBloodPressure4
 InstanceOf: Observation
 Usage: #example
 * id = "4"
 * status = #final
-* code = http://loinc.org#85354-9 "Blood pressure panel"
+* code = http://loinc.org#85354-9 "Blood pressure panel with all children optional"
+* category = http://terminology.hl7.org/CodeSystem/observation-category#vital-signs "Vital Signs"
 * subject = Reference(Patient/3)
 * effectiveDateTime = "2020-01-04T00:00:00Z"
 * component[+]
@@ -176,21 +180,22 @@ Usage: #example
     * value = 150
     * unit = "mm[Hg]"
     * system = "http://unitsofmeasure.org"
-    * code = #mmHg
+    * code = #"mm[Hg]"
 * component[+]
   * code = http://loinc.org#8462-4 "Diastolic blood pressure"
   * valueQuantity
     * value = 110
     * unit = "mm[Hg]"
     * system = "http://unitsofmeasure.org"
-    * code = #mmHg
+    * code = #"mm[Hg]"
 
 Instance: ExampleBloodPressure5
 InstanceOf: Observation
 Usage: #example
 * id = "5"
 * status = #final
-* code = http://loinc.org#85354-9 "Blood pressure panel"
+* code = http://loinc.org#85354-9 "Blood pressure panel with all children optional"
+* category = http://terminology.hl7.org/CodeSystem/observation-category#vital-signs "Vital Signs"
 * subject = Reference(Patient/3)
 * effectiveDateTime = "2020-01-05T00:00:00Z"
 * component[+]
@@ -199,14 +204,14 @@ Usage: #example
     * value = 160
     * unit = "mm[Hg]"
     * system = "http://unitsofmeasure.org"
-    * code = #mmHg
+    * code = #"mm[Hg]"
 * component[+]
   * code = http://loinc.org#8462-4 "Diastolic blood pressure"
   * valueQuantity
     * value = 120
     * unit = "mm[Hg]"
     * system = "http://unitsofmeasure.org"
-    * code = #mmHg
+    * code = #"mm[Hg]"
 
 // =============================================================================
 // Condition resources
@@ -280,6 +285,40 @@ Usage: #example
 * serviceProvider = Reference(Organization/1)
 
 // =============================================================================
+// Supporting resources for the Encounter examples
+// =============================================================================
+// Minimal Practitioner, Organization, and Location instances referenced by
+// ExampleEncounter1 and ExampleEncounter2.
+
+Instance: ExamplePractitioner1
+InstanceOf: Practitioner
+Usage: #example
+* id = "1"
+* name[+]
+  * family = "Smith"
+  * given[+] = "Alice"
+
+Instance: ExampleOrganization1
+InstanceOf: Organization
+Usage: #example
+* id = "1"
+* name = "Example Health Service"
+
+Instance: ExampleLocation1
+InstanceOf: Location
+Usage: #example
+* id = "1"
+* name = "Clinic Room 1"
+* status = #active
+
+Instance: ExampleLocation2
+InstanceOf: Location
+Usage: #example
+* id = "2"
+* name = "Emergency Department"
+* status = #active
+
+// =============================================================================
 // CodeSystem resource (vehicle hierarchy)
 // =============================================================================
 // A small hierarchical CodeSystem to demonstrate the CodeSystemHierarchy view.
@@ -292,8 +331,11 @@ Usage: #example
 Instance: ExampleVehicleCodeSystem
 InstanceOf: CodeSystem
 Usage: #example
-* id = "1"
+* id = "vehicles"
 * url = "http://example.org/CodeSystem/vehicles"
+* identifier[+]
+  * system = "urn:ietf:rfc:3986"
+  * value = "urn:oid:2.25.158148347308242154236102391146884827570"
 * status = #draft
 * content = #complete
 * concept[+]
