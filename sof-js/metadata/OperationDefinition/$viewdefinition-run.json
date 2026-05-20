@@ -1,0 +1,128 @@
+{
+  "resourceType": "OperationDefinition",
+  "url": "http://sql-on-fhir.org/OperationDefinition/$viewdefinition-run",
+  "version": "0.0.1",
+  "versionAlgorithmString": "semver",
+  "id": "$viewdefinition-run",
+  "name": "ViewDefinitionRun",
+  "title": "ViewDefinition Run",
+  "code": "viewdefinition-run",
+  "status": "active",
+  "kind": "operation",
+  "system": true,
+  "type": true,
+  "instance": true,
+  "resource": ["ViewDefinition"],
+  "description": "Execute a view definition against supplied or server data.",
+  "parameter": [
+    {
+      "name": "_format",
+      "type": "code",
+      "use": "in",
+      "scope": ["system", "type", "instance"],
+      "min": 0,
+      "max": "1",
+      "documentation": "Output format for the result (for example json, ndjson, csv, parquet). Optional; if omitted, the server returns ndjson by default.",
+      "binding": {
+        "strength": "extensible",
+        "valueSet": "http://sql-on-fhir.org/ValueSet/output-format"
+      }
+    },
+    {
+      "name": "header",
+      "type": "boolean",
+      "use": "in",
+      "scope": ["system", "type", "instance"],
+      "min": 0,
+      "max": "1",
+      "documentation": "Include CSV headers (default true). Applies only when csv output is requested."
+    },
+    {
+      "name": "viewReference",
+      "type": "Reference",
+      "use": "in",
+      "scope": ["system", "type"],
+      "min": 0,
+      "max": "1",
+      "documentation": "Reference to a ViewDefinition stored on the server."
+    },
+    {
+      "name": "viewResource",
+      "type": "CanonicalResource",
+      "use": "in",
+      "scope": ["system", "type"],
+      "min": 0,
+      "max": "1",
+      "targetProfile": ["https://sql-on-fhir.org/ig/StructureDefinition/ViewDefinition"],
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/operationdefinition-allowed-type",
+          "valueUri": "https://sql-on-fhir.org/ig/StructureDefinition/ViewDefinition"
+        }
+      ],
+      "documentation": "Inline ViewDefinition resource to execute."
+    },
+    {
+      "name": "patient",
+      "type": "Reference",
+      "use": "in",
+      "scope": ["system", "type", "instance"],
+      "min": 0,
+      "max": "1",
+      "documentation": "Restrict execution to the specified patient."
+    },
+    {
+      "name": "group",
+      "type": "Reference",
+      "use": "in",
+      "scope": ["system", "type", "instance"],
+      "min": 0,
+      "max": "*",
+      "documentation": "Restrict execution to members of the given group(s)."
+    },
+    {
+      "name": "source",
+      "type": "string",
+      "use": "in",
+      "scope": ["system", "type", "instance"],
+      "min": 0,
+      "max": "1",
+      "documentation": "External data source to use (for example a URI or bucket name)."
+    },
+    {
+      "name": "resource",
+      "type": "Resource",
+      "use": "in",
+      "scope": ["system", "type", "instance"],
+      "min": 0,
+      "max": "*",
+      "documentation": "FHIR resources to transform instead of using server data."
+    },
+    {
+      "name": "_limit",
+      "type": "integer",
+      "use": "in",
+      "scope": ["system", "type", "instance"],
+      "min": 0,
+      "max": "1",
+      "documentation": "Maximum number of rows to return."
+    },
+    {
+      "name": "_since",
+      "type": "instant",
+      "use": "in",
+      "scope": ["system", "type", "instance"],
+      "min": 0,
+      "max": "1",
+      "documentation": "Include only resources modified after this instant."
+    },
+    {
+      "name": "return",
+      "type": "Binary",
+      "use": "out",
+      "min": 1,
+      "max": "1",
+      "documentation": "Transformed data encoded in the requested output format."
+    }
+  ]
+}

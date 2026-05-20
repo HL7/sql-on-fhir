@@ -1,112 +1,238 @@
 {
-    "resourceType": "OperationDefinition",
-    "url": "http://sql-on-fhir.org/OperationDefinition/$viewdefinition-export",
-    "version": "0.0.1",
-    "id": "$viewdefinition-export",
-    "name": "$viewdefinition-export",
-    "status": "active",
-    "kind": "operation",
-    "code": "viewdefinition-export",
-    "system": false,
-    "type": true,
-    "instance": true,
-    "resource": [ "ViewDefinition" ],
-    "description": "Export a view definition. User can provide viewdefintion references adn/or resources as part of the input parameters.",
-    "parameter": [
+  "resourceType": "OperationDefinition",
+  "url": "http://sql-on-fhir.org/OperationDefinition/$viewdefinition-export",
+  "version": "0.0.1",
+  "id": "$viewdefinition-export",
+  "name": "ViewDefinitionExport",
+  "title": "ViewDefinition Export",
+  "code": "viewdefinition-export",
+  "status": "active",
+  "kind": "operation",
+  "system": true,
+  "type": true,
+  "instance": true,
+  "resource": ["ViewDefinition"],
+  "description": "Export a view definition. User can provide view definition references and/or resources as part of the input parameters.",
+  "parameter": [
+    {
+      "name": "view",
+      "use": "in",
+      "scope": ["system", "type"],
+      "min": 1,
+      "max": "*",
+      "documentation": "One or more ViewDefinitions to export. Each repetition identifies a single view.",
+      "part": [
         {
-            "name": "viewReference",
-            "use": "in",
-            "min": 0,
-            "max": "*",
-            "scope": ["type"],
-            "type": "Reference",
-            "documentation": "The reference to the view definition on the server"
+          "name": "name",
+          "type": "string",
+          "use": "in",
+          "min": 0,
+          "max": "1",
+          "documentation": "Optional friendly name for the exported view output."
         },
         {
-            "name": "viewResource",
-            "use": "in",
-            "min": 0,
-            "max": "*",
-            "scope": ["type"],
-            "type": "ViewDefinition",
-            "documentation": "The view definition to export"
+          "name": "viewReference",
+          "type": "Reference",
+          "use": "in",
+          "min": 0,
+          "max": "1",
+          "documentation": "Reference to a ViewDefinition stored on the server."
         },
         {
-            "name": "format",
-            "use": "in",
-            "min": 1,
-            "max": "1",
-            "type": "code",
-            "scope": ["type"],
-            "binding": {
-                "strength": "extensible",
-                "valueSet": "http://sql-on-fhir.org/ValueSet/output-format"
-            },
-            "documentation": "The format of the output, could be csv, parquet, json, etc."
-        },
-        { 
-            "name": "exportId",
-            "use": "out",
-            "min": 0,
-            "max": "1",
-            "type": "string",
-            "documentation": "The ID of the export"
-        },
-        {
-            "name": "location",
-            "use": "out",
-            "min": 1,
-            "max": "1",
-            "type": "uri",
-            "documentation": "The URL to poll for the status of the export"
-        },
-        {
-            "name": "status",
-            "use": "out",
-            "min": 1,
-            "max": "1",
-            "type": "code",
-            "binding": {
-                "strength": "required",
-                "valueSet": "http://sql-on-fhir.org/ValueSet/export-status"
-            },
-            "documentation": "The status of the export, could be accepted, in-progress, completed, cancelled, failed"
-        },
-        {
-            "name": "output",
-            "use": "out",
-            "min": 0,
-            "max": "*",
-            "part": [
-                {
-                    "name": "name",
-                    "use": "out",
-                    "min": 1,
-                    "max": "1",
-                    "type": "string",
-                    "documentation": "The name of ViewDefinition"
-                },
-                {
-                    "name": "location",
-                    "use": "out",
-                    "min": 1,
-                    "max": "1",
-                    "type": "uri",
-                    "documentation": "The URL to poll the results of export"
-                },
-                {
-                    "name": "format",
-                    "use": "out",
-                    "min": 1,
-                    "max": "1",
-                    "type": "code",
-                    "binding": {
-                        "strength": "extensible",
-                        "valueSet": "http://sql-on-fhir.org/ValueSet/output-format"
-                    },
-                    "documentation": "The format of the output, could be csv, parquet, json, etc."
-                }
-            ]
+          "name": "viewResource",
+          "type": "Resource",
+          "use": "in",
+          "min": 0,
+          "max": "1",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/operationdefinition-allowed-type",
+              "valueUri": "https://sql-on-fhir.org/ig/StructureDefinition/ViewDefinition"
+            }
+          ],
+          "documentation": "Inline ViewDefinition resource to export."
         }
-    ]
+      ]
+    },
+    {
+      "name": "clientTrackingId",
+      "type": "string",
+      "use": "in",
+      "scope": ["system", "type"],
+      "min": 0,
+      "max": "1",
+      "documentation": "Client-provided tracking identifier for the export operation."
+    },
+    {
+      "name": "_format",
+      "type": "code",
+      "use": "in",
+      "scope": ["system", "type"],
+      "min": 0,
+      "max": "1",
+      "documentation": "Bulk export output format (for example csv, ndjson, parquet, json). Optional; if omitted, the server returns ndjson by default.",
+      "binding": {
+        "strength": "extensible",
+        "valueSet": "http://sql-on-fhir.org/ValueSet/output-format"
+      }
+    },
+    {
+      "name": "header",
+      "type": "boolean",
+      "use": "in",
+      "scope": ["system", "type"],
+      "min": 0,
+      "max": "1",
+      "documentation": "Include CSV headers (default true). Applies only when csv output is requested."
+    },
+    {
+      "name": "patient",
+      "type": "Reference",
+      "use": "in",
+      "scope": ["system", "type"],
+      "min": 0,
+      "max": "*",
+      "documentation": "Filter exported data to the supplied patient(s)."
+    },
+    {
+      "name": "group",
+      "type": "Reference",
+      "use": "in",
+      "scope": ["system", "type"],
+      "min": 0,
+      "max": "*",
+      "documentation": "Filter exported data to members of the supplied group(s)."
+    },
+    {
+      "name": "_since",
+      "type": "instant",
+      "use": "in",
+      "scope": ["system", "type"],
+      "min": 0,
+      "max": "1",
+      "documentation": "Export only resources updated since this instant."
+    },
+    {
+      "name": "source",
+      "type": "string",
+      "use": "in",
+      "scope": ["system", "type"],
+      "min": 0,
+      "max": "1",
+      "documentation": "External data source to use for the export (for example a URI or bucket name)."
+    },
+    {
+      "name": "exportId",
+      "type": "string",
+      "use": "out",
+      "min": 1,
+      "max": "1",
+      "documentation": "Server-generated identifier assigned to the export request."
+    },
+    {
+      "name": "clientTrackingId",
+      "type": "string",
+      "use": "out",
+      "min": 0,
+      "max": "1",
+      "documentation": "Echoed client tracking identifier when provided."
+    },
+    {
+      "name": "status",
+      "type": "code",
+      "use": "out",
+      "min": 1,
+      "max": "1",
+      "documentation": "Status of the export (accepted, in-progress, completed, cancelled, failed).",
+      "binding": {
+        "strength": "required",
+        "valueSet": "http://sql-on-fhir.org/ValueSet/export-status"
+      }
+    },
+    {
+      "name": "location",
+      "type": "uri",
+      "use": "out",
+      "min": 1,
+      "max": "1",
+      "documentation": "URL to poll for export status updates."
+    },
+    {
+      "name": "cancelUrl",
+      "type": "uri",
+      "use": "out",
+      "min": 0,
+      "max": "1",
+      "documentation": "Optional URL for cancelling the export."
+    },
+    {
+      "name": "_format",
+      "type": "code",
+      "use": "out",
+      "min": 0,
+      "max": "1",
+      "documentation": "Format of the exported files (echoed from input if supplied).",
+      "binding": {
+        "strength": "extensible",
+        "valueSet": "http://sql-on-fhir.org/ValueSet/output-format"
+      }
+    },
+    {
+      "name": "exportStartTime",
+      "type": "instant",
+      "use": "out",
+      "min": 0,
+      "max": "1",
+      "documentation": "Timestamp when the export operation began."
+    },
+    {
+      "name": "exportEndTime",
+      "type": "instant",
+      "use": "out",
+      "min": 0,
+      "max": "1",
+      "documentation": "Timestamp when the export operation completed."
+    },
+    {
+      "name": "exportDuration",
+      "type": "integer",
+      "use": "out",
+      "min": 0,
+      "max": "1",
+      "documentation": "Duration of the export in seconds."
+    },
+    {
+      "name": "estimatedTimeRemaining",
+      "type": "integer",
+      "use": "out",
+      "min": 0,
+      "max": "1",
+      "documentation": "Estimated seconds remaining until completion."
+    },
+    {
+      "name": "output",
+      "use": "out",
+      "min": 0,
+      "max": "*",
+      "documentation": "Output information for each exported view.",
+      "part": [
+        {
+          "name": "name",
+          "type": "string",
+          "use": "out",
+          "min": 1,
+          "max": "1",
+          "documentation": "Name assigned to the exported view output."
+        },
+        {
+          "name": "location",
+          "type": "uri",
+          "use": "out",
+          "min": 1,
+          "max": "*",
+          "documentation": "Download URL(s) for the exported file(s)."
+        }
+      ]
+    }
+  ]
 }

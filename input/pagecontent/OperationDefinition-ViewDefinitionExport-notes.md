@@ -1,10 +1,11 @@
 #### HTTP Methods
 
-* **POST**: Required for providing export parameters and ViewDefinitions
+- **POST**: Required for providing export parameters and ViewDefinitions
 
 #### Asynchronous Pattern
 
 This operation follows the FHIR Asynchronous Interaction Request Pattern:
+
 1. Client sends request with `Prefer: respond-async` header and one or more `view` parameters
 2. Server returns `202 Accepted` with `Content-Location` header pointing to status URL
 3. Client polls the status URL for export progress
@@ -13,6 +14,7 @@ This operation follows the FHIR Asynchronous Interaction Request Pattern:
 6. Client GETs the result URL to retrieve final output (identical to synchronous response format)
 
 **Note**: This operation uses Parameters resource format instead of Bundle format to:
+
 - Provide structured status reporting and metadata
 - Allow extensible output metadata specific to export operations
 - Maintain consistency with other FHIR operations
@@ -183,31 +185,37 @@ This operation follows the FHIR Asynchronous Interaction Request Pattern:
 #### Data Sources
 
 The operation can export data from:
+
 1. **Server resources** - From the server's data store (default)
 2. **External source** - Specified via `source` parameter
 
 #### Filtering
 
 Optional filtering parameters:
-* `patient` - Export only resources for this patient
-* `group` - Export only resources for this group
-* `_since` - Export only resources updated since this time
+
+- `patient` - Export only resources for this patient
+- `group` - Export only resources for this group
+- `_since` - Export only resources updated since this time
 
 #### Required Headers
 
 ##### Kick-off Request
-* `Prefer: respond-async` (required) - Specifies that the response should be asynchronous
-* `Accept` (recommended) - Specifies the format of the kick-off response
+
+- `Prefer: respond-async` (required) - Specifies that the response should be asynchronous
+- `Accept` (recommended) - Specifies the format of the kick-off response
 
 ##### Status Request
-* `Accept` (recommended) - Specifies the format of the status response
+
+- `Accept` (recommended) - Specifies the format of the status response
 
 ##### Result Request
-* `Accept` (recommended) - Specifies the format of the final result response
+
+- `Accept` (recommended) - Specifies the format of the final result response
 
 ##### Header Scope
 
 Request headers sent during status polling apply **only to the status response**, not to the final operation result. This separation:
+
 - Allows different content negotiation for status vs. result responses
 - Enables servers to use different formats for interim status (e.g., minimal JSON) vs. final results (e.g., detailed Parameters)
 - Eliminates ambiguity about which response the headers apply to
@@ -219,8 +227,9 @@ Request headers sent during status polling apply **only to the status response**
 ##### Core Parameters
 
 | Name | Type    | Min | Max | Description                                                                                                                                            |
-|------|---------|-----|-----|--------------------------------------------------------------------------------------------------------------------------------------------------------|
-| view | complex | 1   | *   | ViewDefinition(s) to export. Can be repeated to export multiple views in a single operation. See [ViewDefinition Parameter](#viewdefinition-parameter) |
+| ---- | ------- | --- | --- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| view | complex | 1   | \*  | ViewDefinition(s) to export. Can be repeated to export multiple views in a single operation. See [ViewDefinition Parameter](#viewdefinition-parameter) |
+
 {:.table-data}
 
 ##### ViewDefinition Parameter
@@ -228,11 +237,12 @@ Request headers sent during status polling apply **only to the status response**
 The `view` parameter is a complex type that can be repeated multiple times to export several ViewDefinitions in a single operation. Each `view` parameter has the following parts:
 
 | Name               | Type           | Min | Max | Description                                                                        |
-|--------------------|----------------|-----|-----|------------------------------------------------------------------------------------|
-| view               | complex        | 1   | *   | A ViewDefinition to export                                                         |
+| ------------------ | -------------- | --- | --- | ---------------------------------------------------------------------------------- |
+| view               | complex        | 1   | \*  | A ViewDefinition to export                                                         |
 | view.name          | string         | 0   | 1   | Name for the export output. If not provided, ViewDefinition name will be used      |
 | view.viewReference | Reference      | 0¹  | 1   | Reference to ViewDefinition on the server. [Details](#viewreference-clarification) |
 | view.viewResource  | ViewDefinition | 0¹  | 1   | Inline ViewDefinition resource                                                     |
+
 {:.table-data}
 
 ¹ Either view.viewReference or view.viewResource is required
@@ -240,39 +250,43 @@ The `view` parameter is a complex type that can be repeated multiple times to ex
 ##### Export Control
 
 | Name             | Type   | Min | Max | Description                                                                                   |
-|------------------|--------|-----|-----|-----------------------------------------------------------------------------------------------|
+| ---------------- | ------ | --- | --- | --------------------------------------------------------------------------------------------- |
 | clientTrackingId | string | 0   | 1   | Client-provided tracking ID for the export operation                                          |
-| _format          | code   | 0   | 1   | Output format: `csv`, `ndjson`, `parquet`, `json`. [Details](#format-parameter-clarification) |
+| \_format         | code   | 0   | 1   | Output format: `csv`, `ndjson`, `parquet`, `json`. [Details](#format-parameter-clarification) |
+
 {:.table-data}
 
 ##### Filtering
 
 | Name    | Type      | Min | Max | Description                                                                              |
-|---------|-----------|-----|-----|------------------------------------------------------------------------------------------|
-| patient | Reference | 0   | *   | Filter by patient reference. [Details](#patient-parameter-clarification)                 |
-| group   | Reference | 0   | *   | Filter by group membership. [Details](#group-parameter-clarification)                    |
-| _since  | instant   | 0   | 1   | Export only resources updated since this time. [Details](#since-parameter-clarification) |
+| ------- | --------- | --- | --- | ---------------------------------------------------------------------------------------- |
+| patient | Reference | 0   | \*  | Filter by patient reference. [Details](#patient-parameter-clarification)                 |
+| group   | Reference | 0   | \*  | Filter by group membership. [Details](#group-parameter-clarification)                    |
+| \_since | instant   | 0   | 1   | Export only resources updated since this time. [Details](#since-parameter-clarification) |
+
 {:.table-data}
 
 ##### Data Source
 
 | Name   | Type   | Min | Max | Description                                                                |
-|--------|--------|-----|-----|----------------------------------------------------------------------------|
+| ------ | ------ | --- | --- | -------------------------------------------------------------------------- |
 | source | string | 0   | 1   | External data source (e.g., URI, bucket name). If absent, uses server data |
+
 {:.table-data}
 
-If server does not support a parameter, request should be rejected with `400 Bad Request` 
+If server does not support a parameter, request should be rejected with `400 Bad Request`
 and `OperationOutcome` resource in the body with clarification that the parameter is not supported.
 Server should document which parameters it supports in its CapabilityStatement.
 
 ##### ViewReference Clarification
 
 The `view.viewReference` parameter MAY be specified using any of the following formats:
-* A relative URL on the server (e.g. "ViewDefinition/123")
-* A canonical URL (e.g. "http://specification.org/fhir/ViewDefinition/123|1.0.0") 
-* An absolute URL (e.g. "http://example.org/fhir/ViewDefinition/123")
 
-Servers MAY choose which reference formats they support. 
+- A relative URL on the server (e.g. "ViewDefinition/123")
+- A canonical URL (e.g. "http://specification.org/fhir/ViewDefinition/123|1.0.0")
+- An absolute URL (e.g. "http://example.org/fhir/ViewDefinition/123")
+
+Servers MAY choose which reference formats they support.
 Servers SHALL document which reference formats they support in their CapabilityStatement.
 
 For servers that want to support all types of references, it is recommended to follow the following algorithm:
@@ -287,31 +301,35 @@ For servers that want to support all types of references, it is recommended to f
 It is RECOMMENDED to support 'json', 'ndjson' and 'csv' formats by default.
 Servers may support other formats, but they should be explicitly documented in the CapabilityStatement.
 
+If `_format` is omitted, the server SHALL return the export output in `ndjson` format.
+
+Servers MAY honour the HTTP `Accept` header to negotiate an alternative format when `_format` is not supplied. When `_format` is supplied, its value SHALL take precedence over `Accept`.
+
 ##### Patient Parameter Clarification
 
-When provided, the server SHALL NOT return resources 
-in the patient compartments belonging to patients outside of this list. 
+When provided, the server SHALL NOT return resources
+in the patient compartments belonging to patients outside of this list.
 
 If a client requests patients who are not present on the server,
 the server SHOULD return details via a FHIR `OperationOutcome` resource in an error response to the request.
 
 ##### Group Parameter Clarification
 
-When provided, the server SHALL NOT return resources that are not a member of the supplied `Group`. 
+When provided, the server SHALL NOT return resources that are not a member of the supplied `Group`.
 
 If a client requests groups that are not present on the server,
 the server SHOULD return details via a FHIR `OperationOutcome` resource in an error response to the request.
 
 ##### Since Parameter Clarification
 
-Resources will be included in the response if their state has changed after the supplied time 
-(e.g., if Resource.meta.lastUpdated is later than the supplied `_since` time). 
-In the case of a Group level export, the server MAY return additional resources modified prior to the supplied time 
+Resources will be included in the response if their state has changed after the supplied time
+(e.g., if Resource.meta.lastUpdated is later than the supplied `_since` time).
+In the case of a Group level export, the server MAY return additional resources modified prior to the supplied time
 if the resources belong to the patient compartment of a patient added to the Group after the supplied time (this behavior SHOULD be clearly documented by the server).
-For Patient- and Group-level requests, the server MAY return resources that are referenced by the resources being returned 
-regardless of when the referenced resources were last updated. 
-For resources where the server does not maintain a last updated time, 
-the server MAY include these resources in a response irrespective of the `_since` value supplied by a client. 
+For Patient- and Group-level requests, the server MAY return resources that are referenced by the resources being returned
+regardless of when the referenced resources were last updated.
+For resources where the server does not maintain a last updated time,
+the server MAY include these resources in a response irrespective of the `_since` value supplied by a client.
 
 #### Output Parameters
 
@@ -320,38 +338,42 @@ Output parameters appear in the **result response** (after following the `303 Se
 ##### Export Identifiers
 
 | Name             | Type   | Min | Max | Description                                                 |
-|------------------|--------|-----|-----|-------------------------------------------------------------|
+| ---------------- | ------ | --- | --- | ----------------------------------------------------------- |
 | exportId         | string | 1   | 1   | Server-generated export ID                                  |
 | clientTrackingId | string | 0   | 1   | Client-provided tracking ID (echoed from input if provided) |
+
 {:.table-data}
 
 ##### Export Metadata
 
-| Name                   | Type    | Min | Max | Description                                                             |
-|------------------------|---------|-----|-----|-------------------------------------------------------------------------|
-| _format                | code    | 0   | 1   | The format of the exported files (echoed from input if provided)        |
-| exportStartTime        | instant | 0   | 1   | When the export operation began                                         |
-| exportEndTime          | instant | 0   | 1   | When the export operation completed                                     |
-| exportDuration         | integer | 0   | 1   | The actual duration of the export in seconds                            |
+| Name            | Type    | Min | Max | Description                                                      |
+| --------------- | ------- | --- | --- | ---------------------------------------------------------------- |
+| \_format        | code    | 0   | 1   | The format of the exported files (echoed from input if provided) |
+| exportStartTime | instant | 0   | 1   | When the export operation began                                  |
+| exportEndTime   | instant | 0   | 1   | When the export operation completed                              |
+| exportDuration  | integer | 0   | 1   | The actual duration of the export in seconds                     |
+
 {:.table-data}
 
 ##### Export Results
 
 | Name            | Type    | Min | Max | Description                                                              |
-|-----------------|---------|-----|-----|--------------------------------------------------------------------------|
-| output          | complex | 0   | *   | Output information for each exported view                                |
+| --------------- | ------- | --- | --- | ------------------------------------------------------------------------ |
+| output          | complex | 0   | \*  | Output information for each exported view                                |
 | output.name     | string  | 1   | 1   | The name of the exported view. [Details](#output-name-clarification)     |
-| output.location | uri     | 1   | *   | URL(s) to download the exported file(s). [Details](#output-partitioning) |
+| output.location | uri     | 1   | \*  | URL(s) to download the exported file(s). [Details](#output-partitioning) |
+
 {:.table-data}
 
 ##### Status Polling Parameters (interim)
 
 During status polling (`202 Accepted` responses), servers MAY include the following in the response body:
 
-| Name                   | Type    | Min | Max | Description                                         |
-|------------------------|---------|-----|-----|-----------------------------------------------------|
-| exportId               | string  | 0   | 1   | Server-generated export ID                          |
-| estimatedTimeRemaining | integer | 0   | 1   | Estimated seconds until completion                  |
+| Name                   | Type    | Min | Max | Description                        |
+| ---------------------- | ------- | --- | --- | ---------------------------------- |
+| exportId               | string  | 0   | 1   | Server-generated export ID         |
+| estimatedTimeRemaining | integer | 0   | 1   | Estimated seconds until completion |
+
 {:.table-data}
 
 Servers MAY also include partial/interim results during polling. The format of interim responses is implementation-defined.
@@ -375,27 +397,28 @@ For large exports, servers MAY partition the output into multiple files. When pa
 3. **Complete Set**: All parts together represent the complete export for that view
 
 **Example of partitioned output:**
+
 ```json
 {
-  "name": "output",
-  "part": [
-    {
-      "name": "name",
-      "valueString": "patient_demographics"
-    },
-    {
-      "name": "location",
-      "valueUri": "https://example.com/export/123/patient_demographics.part1.parquet"
-    },
-    {
-      "name": "location",
-      "valueUri": "https://example.com/export/123/patient_demographics.part2.parquet"
-    },
-    {
-      "name": "location",
-      "valueUri": "https://example.com/export/123/patient_demographics.part3.parquet"
-    }
-  ]
+    "name": "output",
+    "part": [
+        {
+            "name": "name",
+            "valueString": "patient_demographics"
+        },
+        {
+            "name": "location",
+            "valueUri": "https://example.com/export/123/patient_demographics.part1.parquet"
+        },
+        {
+            "name": "location",
+            "valueUri": "https://example.com/export/123/patient_demographics.part2.parquet"
+        },
+        {
+            "name": "location",
+            "valueUri": "https://example.com/export/123/patient_demographics.part3.parquet"
+        }
+    ]
 }
 ```
 
@@ -408,13 +431,14 @@ Clients MUST download all parts to obtain the complete dataset for a view.
 The $viewdefinition-export operation uses standard HTTP status codes to indicate the outcome:
 
 | Status Code               | Description          | When to Use                                                          |
-|---------------------------|----------------------|----------------------------------------------------------------------|
+| ------------------------- | -------------------- | -------------------------------------------------------------------- |
 | 202 Accepted              | In Progress          | Export request accepted or still in progress during polling          |
 | 303 See Other             | Complete             | Export complete, follow `Location` header to retrieve results        |
 | 400 Bad Request           | Client Error         | Invalid parameters, unsupported parameters, missing required headers |
 | 404 Not Found             | Not Found            | ViewDefinition not found, or cancelled export status URL             |
 | 422 Unprocessable Entity  | Business Logic Error | Valid request but ViewDefinition is invalid or cannot be processed   |
 | 500 Internal Server Error | Server Error         | Unexpected server error (at result URL indicates operation failure)  |
+
 {:.table-data}
 
 All error responses (4xx and 5xx) SHOULD include an `OperationOutcome` resource providing details about the error.
@@ -551,43 +575,43 @@ Content-Type: application/fhir+json
 
 1. **Kick-off Request**: Client sends `POST ViewDefinition/$viewdefinition-export` with `Prefer: respond-async` header.
 2. **Kick-off Response**: Server responds with:
-   - `202 Accepted` status code
-   - `Content-Location` header with the absolute URL for subsequent status requests (polling location)
-   - Parameters resource with `status` parameter set to `accepted` and `location` parameter
-   - If request is not valid or cannot be processed, server responds with `400 Bad Request` and `OperationOutcome` resource in the body.
+    - `202 Accepted` status code
+    - `Content-Location` header with the absolute URL for subsequent status requests (polling location)
+    - Parameters resource with `status` parameter set to `accepted` and `location` parameter
+    - If request is not valid or cannot be processed, server responds with `400 Bad Request` and `OperationOutcome` resource in the body.
 3. **Status Polling**: Client polls the polling location to get status of the export:
-   - **In Progress**: `202 Accepted` with optional Parameters resource for interim status
-   - **Progress Updates**: Server MAY include `X-Progress` header to indicate completion percentage
-   - **Retry-After**: Server SHOULD include `Retry-After` header to indicate when to retry
-   - **Interim Results**: Server MAY include partial/interim results in response body (implementation-defined)
+    - **In Progress**: `202 Accepted` with optional Parameters resource for interim status
+    - **Progress Updates**: Server MAY include `X-Progress` header to indicate completion percentage
+    - **Retry-After**: Server SHOULD include `Retry-After` header to indicate when to retry
+    - **Interim Results**: Server MAY include partial/interim results in response body (implementation-defined)
 4. **Completion**: When export is ready, server responds with:
-   - `303 See Other` status code
-   - `Location` header pointing to the result URL
-   - Response body is optional (MAY be empty or contain minimal status)
+    - `303 See Other` status code
+    - `Location` header pointing to the result URL
+    - Response body is optional (MAY be empty or contain minimal status)
 5. **Result Retrieval**: Client GETs the result URL from the `Location` header:
-   - `200 OK` status code with Parameters resource containing `output` locations
-   - Response format is identical to what a synchronous call would return
+    - `200 OK` status code with Parameters resource containing `output` locations
+    - Response format is identical to what a synchronous call would return
 6. **Error Handling**: If export fails:
-   - Status endpoint still returns `303 See Other` with `Location` header
-   - Result URL returns appropriate error status code (e.g., `500 Internal Server Error`)
-   - Result response contains `OperationOutcome` with error details
-   - This cleanly separates polling errors from operation errors
+    - Status endpoint still returns `303 See Other` with `Location` header
+    - Result URL returns appropriate error status code (e.g., `500 Internal Server Error`)
+    - Result response contains `OperationOutcome` with error details
+    - This cleanly separates polling errors from operation errors
 7. **Cancellation** (Recommended):
    Servers SHOULD support export cancellation via DELETE request to the status URL:
-   - Client sends `DELETE` request to the status polling URL
-   - Server responds with `202 Accepted`
-   - Subsequent status requests return `404 Not Found`
-   - Server SHOULD clean up any partial results
+    - Client sends `DELETE` request to the status polling URL
+    - Server responds with `202 Accepted`
+    - Subsequent status requests return `404 Not Found`
+    - Server SHOULD clean up any partial results
 8. **Result URL Lifetime**:
    Result URLs SHALL remain valid for at least 24 hours after export completion:
-   - Servers SHOULD support multiple retrievals of the same result
-   - Servers MAY include an `Expires` header to indicate result URL expiration
-   - Clients should retrieve results promptly but can retry within the validity window
+    - Servers SHOULD support multiple retrievals of the same result
+    - Servers MAY include an `Expires` header to indicate result URL expiration
+    - Clients should retrieve results promptly but can retry within the validity window
 9. **Access Control**:
    Servers SHALL protect status and result URLs with appropriate access controls:
-   - Same authorization context as the original request, OR
-   - Non-guessable URLs (e.g., cryptographically random tokens)
-   - Unauthorized access attempts return `401 Unauthorized` or `403 Forbidden`
+    - Same authorization context as the original request, OR
+    - Non-guessable URLs (e.g., cryptographically random tokens)
+    - Unauthorized access attempts return `401 Unauthorized` or `403 Forbidden`
 10. **File Download**: Client downloads the output from URLs in the `output.location` parameters.
 
 #### Examples

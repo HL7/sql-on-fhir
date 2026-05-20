@@ -88,7 +88,7 @@ Optional filtering parameters:
 
 | Name     | Type    | Scope          | Required | Max | Description                                                       |
 | -------- | ------- | -------------- | -------- | --- | ----------------------------------------------------------------- |
-| \_format | code    | type, instance | Yes      | 1   | Output format: `json`, `ndjson`, `csv`, `parquet`                 |
+| \_format | code    | type, instance | No       | 1   | Output format: `json`, `ndjson`, `csv`, `parquet`                 |
 | header   | boolean | type, instance | No       | 1   | Include CSV headers (default: true). Only applies to `csv` format |
 
 {:.table-data}
@@ -146,6 +146,10 @@ For servers that want to support all types of references, it is recommended to u
 
 It is RECOMMENDED to support 'json', 'ndjson' and 'csv' formats by default.
 Servers may support other formats, but they should be explicitly documented in the CapabilityStatement.
+
+If `_format` is omitted, the server SHALL return the result in `ndjson` format.
+
+Servers MAY honour the HTTP `Accept` header to negotiate an alternative format when `_format` is not supplied. When `_format` is supplied, its value SHALL take precedence over `Accept`.
 
 ##### Patient Parameter Clarification
 

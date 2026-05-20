@@ -53,6 +53,7 @@ parameters:
   excludettl: true
   path-test: tests
   special-url:
+    - http://sql-on-fhir.org/OperationDefinition/$sqlquery-export
     - http://sql-on-fhir.org/OperationDefinition/$sqlquery-run
     - http://sql-on-fhir.org/OperationDefinition/$viewdefinition-export
     - http://sql-on-fhir.org/OperationDefinition/$viewdefinition-run
