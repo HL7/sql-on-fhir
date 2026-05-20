@@ -1,4 +1,8 @@
 import { default as fhirpath } from 'fhirpath'
+import { default as fhirpath_r4_model } from 'fhirpath/fhir-context/r4/index.js'
+import fhirpath_types from 'fhirpath/src/types.js'
+
+const { FP_Date, FP_DateTime, FP_Time } = fhirpath_types
 
 const identity = (ctx, v) => [v]
 
@@ -56,6 +60,22 @@ let fhirpath_options = {
   },
 }
 
+function wrap_constant_value(key, val) {
+  // Wrap date/time-typed constants in FHIRPath type instances so that they
+  // compare correctly against resource fields once the FHIR model is loaded.
+  switch (key) {
+    case 'valueDate':
+      return new FP_Date(null, val)
+    case 'valueDateTime':
+    case 'valueInstant':
+      return new FP_DateTime(null, val)
+    case 'valueTime':
+      return new FP_Time(null, val)
+    default:
+      return val
+  }
+}
+
 function process_constants(constants) {
   return constants.reduce((acc, x) => {
     let name, val
@@ -64,7 +84,7 @@ function process_constants(constants) {
         name = x[key]
       }
       if (key.startsWith('value')) {
-        val = x[key]
+        val = wrap_constant_value(key, x[key])
       }
     }
     acc[name] = val
@@ -86,12 +106,12 @@ export function fhirpath_evaluate(data, path, constants = [], envVars = {}) {
   const context = process_constants(constants)
   // Merge environment variables into context.
   Object.assign(context, envVars)
-  return fhirpath.evaluate(data, rewrite_path(path), context, null, fhirpath_options)
+  return fhirpath.evaluate(data, rewrite_path(path), context, fhirpath_r4_model, fhirpath_options)
 }
 
 export function fhirpath_validate(path) {
   try {
-    fhirpath.compile(path, null, fhirpath_options)
+    fhirpath.compile(path, fhirpath_r4_model, fhirpath_options)
     return true
   } catch (e) {
     return false

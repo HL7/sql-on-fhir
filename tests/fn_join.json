@@ -12,6 +12,10 @@
           "given": ["p1.g1", "p1.g2"]
         }
       ]
+    },
+    {
+      "resourceType": "Patient",
+      "id": "p2"
     }
   ],
   "tests": [
@@ -41,6 +45,10 @@
         {
           "id": "p1",
           "given": "p1.g1,p1.g2"
+        },
+        {
+          "id": "p2",
+          "given": null
         }
       ]
     },
@@ -70,6 +78,10 @@
         {
           "id": "p1",
           "given": "p1.g1p1.g2"
+        },
+        {
+          "id": "p2",
+          "given": null
         }
       ]
     },
@@ -99,6 +111,10 @@
         {
           "id": "p1",
           "given": "p1.g1p1.g2"
+        },
+        {
+          "id": "p2",
+          "given": null
         }
       ]
     }
