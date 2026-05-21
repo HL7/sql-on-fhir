@@ -22,6 +22,10 @@ Usage: #example
   * given[+] = "Malvina"
   * given[+] = "Gerda"
   * family = "Vicario"
+* name[+]
+  * use = #usual
+  * given[+] = "Mal"
+  * family = "Vicario"
 * address[+]
   * use = #home
   * line[+] = "123 Main St"

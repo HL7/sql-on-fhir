@@ -64,6 +64,9 @@ parameters:
     - fsh-generated/resources/Binary-UsCoreBloodPressures.json
     - fsh-generated/resources/Binary-ConditionFlat.json
     - fsh-generated/resources/Binary-EncounterFlat.json
+    - fsh-generated/resources/Binary-PatientNamesWithIndex.json
+    - fsh-generated/resources/Binary-QuestionnaireResponseItems.json
+    - fsh-generated/resources/Binary-CodeSystemHierarchy.json
   special-url:
     - http://sql-on-fhir.org/OperationDefinition/$sqlquery-run
     - http://sql-on-fhir.org/OperationDefinition/$viewdefinition-export
