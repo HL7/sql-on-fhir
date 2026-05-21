@@ -52,6 +52,21 @@ dependencies:
 parameters:
   excludettl: true
   path-test: tests
+  # Register ViewDefinitions for SQL on FHIR integration.
+  # This enables the IG Publisher to process example resources through these
+  # views and populate an SQLite database for {% sql %} queries in notes pages.
+  # See: https://build.fhir.org/ig/FHIR/ig-guidance/sql.html
+  viewDefinition:
+    - fsh-generated/resources/Binary-PatientDemographics.json
+    - fsh-generated/resources/Binary-ShareablePatientDemographics.json
+    - fsh-generated/resources/Binary-PatientAddresses.json
+    - fsh-generated/resources/Binary-PatientAndContactAddressUnion.json
+    - fsh-generated/resources/Binary-UsCoreBloodPressures.json
+    - fsh-generated/resources/Binary-ConditionFlat.json
+    - fsh-generated/resources/Binary-EncounterFlat.json
+    - fsh-generated/resources/Binary-PatientNamesWithIndex.json
+    - fsh-generated/resources/Binary-QuestionnaireResponseItems.json
+    - fsh-generated/resources/Binary-CodeSystemHierarchy.json
   special-url:
     - http://sql-on-fhir.org/OperationDefinition/$sqlquery-export
     - http://sql-on-fhir.org/OperationDefinition/$sqlquery-run
