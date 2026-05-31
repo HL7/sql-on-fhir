@@ -85,26 +85,6 @@
       }
     }]
   },
-  "view_resource.json" : {
-    "tests" : [{
-      "name" : "only pts",
-      "result" : {
-        "passed" : true
-      }
-    },
-    {
-      "name" : "only obs",
-      "result" : {
-        "passed" : true
-      }
-    },
-    {
-      "name" : "resource not specified",
-      "result" : {
-        "passed" : true
-      }
-    }]
-  },
   "logic.json" : {
     "tests" : [{
       "name" : "filtering with 'and'",
@@ -120,6 +100,26 @@
     },
     {
       "name" : "filtering with 'not'",
+      "result" : {
+        "passed" : true
+      }
+    }]
+  },
+  "view_resource.json" : {
+    "tests" : [{
+      "name" : "only pts",
+      "result" : {
+        "passed" : true
+      }
+    },
+    {
+      "name" : "only obs",
+      "result" : {
+        "passed" : true
+      }
+    },
+    {
+      "name" : "resource not specified",
       "result" : {
         "passed" : true
       }
