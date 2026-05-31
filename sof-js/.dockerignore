@@ -1,7 +1,0 @@
-node_modules
-npm-debug.log
-db.sqlite
-.git
-.gitignore
-README.md
-tests

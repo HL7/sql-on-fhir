@@ -1,8 +1,0 @@
-/node_modules/
-/public/build/
-
-.DS_Store
-public/tests.json
-public/test-results.json
-bun.lockb
-package-lock.json
