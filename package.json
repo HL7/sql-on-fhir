@@ -2,10 +2,7 @@
   "name": "sql-on-fhir-v2",
   "version": "2.0.0",
   "description": "SQL on FHIR v2.0 Implementation Guide",
-  "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "test:verbose": "bun test --verbose",
     "build:ig": "./scripts/_genonce.sh",
     "build:ig:continuous": "./scripts/_gencontinuous.sh",
     "update:publisher": "./scripts/_updatePublisher.sh",
@@ -13,8 +10,7 @@
     "open:ig": "open output/index.html"
   },
   "dependencies": {
-    "express": "^4.18.2",
     "fsh-sushi": "^3.0.0",
     "http-server": "^14.1.1"
   }
-} 
+}

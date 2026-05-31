@@ -51,7 +51,6 @@ dependencies:
 #
 parameters:
   excludettl: true
-  path-test: tests
   special-url:
     - http://sql-on-fhir.org/OperationDefinition/$sqlquery-export
     - http://sql-on-fhir.org/OperationDefinition/$sqlquery-run
