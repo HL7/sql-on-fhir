@@ -113,7 +113,7 @@ The resulting output:
 ## The FHIRPath Subset
 
 ViewDefinitions
-use [minimal subset of FHIRPath](https://build.fhir.org/ig/FHIR/sql-on-fhir-v2/StructureDefinition-ViewDefinition.html#fhirpath-functionality)
+use [minimal subset of FHIRPath](https://build.fhir.org/ig/HL7/sql-on-fhir/StructureDefinition-ViewDefinition.html#fhirpath-functionality)
 to make implementation as simple as possible.
 
 The specification also introduces two special functions:
@@ -381,7 +381,7 @@ as shown in the output.
 
 ### Reference Implementation
 
-The [JavaScript reference implementation](https://github.com/FHIR/sql-on-fhir-v2/tree/master/sof-js)
+The [JavaScript reference implementation](https://github.com/FHIR/sql-on-fhir.js)
 implements the functional model described here. It is very concise at roughly
 400 lines of code and reading it is a good way to understand the model in
 detail.

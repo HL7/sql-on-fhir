@@ -5,10 +5,10 @@ Contributors are welcome! Here are some places to start:
 * Join us on weekly meetings, Tuesday 3pm US Eastern time, Zoom links posted
   in [FHIR chat](https://chat.fhir.org/#narrow/stream/179219-analytics-on-FHIR)
 * Contribute issues or pull requests
-  on [GitHub](https://github.com/FHIR/sql-on-fhir-v2)
-* [Register your implementation](https://github.com/FHIR/sql-on-fhir-v2?tab=readme-ov-file#registering-your-implementation)
+  on [GitHub](https://github.com/HL7/sql-on-fhir)
+* [Register your implementation](https://github.com/HL7/sql-on-fhir?tab=readme-ov-file#registering-your-implementation)
   and have it added to
-  our [test report](https://fhir.github.io/sql-on-fhir-v2/#impls)
+  our [test report](https://sql-on-fhir.org/extra/impls.html)
 
 ### Credits
 
@@ -33,6 +33,5 @@ Contributors are welcome! Here are some places to start:
 Work is sponsored and supported by:
 
 * [Health Samurai](https://www.health-samurai.io/)
-* [FHIR Foundation](https://fhir.org/)
 * [Health Dev Hub](https://www.healthdevhub.com/)
 * Interested in helping to support this work - contact us!

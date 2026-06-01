@@ -1,8 +1,8 @@
-# SQL on FHIR® (v2.0)
+# SQL on FHIR®
 
 ## Introduction
 
-This project provides the source for the SQL on FHIR v2.0 Implementation Guide.
+This project provides the source for the SQL on FHIR Implementation Guide.
 
 SQL on FHIR is a specification that defines a standard way to define portable,
 tabular projections of FHIR data.
@@ -27,21 +27,6 @@ Check out the [interactive playground][].
 [//]: # "Links used in this document"
 [interactive playground]: https://sql-on-fhir.org/extra/playground.html
 [implementations page]: https://sql-on-fhir.org/extra/impls.html
-
-## FHIR Foundation Project Statement
-
-- Maintainers: Ryan Brush, Dan Gottlieb, John Grimes, Josh Mandel, Nikolai
-  Ryzhikov, Arjun Sanyal
-- Issues /
-  Discussion: [analytics on FHIR](https://chat.fhir.org/#narrow/stream/179219-analytics-on-FHIR)
-  @chat.fhir.org
-- License: [CC0 1.0 Universal](./LICENSE.md)
-- Contribution Policy: [CONTRIBUTING.md](./CONTRIBUTING.md)
-- Security Information: This repository consists of the source used to build a
-  static implementation guide.
-- Compliance Information: This specification is tested using the shared test
-  suite, which together with the reference implementation lives in the
-  [sql-on-fhir.js](https://github.com/FHIR/sql-on-fhir.js) repository.
 
 ## Content
 
