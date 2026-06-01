@@ -1,0 +1,75 @@
+name: build
+on:
+  push:
+    branches: ["**"]
+  workflow_dispatch:
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: Build Implementation Guide
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Install Ruby for Jekyll, used by the IG Publisher to render pages.
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.0"
+
+      - name: Install Jekyll
+        run: |
+          export GEM_HOME="$HOME/gems"
+          export PATH="$HOME/gems/bin:$PATH"
+          gem install jekyll bundler
+
+      # Bun is used to install the SUSHI FSH compiler.
+      - uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+
+      - name: Install Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: 17
+
+      # Build the IG: compile FSH with SUSHI, then run the IG Publisher.
+      - name: Build IG
+        run: |
+          export GEM_HOME="$HOME/gems"
+          export PATH="$HOME/gems/bin:$HOME/.bun/bin:$PATH"
+          bun i -g fsh-sushi
+          ./scripts/_updatePublisher.sh -y
+          ./scripts/_genonce.sh
+
+      # Fail the build if the IG Publisher reported any errors or any warnings
+      # that have not been suppressed via input/ignoreWarnings.txt. The qa.json
+      # "warnings" count already excludes suppressed warnings (reported
+      # separately as "suppressed-warnings").
+      - name: Enforce zero errors and unsuppressed warnings
+        run: |
+          errs=$(jq '.errs' output/qa.json)
+          warnings=$(jq '.warnings' output/qa.json)
+          echo "IG Publisher QA: errors=$errs, unsuppressed warnings=$warnings"
+          if [ "$errs" -ne 0 ] || [ "$warnings" -ne 0 ]; then
+            echo "::error::IG build has $errs error(s) and $warnings unsuppressed warning(s). See the qa.html artifact."
+            exit 1
+          fi
+
+      # Always publish the QA report so failures can be inspected.
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: qa.html
+          path: output/qa.html
+
+      # TODO: Add the GitHub Pages deployment for the published IG. The previous
+      # workflow merged the IG output into a `releases` branch alongside the
+      # relocated test report and playground, then deployed the combined site to
+      # sql-on-fhir.org (IG at /ig/latest/, extras at /extra/). With the tooling
+      # now in FHIR/sql-on-fhir.js, the apex-domain publishing topology needs to
+      # be re-established before a deploy step can be added here.
