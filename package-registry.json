@@ -6,7 +6,7 @@
       "title" : "SQL on FHIR",
       "canonical" : "https://sql-on-fhir.org/ig",
       "category" : "Infrastructure",
-      "ci-build" : "https://build.fhir.org/ig/FHIR/sql-on-fhir-v2/",
+      "ci-build" : "https://build.fhir.org/ig/HL7/sql-on-fhir/",
       "version-count" : 1,
       "latest" : {
         "version" : "2.0.0",

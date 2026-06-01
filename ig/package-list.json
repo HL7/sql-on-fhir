@@ -8,7 +8,7 @@
     {
       "version" : "current",
       "desc" : "Continuous Integration Build (latest in version control)",
-      "path" : "https://build.fhir.org/ig/FHIR/sql-on-fhir-v2/",
+      "path" : "https://build.fhir.org/ig/HL7/sql-on-fhir/",
       "status" : "ci-build",
       "fhirversion" : "5.0.0",
       "sequence" : "R2",
