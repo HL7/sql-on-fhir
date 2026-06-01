@@ -1,11 +1,15 @@
 CodeSystem: LibraryTypesCodes
 Title: "SQL Library Types Code System"
 Description: "Library types for SQL on FHIR."
+* ^experimental = false
+* ^caseSensitive = true
 * #sql-query "SQL Query Definition" "The resource is a definition for a SQL Query"
 
 CodeSystem: SQLContentTypeCodes
 Title: "SQL Content Type Codes"
 Description: "Permitted contentType values for SQLQuery attachments, including dialect-specific variants."
+* ^experimental = false
+* ^caseSensitive = true
 * #"application/sql" "SQL" "Standard SQL content (no dialect specified)"
 * #"application/sql;dialect=ansi-sql" "ANSI SQL" "SQL content using ANSI SQL dialect"
 * #"application/sql;dialect=bigquery" "BigQuery" "SQL content using Google BigQuery dialect"
@@ -33,11 +37,14 @@ Description: "Permitted contentType values for SQLQuery attachments, including d
 ValueSet: AllSQLContentTypeCodes
 Title: "All SQL Content Type Codes"
 Description: "ValueSet of all codes from SQL Content Type Codes codesystem"
+* ^experimental = false
 * codes from system SQLContentTypeCodes
 
 CodeSystem: ExportStatusCodes
 Title: "Export Status Code System"
 Description: "Export status codes for SQL on FHIR."
+* ^experimental = false
+* ^caseSensitive = true
 * #accepted "Accepted" "The export has been accepted and is awaiting processing"
 * #cancelled "Cancelled" "The export has been cancelled"
 * #completed "Completed" "The export has been completed"
@@ -48,11 +55,14 @@ Description: "Export status codes for SQL on FHIR."
 ValueSet: ExportStatusCodes
 Title: "Export Status Codes"
 Description: "ValueSet of all codes from Export Status Codes codesystem"
+* ^experimental = false
 * codes from system ExportStatusCodes
 
 CodeSystem: OutputFormatCodes
 Title: "Output Format Codes"
 Description: "Output format codes for SQL on FHIR."
+* ^experimental = false
+* ^caseSensitive = true
 * #csv "CSV" "Comma-separated values"
 * #ndjson "NDJSON" "Newline-delimited JSON"
 * #parquet "Parquet" "Apache Parquet"
@@ -62,11 +72,13 @@ Description: "Output format codes for SQL on FHIR."
 ValueSet: OutputFormatCodes
 Title: "Output Format Codes"
 Description: "ValueSet of all codes from Output Format Codes codesystem"
+* ^experimental = false
 * codes from system OutputFormatCodes
 
 ValueSet: SQLQueryRunOutputFormatCodes
 Title: "SQLQuery Run Output Format Codes"
 Description: "Output format codes supported by the $sqlquery-run operation."
+* ^experimental = false
 * OutputFormatCodes#csv
 * OutputFormatCodes#ndjson
 * OutputFormatCodes#parquet
