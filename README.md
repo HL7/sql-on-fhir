@@ -35,7 +35,7 @@ Check out the [interactive playground][].
 - Issues /
   Discussion: [analytics on FHIR](https://chat.fhir.org/#narrow/stream/179219-analytics-on-FHIR)
   @chat.fhir.org
-- License: [MIT](./LICENSE.md)
+- License: [CC0 1.0 Universal](./LICENSE.md)
 - Contribution Policy: [CONTRIBUTING.md](./CONTRIBUTING.md)
 - Security Information: This repository consists of the source used to build a
   static implementation guide.
