@@ -368,6 +368,31 @@ specification.
 
 ### License
 
+This implementation guide is published under the
+[Creative Commons CC0 1.0 Universal](https://creativecommons.org/publicdomain/zero/1.0/)
+public domain dedication. CC0 is the licensing mechanism applied to HL7 FHIR
+products under section 09.01.05 of the HL7 Governance and Operations Manual
+(GOM).
+
+#### Contribution and intellectual property
+
+The SQL on FHIR specification was developed externally to HL7 by the FHIR
+Analytics Collaborative, and adopted into the HL7 balloting process under the
+sponsorship of the FHIR Infrastructure Work Group (HL7 project
+[PSS-2716](https://jira.hl7.org/browse/PSS-2716)).
+
+The contributors identified in PSS-2716 as the developers of this externally
+developed content contribute it to HL7 under section 09.01.02 (Commitment) of
+the GOM. Accordingly, each contributor grants HL7 a free, irrevocable licence to
+incorporate their contributions, in any media or form, and any subsequent
+modifications, in the creation or maintenance of HL7 Protocol Specifications; to
+copyright in HL7's name any Protocol Specification that includes portions of
+those contributions; and to permit others, at HL7's sole discretion, to
+reproduce the resulting Protocol Specifications in whole or in part. Each
+contributor further acknowledges that, to the best of their personal knowledge,
+all contributions are free of encumbrance with respect to the intellectual
+property rights of others.
+
 FHIR® is the registered trademark of HL7 and is used with the permission of HL7.
 Use of the FHIR trademark does not constitute endorsement of the contents of
 this repository by HL7, nor affirmation that this data is conformant to the

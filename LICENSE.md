@@ -1,3 +1,33 @@
+SQL on FHIR - intellectual property and contribution statement
+
+The SQL on FHIR specification was developed externally to HL7 by the FHIR
+Analytics Collaborative, and adopted into the HL7 balloting process under the
+sponsorship of the FHIR Infrastructure Work Group (HL7 project PSS-2716:
+https://jira.hl7.org/browse/PSS-2716).
+
+The contributors identified in PSS-2716 as the developers of this externally
+developed content contribute it to HL7 under section 09.01.02 (Commitment) of
+the HL7 Governance and Operations Manual (GOM). Accordingly, each contributor
+grants HL7 a free, irrevocable licence to:
+
+  - incorporate their contributions, in any media or form, and any subsequent
+    modifications, in the creation or maintenance of HL7 Protocol
+    Specifications;
+  - copyright in HL7's name any Protocol Specification that includes portions
+    of those contributions; and
+  - permit others, at HL7's sole discretion, to reproduce the resulting
+    Protocol Specifications in whole or in part.
+
+Each contributor further acknowledges that, to the best of their personal
+knowledge, all contributions are free of encumbrance with respect to the
+intellectual property rights of others.
+
+The specification is published under the Creative Commons CC0 1.0 Universal
+public domain dedication, the licensing mechanism applied to HL7 FHIR products
+under section 09.01.05 of the GOM. The full text of that dedication follows.
+
+----------------------------------------------------------------------
+
 Creative Commons Legal Code
 
 CC0 1.0 Universal
