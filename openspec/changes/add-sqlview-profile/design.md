@@ -24,8 +24,9 @@ from `output/qa.json`.
 - Add an `SQLView` profile that is a near-twin of `SQLQuery` but with a fixed
   `sql-view` type and no parameters.
 - Add the `sql-view` code to `LibraryTypesCodes`.
-- Document that both `SQLQuery` and `SQLView` may reference ViewDefinitions or
-  SQLViews, forming an acyclic dependency graph.
+- Constrain both `SQLQuery` and `SQLView` so `relatedArtifact.resource` may
+  reference only ViewDefinitions or SQLViews, forming a dependency graph that
+  authors should keep acyclic.
 - Provide a working example of an SQLQuery composing an SQLView.
 
 **Non-Goals:**
@@ -45,15 +46,27 @@ target. Alternative considered: a single profile distinguished by a type code
 or extension - rejected because it cannot express the differing parameter
 cardinality cleanly and muddies the conformance story.
 
-**Decision: Keep `relatedArtifact.resource` as an unconstrained canonical.**
-FHIR `relatedArtifact.resource` is a `canonical` (a URI). A profile cannot
-restrict the resource _type_ that a canonical points to, because the target is
-not dereferenced at validation time. The "ViewDefinition or SQLView" rule is
-therefore expressed through documentation and the element `^short`, not a
-machine-enforced constraint. This matches how the existing SQLQuery profile
-already treats ViewDefinition references. Alternative considered: a custom
-invariant - rejected as it cannot resolve canonical targets during validation
-and would add complexity without enforcement value.
+**Decision: Constrain `relatedArtifact.resource` with a `targetProfile`.**
+FHIR `relatedArtifact.resource` is a `canonical`, and a canonical-typed element
+may carry `targetProfile` (the same mechanism `Reference` uses). Each profile
+therefore declares `relatedArtifact.resource only Canonical(ViewDefinition or
+SQLView)`, recording both allowed targets with OR semantics. This is
+machine-readable and is enforced by the validator whenever the canonical
+resolves to a concrete resource in this IG or a loaded dependency. Enforcement
+is partial: when a canonical cannot be resolved (for example the external
+`https://example.org/...` URLs used by the existing examples) the validator
+reports an unresolved-reference warning and skips the type check rather than
+failing. The element `^short` is retained as the human-facing fallback.
+Alternative considered: leaving the canonical unconstrained and documenting the
+rule in prose only - rejected because the `targetProfile` captures the intent
+for tooling and provides real validation whenever targets resolve, at a
+one-line cost.
+
+`ViewDefinition` is a logical model (parent `CanonicalResource`), so using it as
+a canonical `targetProfile` is unusual; the build must confirm SUSHI compiles
+`Canonical(ViewDefinition or SQLView)` and the IG Publisher does not emit
+non-actionable errors for the logical-model target. `SQLView` is a `Library`
+profile and validates normally.
 
 **Decision: Reuse SQLQuery's content and label rules verbatim on `SQLView`.**
 Views carry SQL identically to queries (base64 `data`, optional `sql-text`
@@ -80,12 +93,16 @@ New profile `SQLView` (canonical
   starting with `application/sql`; `content.data` `1..1`; optional `sql-text`
   extension; same dialect-variant selection rules as SQLQuery.
 - `relatedArtifact` entries: `type` fixed `depends-on`, `resource` `1..1`
-  (canonical of a ViewDefinition or SQLView), `label` `1..1` obeying `sql-name`.
+  constrained `only Canonical(ViewDefinition or SQLView)`, `label` `1..1`
+  obeying `sql-name`.
 - `obeys sql-must-be-sql-expressions`.
 
-Modified profile `SQLQuery`: `relatedArtifact.resource` documentation updated to
-state the canonical may reference a ViewDefinition or an SQLView. The element
-cardinality and types are unchanged, so all existing instances stay valid.
+Modified profile `SQLQuery`: `relatedArtifact.resource` is constrained
+`only Canonical(ViewDefinition or SQLView)` and its `^short` updated to match.
+The element cardinality is unchanged, and the existing examples reference
+ViewDefinitions (a permitted target), so all existing instances stay valid - the
+`targetProfile` only narrows the canonical to targets that were already the
+intended usage.
 
 New code system concept: `LibraryTypesCodes#sql-view` "SQL View Definition".
 
@@ -98,9 +115,13 @@ entry links to it; these follow the existing IG template.
 
 ## Risks / Trade-offs
 
-- [Resource-type of a canonical reference cannot be validated] → Accept;
-  document the allowed targets in prose and `^short`, consistent with the
-  current ViewDefinition handling.
+- [Canonical target type is only validated when the canonical resolves] →
+  Accept; the `targetProfile` enforces the rule for in-IG and dependency targets,
+  and the `^short` documents it for unresolvable external canonicals, which the
+  validator reports as resolution warnings rather than type errors.
+- [`ViewDefinition` is a logical model used as a canonical `targetProfile`] →
+  Verify during the build that SUSHI and the IG Publisher accept it; fall back to
+  documentation-only if it produces non-actionable errors.
 - [Duplication between SQLQuery and SQLView FSH] → Accept for two profiles;
   revisit with a shared parent only if a third variant appears.
 - [Circular references between views are not detected by the spec] → By design;
@@ -111,7 +132,8 @@ entry links to it; these follow the existing IG template.
 
 Additive change. Deploy by merging the FSH/docs updates and rebuilding the IG.
 No existing instances become invalid. Rollback is removal of the new profile,
-code, example, and docs plus reverting the SQLQuery documentation edit.
+code, example, and docs plus reverting the SQLQuery `relatedArtifact.resource`
+constraint and documentation edit.
 
 ## Open Questions
 

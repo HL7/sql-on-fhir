@@ -12,11 +12,13 @@
 - [ ] 2.3 Add `content` rules to `SQLView` mirroring `SQLQuery` (cardinality,
       `contentType` binding, `sql-text` extension, `data`).
 - [ ] 2.4 Add `relatedArtifact` rules to `SQLView` (`type = depends-on`,
-      `resource 1..1`, `label 1..1 obeys sql-name`) with `^short` stating the
-      resource may be a ViewDefinition or SQLView.
-- [ ] 2.5 Update the `SQLQuery` profile's `relatedArtifact.resource` `^short`
-      (and `relatedArtifact.type` short) to state references may be a
-      ViewDefinition or an SQLView.
+      `resource 1..1`, `label 1..1 obeys sql-name`), constrain
+      `relatedArtifact.resource only Canonical(ViewDefinition or SQLView)`, and
+      set a `^short` stating the resource may be a ViewDefinition or SQLView.
+- [ ] 2.5 Update the `SQLQuery` profile: constrain
+      `relatedArtifact.resource only Canonical(ViewDefinition or SQLView)` and
+      update the `relatedArtifact.resource` `^short` (and `relatedArtifact.type`
+      short) to state references may be a ViewDefinition or an SQLView.
 
 ## 3. Examples
 
@@ -31,9 +33,10 @@
       `StructureDefinition-SQLView-notes.md` in `input/pagecontent/`
       (scope/usage, dependency rules, no-parameters constraint).
 - [ ] 4.2 Update `StructureDefinition-SQLQuery-intro.md` /
-      `-notes.md` to describe query composition (SQL-view analogy, dependency
-      DAG, materialisation as an implementation choice) and that
-      `relatedArtifact` may reference ViewDefinitions or SQLViews.
+      `-notes.md` to describe query composition (SQL-view analogy, a dependency
+      graph authors should keep acyclic, materialisation as an implementation
+      choice) and that `relatedArtifact` may reference ViewDefinitions or
+      SQLViews.
 - [ ] 4.3 Add a `SQL View` menu entry in `sushi-config.yaml`.
 
 ## 5. Build and verify
@@ -43,5 +46,11 @@
       warnings via `input/ignoreWarnings.txt` if needed.
 - [ ] 5.2 Confirm the generated `StructureDefinition-SQLView` fixes `type` to
       `sql-view` and constrains `parameter` to `0..0`.
-- [ ] 5.3 Confirm the `SQLView` and composing `SQLQuery` examples validate and
+- [ ] 5.3 Confirm both generated profiles declare
+      `relatedArtifact.resource.type.targetProfile` listing the `ViewDefinition`
+      and `SQLView` canonicals, that SUSHI compiles
+      `Canonical(ViewDefinition or SQLView)` without error, and that the
+      logical-model target (`ViewDefinition`) produces no non-actionable IG
+      Publisher errors (fall back to documentation-only if it does).
+- [ ] 5.4 Confirm the `SQLView` and composing `SQLQuery` examples validate and
       render on the IG site (`output/`).

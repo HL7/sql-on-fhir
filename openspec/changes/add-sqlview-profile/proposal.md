@@ -14,12 +14,12 @@ lets queries build on one another, much like SQL views.
   - Library `type` of `LibraryTypesCodes#sql-view`.
   - `parameter` constrained to `0..0` (dependent views cannot be parameterised
     for now, keeping the first iteration simple).
-  - `relatedArtifact` entries reference either a ViewDefinition or another
-    SQLView.
+  - `relatedArtifact.resource` constrained `only Canonical(ViewDefinition or
+SQLView)` so the allowed dependency targets are machine-readable.
 - Add the `sql-view` code to the `LibraryTypesCodes` code system.
-- Update the existing `SQLQuery` profile so its `relatedArtifact` entries may
-  reference either a ViewDefinition or an SQLView (previously ViewDefinition
-  only).
+- Update the existing `SQLQuery` profile so each `relatedArtifact.resource` is
+  constrained `only Canonical(ViewDefinition or SQLView)` (previously an
+  unconstrained canonical documented as ViewDefinition only).
 - Add documentation describing query composition (the SQL-view analogy, the
   dependency DAG, and that materialisation of intermediate results is an
   implementation choice).
@@ -51,6 +51,9 @@ ViewDefinitions remain valid.
 - The generated `SQLView` profile constrains `Library.parameter` to `0..0`
   (max cardinality 0).
 - The `LibraryTypesCodes` code system contains a `sql-view` concept.
+- The generated `SQLView` and `SQLQuery` profiles declare a `targetProfile` on
+  `relatedArtifact.resource` listing the `ViewDefinition` and `SQLView`
+  canonicals.
 - A `Library` resource conforming to `SQLView` (type `sql-view`, no parameters,
   `relatedArtifact` referencing a ViewDefinition and/or another SQLView)
   validates successfully against the profile.
@@ -59,8 +62,9 @@ ViewDefinitions remain valid.
 
 ## Impact
 
-- `input/fsh/profiles/library-profiles.fsh`: new `SQLView` profile; updated
-  `relatedArtifact` documentation on `SQLQuery`.
+- `input/fsh/profiles/library-profiles.fsh`: new `SQLView` profile; added
+  `relatedArtifact.resource` `targetProfile` constraint and updated `^short` on
+  `SQLQuery`.
 - `input/fsh/terminology.fsh`: new `sql-view` code in `LibraryTypesCodes`.
 - `input/fsh/examples/`: new example instance(s) for `SQLView` and a composing
   `SQLQuery`.
