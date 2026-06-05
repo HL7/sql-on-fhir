@@ -69,6 +69,7 @@ JOIN patient_address_view
   * type = #depends-on
   * resource = "https://example.org/ViewDefinition/patient_address_view"
   * label = "patient_address_view"
+  * display = "Patient address view"
 * content[+]
   * contentType = #application/sql
   * extension[sql-text].valueString = """SELECT
