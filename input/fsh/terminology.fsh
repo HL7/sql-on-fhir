@@ -4,6 +4,7 @@ Description: "Library types for SQL on FHIR."
 * ^experimental = false
 * ^caseSensitive = true
 * #sql-query "SQL Query Definition" "The resource is a definition for a SQL Query"
+* #sql-view "SQL View Definition" "The resource is a definition for a reusable SQL view that other queries reference as a virtual table source"
 
 CodeSystem: SQLContentTypeCodes
 Title: "SQL Content Type Codes"

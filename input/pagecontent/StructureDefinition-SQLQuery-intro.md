@@ -1,6 +1,7 @@
 ### Scope and Usage
 
-Use SQLQuery for shareable SQL over ViewDefinition outputs.
+Use SQLQuery for shareable SQL over ViewDefinition outputs and over reusable
+[SQLView](StructureDefinition-SQLView.html) queries.
 Each Library holds one query. For dialect-specific variants, use multiple
 content attachments while keeping parameters and aliases consistent.
 
@@ -8,20 +9,26 @@ content attachments while keeping parameters and aliases consistent.
 
 SQLQuery does not define table schemas, data extraction, execution behavior, or
 APIs; those belong to ViewDefinition and its operations.
-SQLQuery references ViewDefinitions; execution environments resolve these to
-physical tables.
+SQLQuery references ViewDefinitions and SQLViews; execution environments resolve
+these to physical or virtual tables. An SQLView is itself a reusable named query
+that other queries reference as a virtual table source, letting queries build on
+one another like SQL views (see [Query Composition](StructureDefinition-SQLQuery.html#notes)
+in the Notes tab).
 
 ### Resource Content
 
-#### ViewDefinition Dependencies
+#### Dependencies
 
-Use `relatedArtifact` with `type = "depends-on"` to list required ViewDefinitions.
-Use `label` to define the table name in SQL.
+Use `relatedArtifact` with `type = "depends-on"` to list required ViewDefinitions
+and SQLViews. Use `label` to define the table name in SQL. Each `resource` may
+be the canonical URL of a ViewDefinition or of an
+[SQLView](StructureDefinition-SQLView.html); the allowed targets are recorded as
+a `targetProfile` on `relatedArtifact.resource`.
 
 ```json
 "relatedArtifact": [
   { "type": "depends-on", "resource": "https://example.org/ViewDefinition/patient_view", "label": "patient" },
-  { "type": "depends-on", "resource": "https://example.org/ViewDefinition/bp_view", "label": "bp" }
+  { "type": "depends-on", "resource": "https://sql-on-fhir.org/ig/Library/ActivePatientsView", "label": "active_patients" }
 ]
 ```
 
@@ -119,7 +126,8 @@ that every `contentType` starts with `application/sql`).
 - Library type SHALL be `LibraryTypesCodes#sql-query`
 - Every `content.contentType` SHALL start with `application/sql`
 - `content.data` SHALL be present; the `sql-text` extension MAY carry a plain-text copy
-- Dependencies SHALL use `relatedArtifact` with `type = "depends-on"` and `label`
+- Dependencies SHALL use `relatedArtifact` with `type = "depends-on"` and `label`,
+  each `resource` referencing a ViewDefinition or an SQLView
 - Parameters SHALL use `Library.parameter` with `use = "in"`
 
 For examples and tooling guidance, see the Notes tab below.

@@ -71,6 +71,7 @@ menu:
   Overview: index.html
   View Definition: StructureDefinition-ViewDefinition.html
   SQL Query: StructureDefinition-SQLQuery.html
+  SQL View: StructureDefinition-SQLView.html
   Artifacts: artifacts.html
   Operations:
     Overview: operations.html
