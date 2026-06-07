@@ -4,48 +4,48 @@ A minimal SQLQuery Library:
 
 ```json
 {
-    "resourceType": "Library",
-    "meta": {
-        "profile": ["https://sql-on-fhir.org/ig/StructureDefinition/SQLQuery"]
-    },
-    "type": {
-        "coding": [
-            {
-                "system": "https://sql-on-fhir.org/ig/CodeSystem/LibraryTypesCodes",
-                "code": "sql-query"
-            }
-        ]
-    },
-    "name": "PatientBloodPressure",
-    "status": "active",
-    "relatedArtifact": [
-        {
-            "type": "depends-on",
-            "resource": "https://example.org/ViewDefinition/patient_view",
-            "label": "patient"
-        },
-        {
-            "type": "depends-on",
-            "resource": "https://example.org/ViewDefinition/bp_view",
-            "label": "bp"
-        }
-    ],
-    "parameter": [
-        { "name": "patient_id", "type": "string", "use": "in" },
-        { "name": "from_date", "type": "date", "use": "in" }
-    ],
-    "content": [
-        {
-            "contentType": "application/sql",
-            "extension": [
-                {
-                    "url": "https://sql-on-fhir.org/ig/StructureDefinition/sql-text",
-                    "valueString": "SELECT patient.id, bp.systolic FROM ..."
-                }
-            ],
-            "data": "U0VMRUNUIHBhdGllbnQu..."
-        }
+  "resourceType": "Library",
+  "meta": {
+    "profile": ["https://sql-on-fhir.org/ig/StructureDefinition/SQLQuery"]
+  },
+  "type": {
+    "coding": [
+      {
+        "system": "https://sql-on-fhir.org/ig/CodeSystem/LibraryTypesCodes",
+        "code": "sql-query"
+      }
     ]
+  },
+  "name": "PatientBloodPressure",
+  "status": "active",
+  "relatedArtifact": [
+    {
+      "type": "depends-on",
+      "resource": "https://example.org/ViewDefinition/patient_view",
+      "label": "patient"
+    },
+    {
+      "type": "depends-on",
+      "resource": "https://example.org/ViewDefinition/bp_view",
+      "label": "bp"
+    }
+  ],
+  "parameter": [
+    { "name": "patient_id", "type": "string", "use": "in" },
+    { "name": "from_date", "type": "date", "use": "in" }
+  ],
+  "content": [
+    {
+      "contentType": "application/sql",
+      "extension": [
+        {
+          "url": "https://sql-on-fhir.org/ig/StructureDefinition/sql-text",
+          "valueString": "SELECT patient.id, bp.systolic FROM ..."
+        }
+      ],
+      "data": "U0VMRUNUIHBhdGllbnQu..."
+    }
+  ]
 }
 ```
 
@@ -58,6 +58,26 @@ JOIN bp ON patient.id = bp.patient_id
 WHERE patient.id = :patient_id
   AND bp.effective_date >= :from_date
 ```
+
+### Query Composition
+
+An SQLQuery may reference a reusable
+[SQLView](StructureDefinition-SQLView.html) as well as ViewDefinitions, letting
+queries build on one another much like SQL views. A ViewDefinition projects FHIR
+resources into tables; an SQLView wraps a query over those tables and exposes it
+under a canonical URL; an SQLQuery composes both as its table sources.
+
+These references form a directed graph of ViewDefinitions, SQLViews, and
+SQLQueries, in which each referenced result acts as a virtual table for the
+referencing query. Authors SHOULD keep this graph acyclic. Whether circular
+dependencies are detected, any limit on dependency depth, and whether
+intermediate results are materialised or inlined (for example as CTEs or
+database views) are implementation decisions and are not mandated by this
+specification.
+
+The [Active Patient Addresses](Library-ActivePatientAddressesQuery.html) example
+shows an SQLQuery that references the
+[Active Patients](Library-ActivePatientsView.html) SQLView.
 
 ### Parameter Types
 
