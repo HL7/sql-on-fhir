@@ -4,14 +4,14 @@
 
 #### Asynchronous Pattern
 
-This operation follows the FHIR Asynchronous Interaction Request Pattern:
+This operation follows the [FHIR Asynchronous Interaction Request Pattern](https://www.hl7.org/fhir/async-bulk.html); the completion response is specified once in [Common Operation Behavior — Asynchronous Delivery](operations-common.html#asynchronous-delivery):
 
 1. Client sends request with `Prefer: respond-async` header and one or more `view` parameters
 2. Server returns `202 Accepted` with `Content-Location` header pointing to status URL
 3. Client polls the status URL for export progress
 4. Server responds with `202 Accepted` while export is in progress (MAY include interim results)
-5. Upon completion, server returns `303 See Other` with `Location` header pointing to result URL
-6. Client GETs the result URL to retrieve final output (identical to synchronous response format)
+5. Upon completion, the status poll returns `200 OK` with the manifest `Parameters` resource (`exportId`, `status`, `output`, …) **in the response body**
+6. Client downloads the exported files from the `output.location` URLs in the manifest
 
 **Note**: This operation uses Parameters resource format instead of Bundle format to:
 
@@ -19,7 +19,7 @@ This operation follows the FHIR Asynchronous Interaction Request Pattern:
 - Allow extensible output metadata specific to export operations
 - Maintain consistency with other FHIR operations
 
-**Note**: The `303 See Other` redirect pattern cleanly separates status polling from result retrieval, eliminating ambiguity around error handling and request header scope.
+**Note**: Completion is signalled by `200 OK` with the manifest in the body of the status-poll response, as in the FHIR Asynchronous Interaction Request Pattern (and the Bulk Data pattern it generalises). The operation does not use a `303 See Other` redirect to a separate result resource, so standard async/Bulk Data clients interoperate without special handling.
 
 ##### Async Flow Diagram
 
@@ -79,30 +79,19 @@ This operation follows the FHIR Asynchronous Interaction Request Pattern:
       │                                               │
       │ ┌─────────────────────────────────────────┐   │
       │ │ GET /status/abc123                      │   │
-      │ └─────────────────────────────────────────┘   │
-      │ ─────────────────────────────────────────────>│
-      │                                               │  Step 3: Completion
-      │   ┌─────────────────────────────────────────┐ │  (redirect to result)
-      │   │ 303 See Other                           │ │
-      │   │ Location: /result/abc123                │ │
-      │   └─────────────────────────────────────────┘ │
-      │ <─────────────────────────────────────────────│
-      │                                               │
-      ├ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─┤
-      │                                               │
-      │ ┌─────────────────────────────────────────┐   │
-      │ │ GET /result/abc123                      │   │
       │ │ Accept: application/fhir+json           │   │
       │ └─────────────────────────────────────────┘   │
       │ ─────────────────────────────────────────────>│
-      │                                               │  Step 4: Result
-      │   ┌─────────────────────────────────────────┐ │
+      │                                               │  Step 3: Completion
+      │   ┌─────────────────────────────────────────┐ │  (200 OK + manifest)
       │   │ 200 OK                                  │ │
       │   │ Content-Type: application/fhir+json    │ │
       │   │ Expires: Mon, 21 Jan 2026 16:00:00 GMT │ │
       │   │                                         │ │
       │   │ { "resourceType": "Parameters",         │ │
       │   │   "parameter": [                        │ │
+      │   │     {"name": "status",                  │ │
+      │   │      "valueCode": "completed"},         │ │
       │   │     {"name": "output", "part": [        │ │
       │   │       {"name": "name",                  │ │
       │   │        "valueString": "patients"},      │ │
@@ -119,7 +108,7 @@ This operation follows the FHIR Asynchronous Interaction Request Pattern:
       │ │ GET /export/abc123/patients.ndjson      │   │
       │ └─────────────────────────────────────────┘   │
       │ ─────────────────────────────────────────────>│
-      │                                               │  Step 5: Download
+      │                                               │  Step 4: Download
       │   ┌─────────────────────────────────────────┐ │
       │   │ 200 OK                                  │ │
       │   │ Content-Type: application/fhir+ndjson  │ │
@@ -163,13 +152,6 @@ This operation follows the FHIR Asynchronous Interaction Request Pattern:
   │    │ GET /status/abc123                            │            │
   │    │ ─────────────────────────────────────────────>│            │
   │    │                                               │            │
-  │    │   303 See Other                               │            │
-  │    │   Location: /result/abc123                    │            │
-  │    │ <─────────────────────────────────────────────│            │
-  │    │                                               │            │
-  │    │ GET /result/abc123                            │            │
-  │    │ ─────────────────────────────────────────────>│            │
-  │    │                                               │            │
   │    │   500 Internal Server Error                   │            │
   │    │   { "resourceType": "OperationOutcome",       │            │
   │    │     "issue": [{                               │            │
@@ -206,19 +188,16 @@ Optional filtering parameters:
 
 ##### Status Request
 
-- `Accept` (recommended) - Specifies the format of the status response
-
-##### Result Request
-
-- `Accept` (recommended) - Specifies the format of the final result response
+- `Accept` (recommended) - Specifies the format of the status response, including the completion (`200 OK`) response that carries the manifest
 
 ##### Header Scope
 
-Request headers sent during status polling apply **only to the status response**, not to the final operation result. This separation:
-
-- Allows different content negotiation for status vs. result responses
-- Enables servers to use different formats for interim status (e.g., minimal JSON) vs. final results (e.g., detailed Parameters)
-- Eliminates ambiguity about which response the headers apply to
+Each status-poll request's headers apply to **that poll's response**. Because
+completion is delivered as `200 OK` with the manifest in the body of the
+status-poll response (there is no separate result resource), the `Accept` header
+sent on the completing poll governs the representation of the manifest. This
+allows a client to negotiate a different representation for interim status
+responses (e.g. minimal JSON) than for the final manifest if it chooses.
 
 #### Parameters
 
@@ -298,12 +277,22 @@ For servers that want to support all types of references, it is recommended to f
 
 ##### Format Parameter Clarification
 
-It is RECOMMENDED to support 'json', 'ndjson' and 'csv' formats by default.
-Servers may support other formats, but they should be explicitly documented in the CapabilityStatement.
+The supported formats (`json`, `ndjson`, `csv`, `parquet`, `fhir`) and the
+default are defined in
+[Common Operation Behavior](operations-common.html#output-formats) and apply to
+this operation:
 
-If `_format` is omitted, the server SHALL return the export output in `ndjson` format.
-
-Servers MAY honour the HTTP `Accept` header to negotiate an alternative format when `_format` is not supplied. When `_format` is supplied, its value SHALL take precedence over `Accept`.
+- It is RECOMMENDED to support `json`, `ndjson` and `csv` by default; servers MAY
+  support `parquet` and `fhir`, and SHALL document supported formats in the
+  CapabilityStatement.
+- If `_format` is omitted, the server SHALL produce the export output in `ndjson`
+  format.
+- When `_format` is supplied, its value SHALL take precedence over `Accept`
+  (which here negotiates the format of the *status/manifest* responses, not the
+  exported files).
+- `_format=fhir` exports each output as a file of newline-delimited FHIR
+  `Parameters` rows (media type `application/fhir+ndjson`); see
+  [FHIR Format](operations-common.html#fhir-format).
 
 ##### Patient Parameter Clarification
 
@@ -333,7 +322,9 @@ the server MAY include these resources in a response irrespective of the `_since
 
 #### Output Parameters
 
-Output parameters appear in the **result response** (after following the `303 See Other` redirect), not in status polling responses.
+Output parameters appear in the **completion response** — the `200 OK`
+status-poll response that carries the manifest. They are not present in the
+`202 Accepted` responses returned while the export is still in progress.
 
 ##### Export Identifiers
 
@@ -433,11 +424,11 @@ The $viewdefinition-export operation uses standard HTTP status codes to indicate
 | Status Code               | Description          | When to Use                                                          |
 | ------------------------- | -------------------- | -------------------------------------------------------------------- |
 | 202 Accepted              | In Progress          | Export request accepted or still in progress during polling          |
-| 303 See Other             | Complete             | Export complete, follow `Location` header to retrieve results        |
+| 200 OK                    | Complete             | Export complete; the status-poll response body carries the manifest  |
 | 400 Bad Request           | Client Error         | Invalid parameters, unsupported parameters, missing required headers |
 | 404 Not Found             | Not Found            | ViewDefinition not found, or cancelled export status URL             |
 | 422 Unprocessable Entity  | Business Logic Error | Valid request but ViewDefinition is invalid or cannot be processed   |
-| 500 Internal Server Error | Server Error         | Unexpected server error (at result URL indicates operation failure)  |
+| 500 Internal Server Error | Server Error         | Unexpected server error; on a status poll, indicates operation failure |
 
 {:.table-data}
 
@@ -584,31 +575,31 @@ Content-Type: application/fhir+json
     - **Progress Updates**: Server MAY include `X-Progress` header to indicate completion percentage
     - **Retry-After**: Server SHOULD include `Retry-After` header to indicate when to retry
     - **Interim Results**: Server MAY include partial/interim results in response body (implementation-defined)
-4. **Completion**: When export is ready, server responds with:
-    - `303 See Other` status code
-    - `Location` header pointing to the result URL
-    - Response body is optional (MAY be empty or contain minimal status)
-5. **Result Retrieval**: Client GETs the result URL from the `Location` header:
-    - `200 OK` status code with Parameters resource containing `output` locations
-    - Response format is identical to what a synchronous call would return
-6. **Error Handling**: If export fails:
-    - Status endpoint still returns `303 See Other` with `Location` header
-    - Result URL returns appropriate error status code (e.g., `500 Internal Server Error`)
-    - Result response contains `OperationOutcome` with error details
-    - This cleanly separates polling errors from operation errors
+4. **Completion**: When the export is ready, the status poll returns:
+    - `200 OK` status code
+    - A `Parameters` resource in the body containing `status` = `completed`, the
+      export metadata, and the `output` entries with their download `location`s
+    - This is the same manifest a synchronous call would return; there is no
+      `303 See Other` redirect and no separate result URL
+5. **Error Handling**: If the export fails, the status poll returns the relevant
+   error status code (e.g. `500 Internal Server Error`) with an
+   `OperationOutcome` body. Polling-transport errors and operation failures are
+   distinguished by the status code on the poll response itself.
 7. **Cancellation** (Recommended):
    Servers SHOULD support export cancellation via DELETE request to the status URL:
     - Client sends `DELETE` request to the status polling URL
     - Server responds with `202 Accepted`
     - Subsequent status requests return `404 Not Found`
     - Server SHOULD clean up any partial results
-8. **Result URL Lifetime**:
-   Result URLs SHALL remain valid for at least 24 hours after export completion:
-    - Servers SHOULD support multiple retrievals of the same result
-    - Servers MAY include an `Expires` header to indicate result URL expiration
+8. **Result Lifetime**:
+   The completed status URL (which returns the manifest) and the
+   `output.location` download URLs SHALL remain valid for at least 24 hours after
+   export completion:
+    - Servers SHOULD support multiple retrievals of the completed manifest
+    - Servers MAY include an `Expires` header to indicate when the URLs expire
     - Clients should retrieve results promptly but can retry within the validity window
 9. **Access Control**:
-   Servers SHALL protect status and result URLs with appropriate access controls:
+   Servers SHALL protect status and download URLs with appropriate access controls:
     - Same authorization context as the original request, OR
     - Non-guessable URLs (e.g., cryptographically random tokens)
     - Unauthorized access attempts return `401 Unauthorized` or `403 Forbidden`
@@ -853,25 +844,7 @@ Accept: application/fhir+json
 Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGc...
 ```
 
-Response indicates completion with redirect to result URL:
-
-```http
-HTTP/1.1 303 See Other
-Location: https://example.com/fhir/export/550e8400-e29b-41d4-a716-446655440000/result
-```
-
-**Step 6: Result Retrieval**
-
-Client follows the `Location` header to retrieve the final results:
-
-```http
-GET /fhir/export/550e8400-e29b-41d4-a716-446655440000/result HTTP/1.1
-Host: example.com
-Accept: application/fhir+json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGc...
-```
-
-Response contains the export results (identical to what a synchronous call would return):
+The status poll returns `200 OK` with the manifest in the body (identical to what a synchronous call would return); there is no redirect:
 
 ```http
 HTTP/1.1 200 OK
@@ -943,7 +916,7 @@ Expires: Fri, 16 Jan 2026 14:30:42 GMT
 }
 ```
 
-**Step 7: Download Files**
+**Step 6: Download Files**
 
 Client downloads each file:
 

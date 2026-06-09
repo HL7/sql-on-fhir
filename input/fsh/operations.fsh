@@ -64,7 +64,7 @@ Description: "Export a view definition. User can provide view definition referen
 * parameter[2].type = #code
 * parameter[2].binding.strength = #extensible
 * parameter[2].binding.valueSet = Canonical(OutputFormatCodes)
-* parameter[2].documentation = "Bulk export output format (for example csv, ndjson, parquet, json). Optional; if omitted, the server returns ndjson by default."
+* parameter[2].documentation = "Bulk export output format (csv, ndjson, parquet, json, fhir). Use fhir to export each output as newline-delimited FHIR Parameters rows. Optional; if omitted, the server returns ndjson by default. See Common Operation Behavior (operations-common.html)."
 
 * parameter[3].name = #header
 * parameter[3].use = #in
@@ -235,7 +235,7 @@ Description: "Execute a view definition against supplied or server data."
 * parameter[0].type = #code
 * parameter[0].binding.strength = #extensible
 * parameter[0].binding.valueSet = Canonical(OutputFormatCodes)
-* parameter[0].documentation = "Output format for the result (for example json, ndjson, csv, parquet). Optional; if omitted, the server returns ndjson by default."
+* parameter[0].documentation = "Output format for the result (json, ndjson, csv, parquet, fhir). Use fhir to return results as a FHIR Parameters resource. Optional; if omitted, the server returns ndjson by default. See Common Operation Behavior (operations-common.html)."
 
 * parameter[1].name = #header
 * parameter[1].use = #in
@@ -305,7 +305,7 @@ Description: "Execute a view definition against supplied or server data."
 * parameter[7].scope[1] = #type
 * parameter[7].scope[2] = #instance
 * parameter[7].type = #Resource
-* parameter[7].documentation = "FHIR resources to transform instead of using server data."
+* parameter[7].documentation = "FHIR resources to transform instead of using server data. Repeatable. A Bundle supplied here is unwrapped: the ViewDefinition runs against each Bundle.entry[*].resource rather than against the Bundle itself. See OperationDefinition-ViewDefinitionRun notes (Resource Parameter and Bundle Inputs)."
 
 * parameter[8].name = #_limit
 * parameter[8].use = #in
@@ -332,8 +332,8 @@ Description: "Execute a view definition against supplied or server data."
 * parameter[10].use = #out
 * parameter[10].min = 1
 * parameter[10].max = "1"
-* parameter[10].type = #Binary
-* parameter[10].documentation = "Transformed data encoded in the requested output format."
+* parameter[10].type = #Resource
+* parameter[10].documentation = "Transformed data in the requested output format. Returns Binary for the flat formats (csv, json, ndjson, parquet) or Parameters for _format=fhir. The Binary denotes a raw binary stream in the format's native media type, not a serialized Binary resource envelope; see Common Operation Behavior (operations-common.html)."
 
 Instance: SQLQueryRun
 Usage: #definition
@@ -364,8 +364,8 @@ Description: "Execute a SQLQuery Library against ViewDefinition tables."
 * parameter[0].scope[2] = #instance
 * parameter[0].type = #code
 * parameter[0].binding.strength = #extensible
-* parameter[0].binding.valueSet = Canonical(SQLQueryRunOutputFormatCodes)
-* parameter[0].documentation = "Output format for the result (json, ndjson, csv, parquet, fhir). Use fhir to return results as a FHIR Parameters resource. Optional; if omitted, the server returns ndjson by default."
+* parameter[0].binding.valueSet = Canonical(OutputFormatCodes)
+* parameter[0].documentation = "Output format for the result (json, ndjson, csv, parquet, fhir). Use fhir to return results as a FHIR Parameters resource. Optional; if omitted, the server returns ndjson by default. See Common Operation Behavior (operations-common.html)."
 
 * parameter[1].name = #header
 * parameter[1].use = #in
@@ -531,7 +531,7 @@ Description: "Export SQLQuery Library results asynchronously using the FHIR Asyn
 * parameter[3].type = #code
 * parameter[3].binding.strength = #extensible
 * parameter[3].binding.valueSet = Canonical(OutputFormatCodes)
-* parameter[3].documentation = "Output format for the exported files (csv, ndjson, parquet, json)."
+* parameter[3].documentation = "Output format for the exported files (csv, ndjson, parquet, json, fhir). Use fhir to export each output as newline-delimited FHIR Parameters rows. See Common Operation Behavior (operations-common.html)."
 
 * parameter[4].name = #header
 * parameter[4].use = #in

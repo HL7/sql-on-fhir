@@ -40,8 +40,8 @@ And use standard tools like Apache Spark, AWS Athena or other tools to analyze d
 2. The server returns `202 Accepted` with `Content-Location` header pointing to status URL.
 3. The client polls the status URL:
     - Server returns `202 Accepted` while processing (MAY include interim results)
-    - Server returns `303 See Other` with `Location` header when complete
-4. The client follows the `Location` header to retrieve final results with output URLs.
+    - Server returns `200 OK` with the manifest (output URLs) in the body when complete
+4. The client reads the output URLs from the completion manifest.
 5. The client can then:
     - Download exported files from the output URLs
     - Load them into a data warehouse or analyze with tools like Apache Spark or Amazon Athena
@@ -95,6 +95,13 @@ Administrative bodies can request bulk reports for different populations and met
 [See Run Bulk Queries](OperationDefinition-SQLQueryRun.html)
 
 ## API
+
+Behaviour shared by the four data operations (`$viewdefinition-run`,
+`$sqlquery-run`, `$viewdefinition-export`, `$sqlquery-export`) — the output
+format set, return representation, content negotiation, transfer framing, and
+the asynchronous completion response — is specified once in
+[Common Operation Behavior](operations-common.html). The operation pages below
+reference it rather than restating it.
 
 ### CapabilityStatement
 

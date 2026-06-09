@@ -76,6 +76,7 @@ menu:
   Artifacts: artifacts.html
   Operations:
     Overview: operations.html
+    Common Behavior: operations-common.html
     CapabilityStatement: operations-capability.html
     $viewdefinition-export: OperationDefinition-ViewDefinitionExport.html
     $viewdefinition-run: OperationDefinition-ViewDefinitionRun.html

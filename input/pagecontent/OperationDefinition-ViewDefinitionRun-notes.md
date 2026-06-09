@@ -41,10 +41,16 @@ The operation can process data from:
 
 #### Output Format
 
-The response format is determined by (in order of precedence):
+This operation uses the shared output-format enumeration (`json`, `ndjson`,
+`csv`, `parquet`, `fhir`), content-negotiation rules, and return-representation
+rules defined once in
+[Common Operation Behavior](operations-common.html). Only a summary is repeated
+here.
 
-- **`_format` parameter**: Use shortened format names (`json`, `ndjson`, `csv`, `parquet`)
-- **`Accept` header**: Use standard MIME types (`application/json`, `application/x-ndjson`, `text/csv`, `application/octet-stream`)
+The format is selected by (in order of precedence):
+
+- **`_format` parameter**: shortened format names (`json`, `ndjson`, `csv`, `parquet`, `fhir`)
+- **`Accept` header**: standard MIME types (`application/json`, `application/x-ndjson`, `text/csv`, `application/octet-stream`, `application/fhir+json`)
 
 Examples:
 
@@ -52,6 +58,11 @@ Examples:
 - `_format=ndjson` or `Accept: application/x-ndjson`
 - `_format=csv` or `Accept: text/csv`
 - `_format=parquet` or `Accept: application/octet-stream`
+- `_format=fhir` or `Accept: application/fhir+json`
+
+The `Accept` header also governs a second, independent axis — whether the body
+is the **raw payload** (the default) or a serialized `Binary` resource envelope.
+See [Content Negotiation](operations-common.html#content-negotiation).
 
 #### Filtering
 
@@ -64,9 +75,9 @@ Optional filtering parameters:
 
 #### Response Format
 
-- **Success (200 OK)**: Returns data in requested format
+- **Success (200 OK)**: Returns the raw payload in the requested format, with `Content-Type` set to the format's native media type (not a serialized `Binary` envelope unless a FHIR media type is requested — see [Return Representation](operations-common.html#return-representation))
 - **Error (4xx/5xx)**: Returns `OperationOutcome` resource
-- **Streaming**: MAY use chunked transfer encoding for large result sets
+- **Transfer framing**: The response of **any** format MAY use `Transfer-Encoding: chunked`. Chunked transfer is an HTTP transport choice, independent of the format; it is distinct from incremental result production. See [Streaming and Transfer Encoding](operations-common.html#streaming)
 - **JSON format**: Returns an array of objects
 
 #### Parameters
@@ -115,9 +126,9 @@ Optional filtering parameters:
 
 ##### Output Parameter
 
-| Name   | Type   | Description                                  |
-| ------ | ------ | -------------------------------------------- |
-| return | Binary | The transformed data in the requested format |
+| Name   | Type     | Description                                                                                                       |
+| ------ | -------- | ----------------------------------------------------------------------------------------------------------------- |
+| return | Resource | Transformed data. `Binary` (a raw stream in the format's native media type) for `csv`/`json`/`ndjson`/`parquet`, or `Parameters` for `_format=fhir`. See [Return Representation](operations-common.html#return-representation) |
 
 {:.table-data}
 
@@ -144,12 +155,20 @@ For servers that want to support all types of references, it is recommended to u
 
 ##### Format Parameter Clarification
 
-It is RECOMMENDED to support 'json', 'ndjson' and 'csv' formats by default.
-Servers may support other formats, but they should be explicitly documented in the CapabilityStatement.
+The supported formats (`json`, `ndjson`, `csv`, `parquet`, `fhir`), the default,
+the `Accept`-vs-`_format` precedence rule, and the optional `fhir` shape are
+defined in [Common Operation Behavior](operations-common.html#output-formats)
+and apply to this operation:
 
-If `_format` is omitted, the server SHALL return the result in `ndjson` format.
-
-Servers MAY honour the HTTP `Accept` header to negotiate an alternative format when `_format` is not supplied. When `_format` is supplied, its value SHALL take precedence over `Accept`.
+- It is RECOMMENDED to support `json`, `ndjson` and `csv` by default; servers MAY
+  support `parquet` and `fhir`, and SHALL document supported formats in the
+  CapabilityStatement.
+- If `_format` is omitted (and no format is derivable from `Accept`), the server
+  SHALL return the result in `ndjson` format.
+- When `_format` is supplied, its value SHALL take precedence over `Accept`.
+- `_format=fhir` returns a `Parameters` resource with one repeating `row` per
+  result row, using the
+  [SQL to FHIR type mapping](OperationDefinition-SQLQueryRun.html#sql-to-fhir-type-mapping).
 
 ##### Patient Parameter Clarification
 
@@ -176,6 +195,25 @@ For Patient- and Group-level requests, the server MAY return resources that are 
 regardless of when the referenced resources were last updated.
 For resources where the server does not maintain a last updated time,
 the server MAY include these resources in a response irrespective of the `_since` value supplied by a client.
+
+##### Resource Parameter and Bundle Inputs {#resource-parameter-clarification}
+
+The `resource` parameter is repeatable and carries the discrete FHIR resources
+to transform instead of using server data. Because a `Bundle` is itself a
+`Resource`, a `Bundle` satisfies the parameter's `Resource` type. To avoid
+ambiguity, the following rule applies:
+
+When a `resource` value is a `Bundle`, the server SHALL **unwrap** it and run the
+ViewDefinition against each `Bundle.entry[*].resource`, exactly as if those
+entries had been supplied as individual repeated `resource` values. The
+`Bundle` itself is not treated as an input resource for the ViewDefinition.
+
+Unwrapping is applied one level deep. Resources within the bundle are evaluated
+against the ViewDefinition's `resource` type just like directly supplied
+resources: entries whose type does not match the ViewDefinition's `resource` are
+ignored. Mixing discrete `resource` values and `Bundle` values in the same
+request is permitted; the effective input is the union of the discrete
+resources and every unwrapped bundle entry.
 
 #### Examples
 
@@ -313,6 +351,57 @@ Transfer-Encoding: chunked
 {"id":"enc-1","patient":"Patient/123","status":"finished","class":"ambulatory","period_start":"2023-01-15T10:00:00Z"}
 {"id":"enc-2","patient":"Patient/123","status":"finished","class":"emergency","period_start":"2023-02-20T14:30:00Z"}
 {"id":"enc-3","patient":"Patient/123","status":"in-progress","class":"inpatient","period_start":"2023-03-01T08:00:00Z"}
+```
+
+##### Example 5: POST with a Bundle of resources
+
+A `Bundle` supplied as a `resource` value is unwrapped; the ViewDefinition runs
+against each entry. This request is equivalent to Example 3, which passed the
+two Patients as discrete `resource` values.
+
+```http
+POST /ViewDefinition/$run HTTP/1.1
+Accept: text/csv
+Content-Type: application/fhir+json
+
+{
+  "resourceType": "Parameters",
+  "parameter": [{
+    "name": "viewResource",
+    "resource": {
+      "resourceType": "ViewDefinition",
+      "resource": "Patient",
+      "select": [{
+        "column": [
+          {"name": "id", "type": "id", "path": "getResourceKey()"},
+          {"name": "birthDate", "type": "date", "path": "birthDate"},
+          {"name": "family", "type": "string", "path": "name.family"},
+          {"name": "given", "type": "string", "path": "name.given"}
+        ]
+      }]
+    }
+  },
+  {
+    "name": "resource",
+    "resource": {
+      "resourceType": "Bundle",
+      "type": "collection",
+      "entry": [
+        { "resource": { "resourceType": "Patient", "id": "pt-1", "name": [{"family": "Cole", "given": ["Joanie"]}], "birthDate": "2012-03-30" } },
+        { "resource": { "resourceType": "Patient", "id": "pt-2", "name": [{"family": "Doe", "given": ["John"]}], "birthDate": "2012-03-30" } }
+      ]
+    }
+  }]
+}
+```
+
+```http
+HTTP/1.1 200 OK
+Content-Type: text/csv
+
+id,birthDate,family,given
+pt-1,2012-03-30,Cole,Joanie
+pt-2,2012-03-30,Doe,John
 ```
 
 #### Error Handling
