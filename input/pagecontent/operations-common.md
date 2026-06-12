@@ -3,10 +3,10 @@
 This page defines behaviour that is **shared by all four SQL on FHIR data
 operations** so that it is specified once and applied identically across them:
 
-- [`$viewdefinition-run`](OperationDefinition-ViewDefinitionRun.html) — synchronous
-- [`$sqlquery-run`](OperationDefinition-SQLQueryRun.html) — synchronous
-- [`$viewdefinition-export`](OperationDefinition-ViewDefinitionExport.html) — asynchronous
-- [`$sqlquery-export`](OperationDefinition-SQLQueryExport.html) — asynchronous
+- [`$viewdefinition-run`](OperationDefinition-ViewDefinitionRun.html) - synchronous
+- [`$sqlquery-run`](OperationDefinition-SQLQueryRun.html) - synchronous
+- [`$viewdefinition-export`](OperationDefinition-ViewDefinitionExport.html) - asynchronous
+- [`$sqlquery-export`](OperationDefinition-SQLQueryExport.html) - asynchronous
 
 Each operation page references the relevant subsections below rather than
 restating these rules. Where an operation needs to deviate, that operation's
@@ -42,7 +42,7 @@ Conformance rules that apply to every operation:
 
 Apart from `fhir`, this enumeration and the return-shape rules below are
 identical for all four operations. The two delivery models differ only in
-**how** the bytes reach the client — synchronously in the operation response
+**how** the bytes reach the client - synchronously in the operation response
 (the run operations) or asynchronously as downloadable files (the export
 operations).
 
@@ -67,8 +67,8 @@ type denotes a **binary stream**, not a serialized FHIR `Binary` resource
 envelope. When `_format=fhir` is requested, the response is a `Parameters`
 resource rather than a binary stream (see [FHIR Format](#fhir-format)).
 
-Accordingly — and exactly as for a FHIR `Binary` read over the RESTful API (see
-[Serving Binary Resources](https://www.hl7.org/fhir/binary.html#rest)) — the
+Accordingly - and exactly as for a FHIR `Binary` read over the RESTful API (see
+[Serving Binary Resources](https://www.hl7.org/fhir/binary.html#rest)) - the
 default response body is the **raw payload** in the format's native media type
 (`text/csv`, `application/x-ndjson`, the parquet media type, …), with
 `Content-Type` set to that media type. The server does **not**, by default, wrap
@@ -77,7 +77,7 @@ envelope.
 
 A serialized `Binary` resource (with base64-encoded `data`) is returned **only**
 when the client explicitly asks for a FHIR representation via the `Accept`
-header, and only for formats where the server chooses to support it — see
+header, and only for formats where the server chooses to support it - see
 [Content Negotiation](#content-negotiation). For `_format=fhir`, the result is
 already a FHIR `Parameters` resource, so the raw-vs-envelope question does not
 arise.
@@ -90,13 +90,13 @@ The worked examples on each operation page are normative for the default
 Two independent axes govern the response. They are specified separately so they
 are not conflated:
 
-**Axis 1 — which format (`_format` vs `Accept`).** When `_format` is supplied,
+**Axis 1 - which format (`_format` vs `Accept`).** When `_format` is supplied,
 its value SHALL take precedence over the `Accept` header. When `_format` is not
 supplied, the server MAY honour `Accept` to select an
 [output format](#output-formats); if neither selects a format, the server uses
 `ndjson`.
 
-**Axis 2 — representation (raw payload vs FHIR envelope).** Once the format is
+**Axis 2 - representation (raw payload vs FHIR envelope).** Once the format is
 chosen, the `Accept` header further selects how the payload is represented:
 
 - `Accept: application/octet-stream`, the format's native media type, or no
@@ -134,16 +134,16 @@ framing is governed by HTTP itself, not by this specification.
 
 Two further concepts are independent of each other and of the format:
 
-1. **Transfer framing** — `Transfer-Encoding: chunked` (RFC 9112 §7.1) is an
+1. **Transfer framing** - `Transfer-Encoding: chunked` (RFC 9112 §7.1) is an
    HTTP/1.1 message-framing mechanism. It is independent of `Content-Type` and
-   of `_format`: *any* payload — CSV, JSON, NDJSON, parquet,
-   `application/octet-stream`, or a `Binary` envelope — MAY be sent chunked. The
+   of `_format`: *any* payload - CSV, JSON, NDJSON, parquet,
+   `application/octet-stream`, or a `Binary` envelope - MAY be sent chunked. The
    choice between `Content-Length` and chunked framing depends solely on whether
    the server knows the body size before emitting the first byte, never on the
    format. Servers MAY use chunked transfer encoding for the response of any
    format on either run operation.
 
-2. **Incremental result production** — whether the server can emit output before
+2. **Incremental result production** - whether the server can emit output before
    the full result set is materialized. This is a server/engine capability that
    genuinely varies by format: NDJSON and CSV are trivially row-incremental; a
    JSON array needs bracket/comma bookkeeping; parquet must finalise its footer
