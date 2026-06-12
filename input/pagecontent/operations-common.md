@@ -111,6 +111,12 @@ chosen, the `Accept` header further selects how the payload is represented:
   `Binary` resource whose `contentType` is the format's native media type and
   whose `data` is the base64-encoded payload.
 
+Axis 2 applies only to the flat formats (`csv`, `json`, `ndjson`, `parquet`).
+When the chosen format is `fhir`, the response is always the `Parameters`
+resource itself, serialized according to the FHIR media type in the `Accept`
+header (`application/fhir+json` by default); neither the raw-payload nor the
+`Binary`-envelope representation applies.
+
 Because base64 inflates the payload by roughly a third and defeats streaming,
 servers MAY decline the envelope representation for the large/streaming formats
 (`parquet`, `ndjson`): a server that does not support the envelope form for a
