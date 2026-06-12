@@ -97,10 +97,10 @@ Optional filtering parameters:
 
 ##### Output Control
 
-| Name     | Type    | Scope          | Required | Max | Description                                                       |
-| -------- | ------- | -------------- | -------- | --- | ----------------------------------------------------------------- |
-| \_format | code    | type, instance | No       | 1   | Output format: `json`, `ndjson`, `csv`, `parquet`                 |
-| header   | boolean | type, instance | No       | 1   | Include CSV headers (default: true). Only applies to `csv` format |
+| Name     | Type    | Scope          | Required | Max | Description                                                                                           |
+| -------- | ------- | -------------- | -------- | --- | ----------------------------------------------------------------------------------------------------- |
+| \_format | code    | type, instance | No       | 1   | Output format: `json`, `ndjson`, `csv`, `parquet`, `fhir`. [Details](#format-parameter-clarification) |
+| header   | boolean | type, instance | No       | 1   | Include CSV headers (default: true). Only applies to `csv` format                                     |
 
 {:.table-data}
 

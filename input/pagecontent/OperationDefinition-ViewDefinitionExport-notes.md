@@ -228,10 +228,10 @@ The `view` parameter is a complex type that can be repeated multiple times to ex
 
 ##### Export Control
 
-| Name             | Type   | Min | Max | Description                                                                                   |
-| ---------------- | ------ | --- | --- | --------------------------------------------------------------------------------------------- |
-| clientTrackingId | string | 0   | 1   | Client-provided tracking ID for the export operation                                          |
-| \_format         | code   | 0   | 1   | Output format: `csv`, `ndjson`, `parquet`, `json`. [Details](#format-parameter-clarification) |
+| Name             | Type   | Min | Max | Description                                                                                           |
+| ---------------- | ------ | --- | --- | ----------------------------------------------------------------------------------------------------- |
+| clientTrackingId | string | 0   | 1   | Client-provided tracking ID for the export operation                                                  |
+| \_format         | code   | 0   | 1   | Output format: `csv`, `ndjson`, `parquet`, `json`, `fhir`. [Details](#format-parameter-clarification) |
 
 {:.table-data}
 
