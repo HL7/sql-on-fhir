@@ -567,7 +567,7 @@ Content-Type: application/fhir+json
     {
       "severity": "error",
       "code": "not-supported",
-      "diagnostics": "Format 'xml' is not supported. Supported formats: json, ndjson, csv, parquet",
+      "diagnostics": "Format 'xml' is not supported. Supported formats: json, ndjson, csv, parquet, fhir",
       "expression": ["_format"]
     }
   ]
