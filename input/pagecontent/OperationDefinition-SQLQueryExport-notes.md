@@ -4,7 +4,7 @@
 
 #### Asynchronous Pattern
 
-This operation follows the [FHIR Asynchronous Interaction Request Pattern](https://www.hl7.org/fhir/async-bulk.html); the completion response is specified once in [Common Operation Behavior — Asynchronous Delivery](operations-common.html#asynchronous-delivery):
+This operation follows the [FHIR Asynchronous Bulk Data Request Pattern](https://www.hl7.org/fhir/async-bulk.html); the completion response is specified once in [Common Operation Behavior — Asynchronous Delivery](operations-common.html#asynchronous-delivery):
 
 1. Client sends request with `Prefer: respond-async` header and query source parameters
 2. Server returns `202 Accepted` with `Content-Location` header pointing to status URL
@@ -13,13 +13,13 @@ This operation follows the [FHIR Asynchronous Interaction Request Pattern](https
 5. Upon completion, the status poll returns `200 OK` with the manifest `Parameters` resource (`exportId`, `status`, `output`, …) **in the response body**
 6. Client downloads the exported files from the `output.location` URLs in the manifest
 
-**Note**: This operation uses Parameters resource format instead of Bundle format to:
+**Note**: This operation uses a FHIR `Parameters` resource as the manifest instead of the Bulk Data JSON manifest object to:
 
 - Provide structured status reporting and metadata
 - Allow extensible output metadata specific to export operations
 - Maintain consistency with other FHIR operations
 
-**Note**: Completion is signalled by `200 OK` with the manifest in the body of the status-poll response, as in the FHIR Asynchronous Interaction Request Pattern (and the Bulk Data pattern it generalises). The operation does not use a `303 See Other` redirect to a separate result resource, so standard async/Bulk Data clients interoperate without special handling.
+**Note**: Completion is signalled by `200 OK` with the manifest in the body of the status-poll response, as in the FHIR Asynchronous Bulk Data Request Pattern. The operation does not use a `303 See Other` redirect to a separate result resource, so standard Bulk Data clients interoperate without special handling.
 
 ##### Async Flow Diagram
 

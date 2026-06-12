@@ -148,7 +148,7 @@ Two further concepts are independent of each other and of the format:
 ## Asynchronous Delivery {#asynchronous-delivery}
 
 The two export operations conform to the
-[FHIR Asynchronous Interaction Request Pattern](https://www.hl7.org/fhir/async-bulk.html).
+[FHIR Asynchronous Bulk Data Request Pattern](https://www.hl7.org/fhir/async-bulk.html).
 In particular, on completion they follow that pattern's completion response
 exactly:
 
@@ -163,6 +163,11 @@ exactly:
   `303 See Other` redirect and no separate result resource to follow.
 - **Failure** → the status poll returns the relevant error status code (e.g.
   `500 Internal Server Error`) with an `OperationOutcome` body.
+
+The deliberate deviation from that pattern is the manifest's representation:
+it is a FHIR `Parameters` resource rather than the Bulk Data JSON manifest
+object. The flow, status codes, and headers are otherwise as the pattern
+specifies.
 
 File downloads referenced by `output.location` are independent HTTP responses
 and MAY use any framing (including chunked) per [Streaming](#streaming).

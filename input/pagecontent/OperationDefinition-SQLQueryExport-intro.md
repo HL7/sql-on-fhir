@@ -1,4 +1,4 @@
-Export SQLQuery Library results asynchronously using the FHIR Asynchronous Interaction Request Pattern.
+Export SQLQuery Library results asynchronously using the FHIR Asynchronous Bulk Data Request Pattern.
 
 **Use Cases:**
 
