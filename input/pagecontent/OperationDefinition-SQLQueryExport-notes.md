@@ -474,25 +474,25 @@ Content-Type: application/fhir+json
    error status code (e.g. `500 Internal Server Error`) with an
    `OperationOutcome` body. Polling-transport errors and operation failures are
    distinguished by the status code on the poll response itself.
-7. **Cancellation** (Recommended):
+6. **Cancellation** (Recommended):
    Servers SHOULD support export cancellation via DELETE request to the status URL:
     - Client sends `DELETE` request to the status polling URL
     - Server responds with `202 Accepted`
     - Subsequent status requests return `404 Not Found`
     - Server SHOULD clean up any partial results
-8. **Result Lifetime**:
+7. **Result Lifetime**:
    The completed status URL (which returns the manifest) and the
    `output.location` download URLs SHALL remain valid for at least 24 hours after
    export completion:
     - Servers SHOULD support multiple retrievals of the completed manifest
     - Servers MAY include an `Expires` header to indicate when the URLs expire
     - Clients should retrieve results promptly but can retry within the validity window
-9. **Access Control**:
+8. **Access Control**:
    Servers SHALL protect status and download URLs with appropriate access controls:
     - Same authorization context as the original request, OR
     - Non-guessable URLs (e.g., cryptographically random tokens)
     - Unauthorized access attempts return `401 Unauthorized` or `403 Forbidden`
-10. **File Download**: Client downloads the output from URLs in the `output.location` parameters.
+9. **File Download**: Client downloads the output from URLs in the `output.location` parameters.
 
 #### Examples
 
