@@ -431,7 +431,7 @@ Description: "Execute a SQLQuery Library against ViewDefinition tables."
 * parameter[7].min = 1
 * parameter[7].max = "1"
 * parameter[7].type = #Resource
-* parameter[7].documentation = "Query results. Returns Binary for flat formats (csv, json, ndjson, parquet) or Parameters for _format=fhir."
+* parameter[7].documentation = "Query results in the requested output format. Returns Binary for the flat formats (csv, json, ndjson, parquet) or Parameters for _format=fhir. The Binary denotes a raw binary stream in the format's native media type, not a serialized Binary resource envelope; see Common Operation Behavior (operations-common.html)."
 
 Instance: SQLQueryExport
 Usage: #definition
