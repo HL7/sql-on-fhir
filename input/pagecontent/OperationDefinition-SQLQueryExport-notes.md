@@ -891,7 +891,7 @@ Prefer: respond-async
         {
           "name": "viewReference",
           "valueReference": {
-            "reference": "Binary/UsCoreBloodPressures"
+            "reference": "ViewDefinition/UsCoreBloodPressures"
           }
         }
       ]
