@@ -63,8 +63,8 @@ Description: "Export a view definition. User can provide view definition referen
 * parameter[2].scope[1] = #type
 * parameter[2].type = #code
 * parameter[2].binding.strength = #extensible
-* parameter[2].binding.valueSet = Canonical(OutputFormatCodes)
-* parameter[2].documentation = "Bulk export output format (csv, ndjson, parquet, json, fhir). Use fhir to export each output as newline-delimited FHIR Parameters rows. Optional; if omitted, the server returns ndjson by default. See Common Operation Behavior (operations-common.html)."
+* parameter[2].binding.valueSet = Canonical(ExportOutputFormatCodes)
+* parameter[2].documentation = "Bulk export output format (csv, ndjson, parquet, json). Optional; if omitted, the server returns ndjson by default. See Common Operation Behavior (operations-common.html)."
 
 * parameter[3].name = #header
 * parameter[3].use = #in
@@ -530,8 +530,8 @@ Description: "Export SQLQuery Library results asynchronously using the FHIR Asyn
 * parameter[3].scope[1] = #type
 * parameter[3].type = #code
 * parameter[3].binding.strength = #extensible
-* parameter[3].binding.valueSet = Canonical(OutputFormatCodes)
-* parameter[3].documentation = "Output format for the exported files (csv, ndjson, parquet, json, fhir). Use fhir to export each output as newline-delimited FHIR Parameters rows. See Common Operation Behavior (operations-common.html)."
+* parameter[3].binding.valueSet = Canonical(ExportOutputFormatCodes)
+* parameter[3].documentation = "Output format for the exported files (csv, ndjson, parquet, json). See Common Operation Behavior (operations-common.html)."
 
 * parameter[4].name = #header
 * parameter[4].use = #in

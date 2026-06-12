@@ -14,55 +14,51 @@ page calls out the deviation explicitly.
 
 ## Output Formats (`_format`) {#output-formats}
 
-The four operations share a single enumeration of output formats. The supported
-values, their native media types, and the shape they produce are:
+The four operations share a single enumeration of output formats, with one
+exception: `fhir` applies to the run operations only. The supported values,
+their native media types, and the shape they produce are:
 
-| `_format`  | Native media type             | Shape                                                                 |
-| ---------- | ----------------------------- | --------------------------------------------------------------------- |
-| `csv`      | `text/csv`                    | Header row (unless `header=false`) followed by one row per result row |
-| `json`     | `application/json`            | A single JSON array of row objects                                    |
-| `ndjson`   | `application/x-ndjson`        | One JSON object per line, one line per result row                     |
-| `parquet`  | `application/vnd.apache.parquet` | Apache Parquet file                                                |
-| `fhir`     | `application/fhir+json`       | A FHIR `Parameters` resource with one repeating `row` per result row (see [FHIR Format](#fhir-format)) |
+| `_format` | Native media type                | Shape                                                                                                                       |
+| --------- | -------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| `csv`     | `text/csv`                       | Header row (unless `header=false`) followed by one row per result row                                                       |
+| `json`    | `application/json`               | A single JSON array of row objects                                                                                          |
+| `ndjson`  | `application/x-ndjson`           | One JSON object per line, one line per result row                                                                           |
+| `parquet` | `application/vnd.apache.parquet` | Apache Parquet file                                                                                                         |
+| `fhir`    | `application/fhir+json`          | A FHIR `Parameters` resource with one repeating `row` per result row; run operations only (see [FHIR Format](#fhir-format)) |
 
 {:.table-data}
 
 Conformance rules that apply to every operation:
 
 - It is RECOMMENDED to support `json`, `ndjson` and `csv` by default. Servers
-  MAY support `parquet` and `fhir`; any format a server supports SHALL be
-  declared in its CapabilityStatement, and any format it does not support SHALL
-  be rejected with `400 Bad Request` and an `OperationOutcome`.
+  MAY support `parquet`, and MAY support `fhir` on the run operations; any
+  format a server supports SHALL be declared in its CapabilityStatement, and
+  any format it does not support SHALL be rejected with `400 Bad Request` and
+  an `OperationOutcome`.
 - If `_format` is omitted and the format cannot be derived from the `Accept`
   header (see [Content Negotiation](#content-negotiation)), the server SHALL use
   `ndjson`.
 - `header` applies only to `csv` and defaults to `true`.
 
-This enumeration and the return-shape rules below are identical for all four
-operations. The two delivery models differ only in **how** the bytes reach the
-client — synchronously in the operation response (the run operations) or
-asynchronously as downloadable files (the export operations).
+Apart from `fhir`, this enumeration and the return-shape rules below are
+identical for all four operations. The two delivery models differ only in
+**how** the bytes reach the client — synchronously in the operation response
+(the run operations) or asynchronously as downloadable files (the export
+operations).
 
 ### FHIR Format (`_format=fhir`) {#fhir-format}
 
 `fhir` is an OPTIONAL format that returns result rows as typed FHIR values
-rather than as text or binary. It is available, at the server's option, on all
-four operations.
+rather than as text or binary. It is available, at the server's option, on the
+two synchronous run operations only; it is not available on the export
+operations, whose outputs are flat files.
 
-For the **synchronous** run operations, the result is a `Parameters` resource
-with one repeating `row` parameter per result row; each row's columns are
-`part`s carrying the appropriate `value[x]`. A query that yields no rows returns
-a `Parameters` resource with no `parameter` elements. SQL `NULL` is represented
-by omitting the corresponding `part`. The column-type-to-`value[x]` mapping is
-defined in
+The result is a `Parameters` resource with one repeating `row` parameter per
+result row; each row's columns are `part`s carrying the appropriate `value[x]`.
+A query that yields no rows returns a `Parameters` resource with no `parameter`
+elements. SQL `NULL` is represented by omitting the corresponding `part`. The
+column-type-to-`value[x]` mapping is defined in
 [SQL to FHIR type mapping](OperationDefinition-SQLQueryRun.html#sql-to-fhir-type-mapping).
-
-For the **asynchronous** export operations, each `output` entry is delivered as
-a file of **newline-delimited `Parameters` resources** — one `Parameters`
-resource per line, each structured exactly as a single synchronous `row`
-parameter's `part` list (i.e. one line per result row). This keeps `fhir`
-exports row-incremental and consistent with the other file formats, while
-preserving FHIR typing. The file's media type is `application/fhir+ndjson`.
 
 ## Return Representation and the `Binary` Parameter {#return-representation}
 

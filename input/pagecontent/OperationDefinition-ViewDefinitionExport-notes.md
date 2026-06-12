@@ -228,11 +228,11 @@ The `view` parameter is a complex type that can be repeated multiple times to ex
 
 ##### Export Control
 
-| Name             | Type    | Min | Max | Description                                                                                           |
-| ---------------- | ------- | --- | --- | ----------------------------------------------------------------------------------------------------- |
-| clientTrackingId | string  | 0   | 1   | Client-provided tracking ID for the export operation                                                  |
-| \_format         | code    | 0   | 1   | Output format: `csv`, `ndjson`, `parquet`, `json`, `fhir`. [Details](#format-parameter-clarification) |
-| header           | boolean | 0   | 1   | Include CSV headers (default true). Applies only when csv output is requested                         |
+| Name             | Type    | Min | Max | Description                                                                                   |
+| ---------------- | ------- | --- | --- | --------------------------------------------------------------------------------------------- |
+| clientTrackingId | string  | 0   | 1   | Client-provided tracking ID for the export operation                                          |
+| \_format         | code    | 0   | 1   | Output format: `csv`, `ndjson`, `parquet`, `json`. [Details](#format-parameter-clarification) |
+| header           | boolean | 0   | 1   | Include CSV headers (default true). Applies only when csv output is requested                 |
 
 {:.table-data}
 
@@ -278,22 +278,19 @@ For servers that want to support all types of references, it is recommended to f
 
 ##### Format Parameter Clarification
 
-The supported formats (`json`, `ndjson`, `csv`, `parquet`, `fhir`) and the
-default are defined in
+The supported formats (`json`, `ndjson`, `csv`, `parquet`) and the default are
+defined in
 [Common Operation Behavior](operations-common.html#output-formats) and apply to
-this operation:
+this operation. The `fhir` format is available on the run operations only:
 
 - It is RECOMMENDED to support `json`, `ndjson` and `csv` by default; servers MAY
-  support `parquet` and `fhir`, and SHALL document supported formats in the
+  support `parquet`, and SHALL document supported formats in the
   CapabilityStatement.
 - If `_format` is omitted, the server SHALL produce the export output in `ndjson`
   format.
 - When `_format` is supplied, its value SHALL take precedence over `Accept`
-  (which here negotiates the format of the *status/manifest* responses, not the
+  (which here negotiates the format of the _status/manifest_ responses, not the
   exported files).
-- `_format=fhir` exports each output as a file of newline-delimited FHIR
-  `Parameters` rows (media type `application/fhir+ndjson`); see
-  [FHIR Format](operations-common.html#fhir-format).
 
 ##### Patient Parameter Clarification
 
