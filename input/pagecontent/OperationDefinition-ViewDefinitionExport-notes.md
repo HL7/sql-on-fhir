@@ -111,7 +111,7 @@ This operation follows the [FHIR Asynchronous Bulk Data Request Pattern](https:/
       │                                               │  Step 4: Download
       │   ┌─────────────────────────────────────────┐ │
       │   │ 200 OK                                  │ │
-      │   │ Content-Type: application/fhir+ndjson  │ │
+      │   │ Content-Type: application/x-ndjson     │ │
       │   │                                         │ │
       │   │ {"id":"pt1","name":[{"given":["John"]}]}│ │
       │   │ {"id":"pt2","name":[{"given":["Jane"]}]}│ │
