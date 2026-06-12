@@ -130,6 +130,12 @@ These two axes are distinct: Axis 1 decides *what* is encoded, Axis 2 decides
 
 ## Streaming and Transfer Encoding {#streaming}
 
+This section applies to the two synchronous run operations, whose responses
+carry the result payload. It does not apply to the export operations: their
+responses follow the [asynchronous model](#asynchronous-delivery), and the
+files they produce are downloaded as ordinary HTTP responses whose transfer
+framing is governed by HTTP itself, not by this specification.
+
 Two further concepts are independent of each other and of the format:
 
 1. **Transfer framing** — `Transfer-Encoding: chunked` (RFC 9112 §7.1) is an
@@ -139,9 +145,7 @@ Two further concepts are independent of each other and of the format:
    choice between `Content-Length` and chunked framing depends solely on whether
    the server knows the body size before emitting the first byte, never on the
    format. Servers MAY use chunked transfer encoding for the response of any
-   format on any of the four operations; for the export operations the same
-   applies to the file downloads, while the operation response itself follows
-   the [asynchronous model](#asynchronous-delivery).
+   format on either run operation.
 
 2. **Incremental result production** — whether the server can emit output before
    the full result set is materialized. This is a server/engine capability that
@@ -175,5 +179,6 @@ it is a FHIR `Parameters` resource rather than the Bulk Data JSON manifest
 object. The flow, status codes, and headers are otherwise as the pattern
 specifies.
 
-File downloads referenced by `output.location` are independent HTTP responses
-and MAY use any framing (including chunked) per [Streaming](#streaming).
+File downloads referenced by `output.location` are independent HTTP responses;
+their transfer framing is governed by HTTP itself and is not constrained by
+this specification.
