@@ -126,9 +126,9 @@ Optional filtering parameters:
 
 ##### Output Parameter
 
-| Name   | Type     | Description                                                                                                       |
-| ------ | -------- | ----------------------------------------------------------------------------------------------------------------- |
-| return | Resource | Transformed data. `Binary` (a raw stream in the format's native media type) for `csv`/`json`/`ndjson`/`parquet`, or `Parameters` for `_format=fhir`. See [Return Representation](operations-common.html#return-representation) |
+| Name   | Type   | Description                                                                                                                                                                                                                                  |
+| ------ | ------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| return | Binary | Transformed data as a raw stream in the format's native media type, not a serialized `Binary` envelope (a `Parameters` resource when `_format=fhir` is requested). See [Return Representation](operations-common.html#return-representation) |
 
 {:.table-data}
 

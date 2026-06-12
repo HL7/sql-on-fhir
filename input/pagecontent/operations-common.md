@@ -66,10 +66,10 @@ preserving FHIR typing. The file's media type is `application/fhir+ndjson`.
 
 ## Return Representation and the `Binary` Parameter {#return-representation}
 
-The run operations declare their `return` as `Binary` (or, for `$sqlquery-run`,
-`Resource` — `Binary` for the flat formats and `Parameters` for `_format=fhir`).
-The `Binary` type denotes a **binary stream**, not a serialized FHIR `Binary`
-resource envelope.
+The run operations declare their `return` parameter as `Binary`. The `Binary`
+type denotes a **binary stream**, not a serialized FHIR `Binary` resource
+envelope. When `_format=fhir` is requested, the response is a `Parameters`
+resource rather than a binary stream (see [FHIR Format](#fhir-format)).
 
 Accordingly — and exactly as for a FHIR `Binary` read over the RESTful API (see
 [Serving Binary Resources](https://www.hl7.org/fhir/binary.html#rest)) — the

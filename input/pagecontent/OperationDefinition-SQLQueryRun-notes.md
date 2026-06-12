@@ -21,9 +21,9 @@ the path).
 
 #### Output Parameter
 
-| Name   | Type     | Description                                                                                          |
-| ------ | -------- | ---------------------------------------------------------------------------------------------------- |
-| return | Resource | Query results. Returns Binary for flat formats (csv, json, ndjson, parquet) or Parameters for `fhir`. The Binary is a raw stream in the format's native media type, not a serialized Binary envelope. See [Return Representation](operations-common.html#return-representation) |
+| Name   | Type   | Description                                                                                                                                                                                                                               |
+| ------ | ------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| return | Binary | Query results as a raw stream in the format's native media type, not a serialized `Binary` envelope (a `Parameters` resource when `_format=fhir` is requested). See [Return Representation](operations-common.html#return-representation) |
 
 {:.table-data}
 

@@ -332,8 +332,8 @@ Description: "Execute a view definition against supplied or server data."
 * parameter[10].use = #out
 * parameter[10].min = 1
 * parameter[10].max = "1"
-* parameter[10].type = #Resource
-* parameter[10].documentation = "Transformed data in the requested output format. Returns Binary for the flat formats (csv, json, ndjson, parquet) or Parameters for _format=fhir. The Binary denotes a raw binary stream in the format's native media type, not a serialized Binary resource envelope; see Common Operation Behavior (operations-common.html)."
+* parameter[10].type = #Binary
+* parameter[10].documentation = "Transformed data in the requested output format, returned as a raw binary stream in the format's native media type, not a serialized Binary resource envelope. When _format=fhir is requested, the response is a Parameters resource instead. See Common Operation Behavior (operations-common.html)."
 
 Instance: SQLQueryRun
 Usage: #definition
@@ -430,8 +430,8 @@ Description: "Execute a SQLQuery Library against ViewDefinition tables."
 * parameter[7].use = #out
 * parameter[7].min = 1
 * parameter[7].max = "1"
-* parameter[7].type = #Resource
-* parameter[7].documentation = "Query results in the requested output format. Returns Binary for the flat formats (csv, json, ndjson, parquet) or Parameters for _format=fhir. The Binary denotes a raw binary stream in the format's native media type, not a serialized Binary resource envelope; see Common Operation Behavior (operations-common.html)."
+* parameter[7].type = #Binary
+* parameter[7].documentation = "Query results in the requested output format, returned as a raw binary stream in the format's native media type, not a serialized Binary resource envelope. When _format=fhir is requested, the response is a Parameters resource instead. See Common Operation Behavior (operations-common.html)."
 
 Instance: SQLQueryExport
 Usage: #definition
