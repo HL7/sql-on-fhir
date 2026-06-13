@@ -9,6 +9,86 @@
   test report site live in a separate repository:
   https://github.com/FHIR/sql-on-fhir.js.
 
+## Constitution
+
+These principles are non-negotiable. They govern how the specification is
+written, changed and reviewed. A pull request that violates one of them must
+not be merged.
+
+### Core principles
+
+#### I. Portability across SQL engines
+
+Every normative feature of the specification MUST be implementable on
+mainstream SQL engines without relying on engine-specific extensions.
+ViewDefinition and operation semantics MUST be defined independently of any
+particular SQL dialect. SQL examples in spec pages MUST be checked for
+cross-dialect portability before merge. Rationale: the entire value of this
+specification is portable, tabular projections of FHIR data; a feature that
+only works on one engine defeats its purpose.
+
+#### II. Implementation neutrality
+
+The specification MUST NOT privilege any vendor, product, database or
+implementation strategy. Normative text MUST NOT require a specific storage
+model, query engine or architecture. Where examples mention concrete products
+or implementations, they MUST be clearly marked as informative.
+
+#### III. Testable normative behaviour
+
+Every change to normative behaviour MUST be paired with conformance tests in
+the shared test suite at https://github.com/FHIR/sql-on-fhir.js, and the spec
+pull request MUST link the companion test change. A normative statement that
+cannot be exercised by a conformance test SHOULD be reworded until it can be.
+
+#### IV. Backwards compatibility
+
+Anything released as a published version of the specification (see
+https://sql-on-fhir.org/ig/history.html) MUST NOT change in ways that break
+existing conforming views or implementations without an explicit deprecation
+period and a documented migration path. Breaking changes MUST be identified as
+such in the pull request description.
+
+#### V. Edit sources only
+
+All changes MUST be made to source files (`input/`, `sushi-config.yaml`,
+templates and scripts). Generated directories (`fsh-generated/`, `output/`,
+`temp/`, `input-cache/`) MUST NOT be hand-edited or committed.
+
+#### VI. Clean builds
+
+The IG MUST build with zero errors and zero unsuppressed warnings
+(`npm run build:ig`, verified by CI from `output/qa.json`) before merge. Each
+new suppression added to `input/ignoreWarnings.txt` MUST be justified in the
+pull request that introduces it; suppressions are not a substitute for fixing
+the underlying problem.
+
+#### VII. Community consensus for normative change
+
+Normative changes MUST be proposed through a public GitHub issue or pull
+request and MUST be reviewed by at least one other contributor before merge.
+Substantive changes SHOULD be raised in the weekly project meeting or on the
+FHIR chat (Analytics on FHIR stream) before being finalised.
+
+#### VIII. Accessible to both audiences
+
+Specification prose MUST be understandable by both SQL practitioners and FHIR
+practitioners. Every normative construct MUST be accompanied by at least one
+worked example. Domain-specific terms from either world MUST be defined in the
+glossary the first time they are relied upon.
+
+### Quality gates
+
+- CI (`.github/workflows/build.yaml`) fails on any IG Publisher error or any
+  warning not suppressed via `input/ignoreWarnings.txt`. Reproduce locally
+  with `npm run build:ig` and inspect `output/qa.html` before opening a pull
+  request.
+- Pull requests state purpose, scope and linked issues; page or documentation
+  changes include screenshots or links to the rendered output.
+- Changes to normative behaviour are not complete until the companion
+  conformance tests in sql-on-fhir.js exist and pass against the reference
+  implementation.
+
 ## Project Structure & Module Organization
 
 - `input/`: IG content (FSH, markdown). Edit spec pages here.
