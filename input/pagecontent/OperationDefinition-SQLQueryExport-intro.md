@@ -1,4 +1,4 @@
-Export SQLQuery Library results asynchronously using the FHIR Asynchronous Bulk Data Request Pattern.
+Export SQLQuery Library results asynchronously using the FHIR Asynchronous Interaction Request Pattern.
 
 **Use Cases:**
 
@@ -19,8 +19,9 @@ Export SQLQuery Library results asynchronously using the FHIR Asynchronous Bulk 
 
 1. Client sends request with `Prefer: respond-async` header
 2. Server returns `202 Accepted` with `Content-Location` polling URL
-3. Client polls for status until the poll returns `200 OK` with the manifest in the body
-4. Client downloads exported files from the `output.location` URLs in the manifest
+3. Client polls for status until the poll returns `303 See Other` with the result URL in the `Location` header
+4. Client fetches the result URL, which returns the manifest with `200 OK`
+5. Client downloads exported files from the `output.location` URLs in the manifest
 
 This operation combines the query source and parameter binding from
 [`$sqlquery-run`](OperationDefinition-SQLQueryRun.html) with the asynchronous

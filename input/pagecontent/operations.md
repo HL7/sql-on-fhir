@@ -39,12 +39,13 @@ And use standard tools like Apache Spark, AWS Athena or other tools to analyze d
    a list of ViewDefinitions to the server with `Prefer: respond-async` header.
 2. The server returns `202 Accepted` with `Content-Location` header pointing to status URL.
 3. The client polls the status URL:
-    - Server returns `202 Accepted` while processing (MAY include interim results)
-    - Server returns `200 OK` with the manifest (output URLs) in the body when complete
-4. The client reads the output URLs from the completion manifest.
-5. The client can then:
-    - Download exported files from the output URLs
-    - Load them into a data warehouse or analyze with tools like Apache Spark or Amazon Athena
+   - Server returns `202 Accepted` while processing (MAY include interim results)
+   - Server returns `303 See Other` with a `Location` header carrying the result URL when the export has finished
+4. The client fetches the result URL, which returns the manifest (output URLs) with `200 OK`.
+5. The client reads the output URLs from the manifest.
+6. The client can then:
+   - Download exported files from the output URLs
+   - Load them into a data warehouse or analyze with tools like Apache Spark or Amazon Athena
 
 [See Async Bulk Export](OperationDefinition-ViewDefinitionExport.html)
 
@@ -58,8 +59,8 @@ observations and medications as they are recorded.
 
 1. The client initiates a real-time evaluation of a ViewDefinition by submitting it to the server.
 2. The server:
-    - Processes the ViewDefinition
-    - Responds with the results of the evaluation
+   - Processes the ViewDefinition
+   - Responds with the results of the evaluation
 3. The client can process streamed results on fly.
 
 [See Run ViewDefinition](OperationDefinition-ViewDefinitionRun.html)
@@ -72,8 +73,8 @@ Developers or developer tools can test and refine ViewDefinitions interactively 
 
 1. The client initiates a real-time evaluation of a ViewDefinition by submitting it to the server.
 2. The server:
-    - Processes the ViewDefinition
-    - Responds with the results of the evaluation
+   - Processes the ViewDefinition
+   - Responds with the results of the evaluation
 
 [See Run ViewDefinition](OperationDefinition-ViewDefinitionRun.html)
 
@@ -87,9 +88,9 @@ Administrative bodies can request bulk reports for different populations and met
 
 1. The client initiates an asynchronous request to run queries on specific views.
 2. The server:
-    - Processes the request
-    - Builds views and runs queries
-    - Responds with the results
+   - Processes the request
+   - Builds views and runs queries
+   - Responds with the results
 3. The client can poll results
 
 [See Run Bulk Queries](OperationDefinition-SQLQueryRun.html)
@@ -97,9 +98,9 @@ Administrative bodies can request bulk reports for different populations and met
 ## API
 
 Behaviour shared by the four data operations (`$viewdefinition-run`,
-`$sqlquery-run`, `$viewdefinition-export`, `$sqlquery-export`) — the output
+`$sqlquery-run`, `$viewdefinition-export`, `$sqlquery-export`) - the output
 format set, return representation, content negotiation, transfer framing, and
-the asynchronous completion response — is specified once in
+the asynchronous delivery flow - is specified once in
 [Common Operation Behavior](operations-common.html). The operation pages below
 reference it rather than restating it.
 

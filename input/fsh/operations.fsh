@@ -437,7 +437,7 @@ Instance: SQLQueryExport
 Usage: #definition
 InstanceOf: OperationDefinition
 Title: "SQLQuery Export"
-Description: "Export SQLQuery Library results asynchronously using the FHIR Asynchronous Bulk Data Request Pattern."
+Description: "Export SQLQuery Library results asynchronously using the FHIR Asynchronous Interaction Request Pattern."
 
 * id = "SQLQueryExport"
 * url = "http://sql-on-fhir.org/OperationDefinition/$sqlquery-export"
