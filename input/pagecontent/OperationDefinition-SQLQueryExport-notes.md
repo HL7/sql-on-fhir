@@ -4,22 +4,22 @@
 
 #### Asynchronous Pattern
 
-This operation follows the FHIR Asynchronous Interaction Request Pattern:
+This operation follows the [FHIR Asynchronous Bulk Data Request Pattern](https://www.hl7.org/fhir/async-bulk.html); the completion response is specified once in [Common Operation Behavior — Asynchronous Delivery](operations-common.html#asynchronous-delivery):
 
 1. Client sends request with `Prefer: respond-async` header and query source parameters
 2. Server returns `202 Accepted` with `Content-Location` header pointing to status URL
 3. Client polls the status URL for export progress
 4. Server responds with `202 Accepted` while export is in progress (MAY include interim results)
-5. Upon completion, server returns `303 See Other` with `Location` header pointing to result URL
-6. Client GETs the result URL to retrieve final output (identical to synchronous response format)
+5. Upon completion, the status poll returns `200 OK` with the manifest `Parameters` resource (`exportId`, `status`, `output`, …) **in the response body**
+6. Client downloads the exported files from the `output.location` URLs in the manifest
 
-**Note**: This operation uses Parameters resource format instead of Bundle format to:
+**Note**: This operation uses a FHIR `Parameters` resource as the manifest instead of the Bulk Data JSON manifest object to:
 
 - Provide structured status reporting and metadata
 - Allow extensible output metadata specific to export operations
 - Maintain consistency with other FHIR operations
 
-**Note**: The `303 See Other` redirect pattern cleanly separates status polling from result retrieval, eliminating ambiguity around error handling and request header scope.
+**Note**: Completion is signalled by `200 OK` with the manifest in the body of the status-poll response, as in the FHIR Asynchronous Bulk Data Request Pattern. The operation does not use a `303 See Other` redirect to a separate result resource, so standard Bulk Data clients interoperate without special handling.
 
 ##### Async Flow Diagram
 
@@ -43,17 +43,11 @@ sequenceDiagram
     rect rgb(240, 255, 240)
     Note over C,S: Step 3: Completion
     C->>S: GET /status/abc123
-    S-->>C: 303 See Other<br/>Location: /result/abc123
-    end
-
-    rect rgb(255, 255, 240)
-    Note over C,S: Step 4: Result
-    C->>S: GET /result/abc123
-    S-->>C: 200 OK<br/>Body: Parameters{output: [{name, location}]}
+    S-->>C: 200 OK<br/>Body: Parameters{status: completed, output: [{name, location}]}
     end
 
     rect rgb(255, 248, 240)
-    Note over C,S: Step 5: Download
+    Note over C,S: Step 4: Download
     C->>S: GET /export/abc123/bp-results.csv
     S-->>C: 200 OK<br/>Content-Type: text/csv<br/>Body: patient_id,systolic,...
     end
@@ -80,8 +74,6 @@ sequenceDiagram
     participant S as Server
 
     C->>S: GET /status/abc123
-    S-->>C: 303 See Other<br/>Location: /result/abc123
-    C->>S: GET /result/abc123
     S-->>C: 500 Internal Server Error<br/>Body: OperationOutcome{severity: error, diagnostics: ...}
 ```
 
@@ -109,19 +101,16 @@ Optional filtering parameters:
 
 ##### Status Request
 
-- `Accept` (recommended) - Specifies the format of the status response
-
-##### Result Request
-
-- `Accept` (recommended) - Specifies the format of the final result response
+- `Accept` (recommended) - Specifies the format of the status response, including the completion (`200 OK`) response that carries the manifest
 
 ##### Header Scope
 
-Request headers sent during status polling apply **only to the status response**, not to the final operation result. This separation:
-
-- Allows different content negotiation for status vs. result responses
-- Enables servers to use different formats for interim status (e.g., minimal JSON) vs. final results (e.g., detailed Parameters)
-- Eliminates ambiguity about which response the headers apply to
+Each status-poll request's headers apply to **that poll's response**. Because
+completion is delivered as `200 OK` with the manifest in the body of the
+status-poll response (there is no separate result resource), the `Accept` header
+sent on the completing poll governs the representation of the manifest. This
+allows a client to negotiate a different representation for interim status
+responses (e.g. minimal JSON) than for the final manifest if it chooses.
 
 #### Parameters
 
@@ -203,8 +192,16 @@ Servers SHALL document which reference formats they support in their CapabilityS
 
 ##### Format Parameter Clarification
 
-It is RECOMMENDED to support 'json', 'ndjson' and 'csv' formats by default.
-Servers may support other formats, but they should be explicitly documented in the CapabilityStatement.
+The supported formats (`json`, `ndjson`, `csv`, `parquet`) and the default are
+defined in
+[Common Operation Behavior](operations-common.html#output-formats) and apply to
+this operation. The `fhir` format is available on the run operations only:
+
+- It is RECOMMENDED to support `json`, `ndjson` and `csv` by default; servers MAY
+  support `parquet`, and SHALL document supported formats in the
+  CapabilityStatement.
+- If `_format` is omitted, the server SHALL produce the export output in `ndjson`
+  format.
 
 ##### Patient Parameter Clarification
 
@@ -244,7 +241,9 @@ SQLQuery profile for the binding rules and the mapping from
 
 #### Output Parameters
 
-Output parameters appear in the **result response** (after following the `303 See Other` redirect), not in status polling responses.
+Output parameters appear in the **completion response** — the `200 OK`
+status-poll response that carries the manifest. They are not present in the
+`202 Accepted` responses returned while the export is still in progress.
 
 ##### Export Identifiers
 
@@ -340,11 +339,11 @@ The $sqlquery-export operation uses standard HTTP status codes to indicate the o
 | Status Code               | Description          | When to Use                                                          |
 | ------------------------- | -------------------- | -------------------------------------------------------------------- |
 | 202 Accepted              | In Progress          | Export request accepted or still in progress during polling          |
-| 303 See Other             | Complete             | Export complete, follow `Location` header to retrieve results        |
+| 200 OK                    | Complete             | Export complete; the status-poll response body carries the manifest  |
 | 400 Bad Request           | Client Error         | Invalid parameters, unsupported parameters, missing required headers |
 | 404 Not Found             | Not Found            | SQLQuery Library not found, or cancelled export status URL           |
 | 422 Unprocessable Entity  | Business Logic Error | Valid request but query is invalid or cannot be executed             |
-| 500 Internal Server Error | Server Error         | Unexpected server error (at result URL indicates operation failure)  |
+| 500 Internal Server Error | Server Error         | Unexpected server error; on a status poll, indicates operation failure |
 
 {:.table-data}
 
@@ -465,35 +464,35 @@ Content-Type: application/fhir+json
     - **Progress Updates**: Server MAY include `X-Progress` header to indicate completion percentage
     - **Retry-After**: Server SHOULD include `Retry-After` header to indicate when to retry
     - **Interim Results**: Server MAY include partial/interim results in response body (implementation-defined)
-4. **Completion**: When export is ready, server responds with:
-    - `303 See Other` status code
-    - `Location` header pointing to the result URL
-    - Response body is optional (MAY be empty or contain minimal status)
-5. **Result Retrieval**: Client GETs the result URL from the `Location` header:
-    - `200 OK` status code with Parameters resource containing `output` locations
-    - Response format is identical to what a synchronous call would return
-6. **Error Handling**: If export fails:
-    - Status endpoint still returns `303 See Other` with `Location` header
-    - Result URL returns appropriate error status code (e.g., `500 Internal Server Error`)
-    - Result response contains `OperationOutcome` with error details
-    - This cleanly separates polling errors from operation errors
-7. **Cancellation** (Recommended):
+4. **Completion**: When the export is ready, the status poll returns:
+    - `200 OK` status code
+    - A `Parameters` resource in the body containing `status` = `completed`, the
+      export metadata, and the `output` entries with their download `location`s
+    - This is the same manifest a synchronous call would return; there is no
+      `303 See Other` redirect and no separate result URL
+5. **Error Handling**: If the export fails, the status poll returns the relevant
+   error status code (e.g. `500 Internal Server Error`) with an
+   `OperationOutcome` body. Polling-transport errors and operation failures are
+   distinguished by the status code on the poll response itself.
+6. **Cancellation** (Recommended):
    Servers SHOULD support export cancellation via DELETE request to the status URL:
     - Client sends `DELETE` request to the status polling URL
     - Server responds with `202 Accepted`
     - Subsequent status requests return `404 Not Found`
     - Server SHOULD clean up any partial results
-8. **Result URL Lifetime**:
-   Result URLs SHALL remain valid for at least 24 hours after export completion:
-    - Servers SHOULD support multiple retrievals of the same result
-    - Servers MAY include an `Expires` header to indicate result URL expiration
+7. **Result Lifetime**:
+   The completed status URL (which returns the manifest) and the
+   `output.location` download URLs SHALL remain valid for at least 24 hours after
+   export completion:
+    - Servers SHOULD support multiple retrievals of the completed manifest
+    - Servers MAY include an `Expires` header to indicate when the URLs expire
     - Clients should retrieve results promptly but can retry within the validity window
-9. **Access Control**:
-   Servers SHALL protect status and result URLs with appropriate access controls:
+8. **Access Control**:
+   Servers SHALL protect status and download URLs with appropriate access controls:
     - Same authorization context as the original request, OR
     - Non-guessable URLs (e.g., cryptographically random tokens)
     - Unauthorized access attempts return `401 Unauthorized` or `403 Forbidden`
-10. **File Download**: Client downloads the output from URLs in the `output.location` parameters.
+9. **File Download**: Client downloads the output from URLs in the `output.location` parameters.
 
 #### Examples
 
@@ -704,25 +703,7 @@ Accept: application/fhir+json
 Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGc...
 ```
 
-Response indicates completion with redirect to result URL:
-
-```http
-HTTP/1.1 303 See Other
-Location: https://example.com/fhir/export/550e8400-e29b-41d4-a716-446655440000/result
-```
-
-**Step 6: Result Retrieval**
-
-Client follows the `Location` header to retrieve the final results:
-
-```http
-GET /fhir/export/550e8400-e29b-41d4-a716-446655440000/result HTTP/1.1
-Host: example.com
-Accept: application/fhir+json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGc...
-```
-
-Response contains the export results:
+The status poll returns `200 OK` with the manifest in the body; there is no redirect:
 
 ```http
 HTTP/1.1 200 OK
@@ -777,7 +758,7 @@ Expires: Wed, 04 Mar 2026 14:30:42 GMT
 }
 ```
 
-**Step 7: Download Files**
+**Step 6: Download Files**
 
 Client downloads each file:
 
@@ -910,7 +891,7 @@ Prefer: respond-async
         {
           "name": "viewReference",
           "valueReference": {
-            "reference": "Binary/UsCoreBloodPressures"
+            "reference": "ViewDefinition/UsCoreBloodPressures"
           }
         }
       ]

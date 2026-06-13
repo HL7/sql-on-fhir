@@ -21,9 +21,9 @@ the path).
 
 #### Output Parameter
 
-| Name   | Type     | Description                                                                                          |
-| ------ | -------- | ---------------------------------------------------------------------------------------------------- |
-| return | Resource | Query results. Returns Binary for flat formats (csv, json, ndjson, parquet) or Parameters for `fhir` |
+| Name   | Type   | Description                                                                                                                                                                                                                               |
+| ------ | ------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| return | Binary | Query results as a raw stream in the format's native media type, not a serialized `Binary` envelope (a `Parameters` resource when `_format=fhir` is requested). See [Return Representation](operations-common.html#return-representation) |
 
 {:.table-data}
 
@@ -44,15 +44,21 @@ as an error.
 
 #### Format Parameter Clarification
 
-It is RECOMMENDED to support `json`, `ndjson` and `csv` formats by default.
-Servers may support other formats, but they should be explicitly documented in
-the CapabilityStatement.
+The supported formats (`json`, `ndjson`, `csv`, `parquet`, `fhir`), the default,
+the `Accept`-vs-`_format` precedence rule, the raw-vs-envelope representation
+axis, and transfer framing are defined in
+[Common Operation Behavior](operations-common.html) and apply identically to
+this operation:
 
-If `_format` is omitted, the server SHALL return the result in `ndjson` format.
-
-Servers MAY honour the HTTP `Accept` header to negotiate an alternative format
-when `_format` is not supplied. When `_format` is supplied, its value SHALL
-take precedence over `Accept`.
+- It is RECOMMENDED to support `json`, `ndjson` and `csv` by default; servers MAY
+  support `parquet` and `fhir`, and SHALL document supported formats in the
+  CapabilityStatement.
+- If `_format` is omitted (and no format is derivable from `Accept`), the server
+  SHALL return the result in `ndjson` format.
+- When `_format` is supplied, its value SHALL take precedence over `Accept`.
+- The response of any format MAY use `Transfer-Encoding: chunked`; chunked
+  transfer is independent of the format. See
+  [Streaming and Transfer Encoding](operations-common.html#streaming).
 
 ### Examples
 
@@ -211,7 +217,12 @@ Content-Type: application/fhir+json
 
 #### Response
 
-For flat formats (`csv`, `json`, `ndjson`, `parquet`), the response is a Binary:
+For flat formats (`csv`, `json`, `ndjson`, `parquet`), the response body is the
+raw payload in the format's native media type (the `Binary` stream), not a
+serialized `Binary` resource envelope; `Content-Type` is set to that media type.
+The response MAY be sent with `Transfer-Encoding: chunked` regardless of format.
+See [Return Representation](operations-common.html#return-representation) and
+[Streaming](operations-common.html#streaming).
 
 ```http
 HTTP/1.1 200 OK

@@ -72,16 +72,15 @@ Description: "Output format codes for SQL on FHIR."
 
 ValueSet: OutputFormatCodes
 Title: "Output Format Codes"
-Description: "ValueSet of all codes from Output Format Codes codesystem"
+Description: "ValueSet of all codes from Output Format Codes codesystem. Used by the synchronous run operations; see Common Operation Behavior."
 * ^experimental = false
 * codes from system OutputFormatCodes
 
-ValueSet: SQLQueryRunOutputFormatCodes
-Title: "SQLQuery Run Output Format Codes"
-Description: "Output format codes supported by the $sqlquery-run operation."
+ValueSet: ExportOutputFormatCodes
+Title: "Export Output Format Codes"
+Description: "Output format codes supported by the export operations. Excludes fhir, which applies to the run operations only; see Common Operation Behavior."
 * ^experimental = false
 * OutputFormatCodes#csv
 * OutputFormatCodes#ndjson
 * OutputFormatCodes#parquet
 * OutputFormatCodes#json
-* OutputFormatCodes#fhir
