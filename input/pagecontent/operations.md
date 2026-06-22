@@ -12,7 +12,9 @@ The following list of API endpoints are defined:
 
 - CapabilityStatement
 - Operation $viewdefinition-export of ViewDefinition
-- Operation $run of ViewDefinition
+- Operation $viewdefinition-run of ViewDefinition
+- Operation $sqlquery-run of Library
+- Operation $sqlquery-export of Library
 
 ## Use Cases
 
@@ -39,12 +41,12 @@ And use standard tools like Apache Spark, AWS Athena or other tools to analyze d
    a list of ViewDefinitions to the server with `Prefer: respond-async` header.
 2. The server returns `202 Accepted` with `Content-Location` header pointing to status URL.
 3. The client polls the status URL:
-    - Server returns `202 Accepted` while processing (MAY include interim results)
-    - Server returns `200 OK` with the manifest (output URLs) in the body when complete
+   - Server returns `202 Accepted` while processing (MAY include interim results)
+   - Server returns `200 OK` with the manifest (output URLs) in the body when complete
 4. The client reads the output URLs from the completion manifest.
 5. The client can then:
-    - Download exported files from the output URLs
-    - Load them into a data warehouse or analyze with tools like Apache Spark or Amazon Athena
+   - Download exported files from the output URLs
+   - Load them into a data warehouse or analyze with tools like Apache Spark or Amazon Athena
 
 [See Async Bulk Export](OperationDefinition-ViewDefinitionExport.html)
 
@@ -58,8 +60,8 @@ observations and medications as they are recorded.
 
 1. The client initiates a real-time evaluation of a ViewDefinition by submitting it to the server.
 2. The server:
-    - Processes the ViewDefinition
-    - Responds with the results of the evaluation
+   - Processes the ViewDefinition
+   - Responds with the results of the evaluation
 3. The client can process streamed results on fly.
 
 [See Run ViewDefinition](OperationDefinition-ViewDefinitionRun.html)
@@ -72,8 +74,8 @@ Developers or developer tools can test and refine ViewDefinitions interactively 
 
 1. The client initiates a real-time evaluation of a ViewDefinition by submitting it to the server.
 2. The server:
-    - Processes the ViewDefinition
-    - Responds with the results of the evaluation
+   - Processes the ViewDefinition
+   - Responds with the results of the evaluation
 
 [See Run ViewDefinition](OperationDefinition-ViewDefinitionRun.html)
 
@@ -87,9 +89,9 @@ Administrative bodies can request bulk reports for different populations and met
 
 1. The client initiates an asynchronous request to run queries on specific views.
 2. The server:
-    - Processes the request
-    - Builds views and runs queries
-    - Responds with the results
+   - Processes the request
+   - Builds views and runs queries
+   - Responds with the results
 3. The client can poll results
 
 [See Run Bulk Queries](OperationDefinition-SQLQueryRun.html)
@@ -121,13 +123,27 @@ The server processes the ViewDefinitions asynchronously and provides progress up
 
 See [Operation $viewdefinition-export of ViewDefinition](OperationDefinition-ViewDefinitionExport.html)
 
-### Operation $run of ViewDefinition
+### Operation $viewdefinition-run of ViewDefinition
 
-The `$run` operation provides real-time, synchronous evaluation of ViewDefinitions to transform FHIR resources into tabular format.
+The `$viewdefinition-run` operation provides real-time, synchronous evaluation of ViewDefinitions to transform FHIR resources into tabular format.
 This operation is designed for interactive development, debugging of ViewDefinitions, and real-time data streaming applications.
-It can be invoked at either the type level (ViewDefinition/$run) or instance level (ViewDefinition/{id}/$run), with the ViewDefinition specified either in the request parameters or inferred from the URL path.
+It can be invoked at either the type level (ViewDefinition/$viewdefinition-run) or instance level (ViewDefinition/{id}/$viewdefinition-run), with the ViewDefinition specified either in the request parameters or inferred from the URL path.
 
 The operation supports multiple output formats including JSON, NDJSON, CSV, Parquet, and table formats, with the format determined by the Accept header or \_format parameter.
 It can process either resources provided directly in the request or resources available on the server, with optional filtering by patient, group, or time parameters. The operation may use chunked transfer encoding for large result sets and includes comprehensive error handling through FHIR OperationOutcome resources for validation and processing errors.
 
-See [Operation $run of ViewDefinition](OperationDefinition-ViewDefinitionRun.html)
+See [Operation $viewdefinition-run of ViewDefinition](OperationDefinition-ViewDefinitionRun.html)
+
+### Operation $sqlquery-run of Library
+
+The `$sqlquery-run` operation provides real-time, synchronous execution of a SQLQuery Library against materialised ViewDefinition tables, returning the query results in the requested format.
+It can be invoked at the system, type, or instance level, with the query supplied inline, by reference, or inferred from the URL path at instance level.
+
+See [Operation $sqlquery-run of Library](OperationDefinition-SQLQueryRun.html) and the shared [Common Operation Behavior](operations-common.html).
+
+### Operation $sqlquery-export of Library
+
+The `$sqlquery-export` operation is the asynchronous counterpart to `$sqlquery-run`, exporting SQLQuery Library results into formats such as CSV, NDJSON, or Parquet using the FHIR Asynchronous Bulk Data Request pattern.
+It accepts one or more queries to export and returns export tasks that can be monitored for progress and completion, suiting it to large-scale query execution with results delivered to file storage.
+
+See [Operation $sqlquery-export of Library](OperationDefinition-SQLQueryExport.html) and the shared [Common Operation Behavior](operations-common.html).

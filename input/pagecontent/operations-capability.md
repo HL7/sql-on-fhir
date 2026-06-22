@@ -7,19 +7,36 @@ The CapabilityStatement.rest.resource array SHALL contain an entry for the ViewD
 - An operation element with:
   - name = "$viewdefinition-export"
   - definition = "http://sql-on-fhir.org/OperationDefinition/$viewdefinition-export"
-- An operation element with:  
-  - name = "$run"
-  - definition = "http://sql-on-fhir.org/OperationDefinition/$run"
+- An operation element with:
+  - name = "$viewdefinition-run"
+  - definition = "http://sql-on-fhir.org/OperationDefinition/$viewdefinition-run"
 
 If the server supports CRUD and search interactions for the ViewDefinition resource type, the interaction array SHALL include the appropriate codes:
 
 - read
-- search-type  
+- search-type
 - write
 - patch
 - delete
 - create
 
+The CapabilityStatement.rest.resource array SHALL also contain an entry for the Library resource type (a SQLQuery is a profile of Library) with:
+
+- An operation element with:
+  - name = "$sqlquery-run"
+  - definition = "http://sql-on-fhir.org/OperationDefinition/$sqlquery-run"
+- An operation element with:
+  - name = "$sqlquery-export"
+  - definition = "http://sql-on-fhir.org/OperationDefinition/$sqlquery-export"
+
+If the server supports CRUD and search interactions for the Library resource type, the interaction array SHALL include the appropriate codes:
+
+- read
+- search-type
+- write
+- patch
+- delete
+- create
 
 ## Example
 
@@ -58,12 +75,29 @@ Content-Type: application/fhir+json
           "definition": "http://sql-on-fhir.org/OperationDefinition/$viewdefinition-export"
         },
         {
-          "name": "$validate",
-          "definition": "http://sql-on-fhir.org/OperationDefinition/$validate"
+          "name": "$viewdefinition-run",
+          "definition": "http://sql-on-fhir.org/OperationDefinition/$viewdefinition-run"
+        }
+      ]
+    },
+    {
+      "type": "Library",
+      "interaction": [
+        { "code": "read" },
+        { "code": "search-type" },
+        { "code": "write" },
+        { "code": "patch" },
+        { "code": "delete" },
+        { "code": "create" }
+      ],
+      "operation": [
+        {
+          "name": "$sqlquery-run",
+          "definition": "http://sql-on-fhir.org/OperationDefinition/$sqlquery-run"
         },
         {
-          "name": "$run",
-          "definition": "http://sql-on-fhir.org/OperationDefinition/$run"
+          "name": "$sqlquery-export",
+          "definition": "http://sql-on-fhir.org/OperationDefinition/$sqlquery-export"
         }
       ]
     }]
