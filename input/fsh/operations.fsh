@@ -38,12 +38,14 @@ Description: "Export a view definition. User can provide view definition referen
 * parameter[0].part[1].min = 0
 * parameter[0].part[1].max = "1"
 * parameter[0].part[1].type = #Reference
+* parameter[0].part[1].targetProfile = Canonical(ViewDefinition)
 * parameter[0].part[1].documentation = "Reference to a ViewDefinition stored on the server."
 * parameter[0].part[2].name = #viewResource
 * parameter[0].part[2].use = #in
 * parameter[0].part[2].min = 0
 * parameter[0].part[2].max = "1"
-* parameter[0].part[2].type = #Resource
+* parameter[0].part[2].type = #CanonicalResource
+* parameter[0].part[2].targetProfile = Canonical(ViewDefinition)
 * parameter[0].part[2].documentation = "Inline ViewDefinition resource to export."
 
 * parameter[1].name = #clientTrackingId
@@ -254,6 +256,7 @@ Description: "Execute a view definition against supplied or server data."
 * parameter[2].scope[0] = #system
 * parameter[2].scope[1] = #type
 * parameter[2].type = #Reference
+* parameter[2].targetProfile = Canonical(ViewDefinition)
 * parameter[2].documentation = "Reference to a ViewDefinition stored on the server."
 
 * parameter[3].name = #viewResource
@@ -384,7 +387,9 @@ Description: "Execute a SQLQuery Library against ViewDefinition tables."
 * parameter[2].scope[0] = #system
 * parameter[2].scope[1] = #type
 * parameter[2].type = #Reference
-* parameter[2].documentation = "Reference to a SQLQuery Library stored on the server."
+* parameter[2].targetProfile[0] = Canonical(SQLQuery)
+* parameter[2].targetProfile[1] = Canonical(SQLView)
+* parameter[2].documentation = "Reference to a SQLQuery or SQLView Library stored on the server."
 
 * parameter[3].name = #queryResource
 * parameter[3].use = #in
@@ -393,7 +398,9 @@ Description: "Execute a SQLQuery Library against ViewDefinition tables."
 * parameter[3].scope[0] = #system
 * parameter[3].scope[1] = #type
 * parameter[3].type = #Library
-* parameter[3].documentation = "Inline SQLQuery Library resource to execute."
+* parameter[3].targetProfile[0] = Canonical(SQLQuery)
+* parameter[3].targetProfile[1] = Canonical(SQLView)
+* parameter[3].documentation = "Inline SQLQuery or SQLView Library resource to execute."
 
 * parameter[4].name = #parameters
 * parameter[4].use = #in
@@ -459,7 +466,7 @@ Description: "Export SQLQuery Library results asynchronously using the FHIR Asyn
 * parameter[0].max = "*"
 * parameter[0].scope[0] = #system
 * parameter[0].scope[1] = #type
-* parameter[0].documentation = "One or more SQLQuery Libraries to export. Each repetition identifies a single query. Applies at system and type level only; at instance level the bound Library identified by the request URL is the query source and this parameter does not apply."
+* parameter[0].documentation = "One or more SQLQuery or SQLView Libraries to export. Each repetition identifies a single query. Applies at system and type level only; at instance level the bound Library identified by the request URL is the query source and this parameter does not apply."
 * parameter[0].part[0].name = #name
 * parameter[0].part[0].use = #in
 * parameter[0].part[0].min = 0
@@ -471,13 +478,17 @@ Description: "Export SQLQuery Library results asynchronously using the FHIR Asyn
 * parameter[0].part[1].min = 0
 * parameter[0].part[1].max = "1"
 * parameter[0].part[1].type = #Reference
-* parameter[0].part[1].documentation = "Reference to a SQLQuery Library stored on the server."
+* parameter[0].part[1].targetProfile[0] = Canonical(SQLQuery)
+* parameter[0].part[1].targetProfile[1] = Canonical(SQLView)
+* parameter[0].part[1].documentation = "Reference to a SQLQuery or SQLView Library stored on the server."
 * parameter[0].part[2].name = #queryResource
 * parameter[0].part[2].use = #in
 * parameter[0].part[2].min = 0
 * parameter[0].part[2].max = "1"
-* parameter[0].part[2].type = #Resource
-* parameter[0].part[2].documentation = "Inline SQLQuery Library resource to execute."
+* parameter[0].part[2].type = #Library
+* parameter[0].part[2].targetProfile[0] = Canonical(SQLQuery)
+* parameter[0].part[2].targetProfile[1] = Canonical(SQLView)
+* parameter[0].part[2].documentation = "Inline SQLQuery or SQLView Library resource to execute."
 * parameter[0].part[3].name = #parameters
 * parameter[0].part[3].use = #in
 * parameter[0].part[3].min = 0
@@ -504,12 +515,14 @@ Description: "Export SQLQuery Library results asynchronously using the FHIR Asyn
 * parameter[1].part[1].min = 0
 * parameter[1].part[1].max = "1"
 * parameter[1].part[1].type = #Reference
+* parameter[1].part[1].targetProfile = Canonical(ViewDefinition)
 * parameter[1].part[1].documentation = "Reference to a ViewDefinition stored on the server."
 * parameter[1].part[2].name = #viewResource
 * parameter[1].part[2].use = #in
 * parameter[1].part[2].min = 0
 * parameter[1].part[2].max = "1"
-* parameter[1].part[2].type = #Resource
+* parameter[1].part[2].type = #CanonicalResource
+* parameter[1].part[2].targetProfile = Canonical(ViewDefinition)
 * parameter[1].part[2].documentation = "Inline ViewDefinition resource."
 
 // Input parameters — export control (from $viewdefinition-export)
