@@ -73,6 +73,7 @@ menu:
   SQL:
     SQL Query: StructureDefinition-SQLQuery.html
     SQL View: StructureDefinition-SQLView.html
+  Materialized View: StructureDefinition-MaterializedView.html
   Artifacts: artifacts.html
   Operations:
     Overview: operations.html
