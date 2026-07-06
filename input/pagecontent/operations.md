@@ -12,7 +12,9 @@ The following list of API endpoints are defined:
 
 - CapabilityStatement
 - Operation $viewdefinition-export of ViewDefinition
-- Operation $run of ViewDefinition
+- Operation $viewdefinition-run of ViewDefinition
+- Operation $sqlquery-run of Library
+- Operation $sqlquery-export of Library
 
 ## Use Cases
 
@@ -122,13 +124,27 @@ The server processes the ViewDefinitions asynchronously and provides progress up
 
 See [Operation $viewdefinition-export of ViewDefinition](OperationDefinition-ViewDefinitionExport.html)
 
-### Operation $run of ViewDefinition
+### Operation $viewdefinition-run of ViewDefinition
 
-The `$run` operation provides real-time, synchronous evaluation of ViewDefinitions to transform FHIR resources into tabular format.
+The `$viewdefinition-run` operation provides real-time, synchronous evaluation of ViewDefinitions to transform FHIR resources into tabular format.
 This operation is designed for interactive development, debugging of ViewDefinitions, and real-time data streaming applications.
-It can be invoked at either the type level (ViewDefinition/$run) or instance level (ViewDefinition/{id}/$run), with the ViewDefinition specified either in the request parameters or inferred from the URL path.
+It can be invoked at either the type level (ViewDefinition/$viewdefinition-run) or instance level (ViewDefinition/{id}/$viewdefinition-run), with the ViewDefinition specified either in the request parameters or inferred from the URL path.
 
 The operation supports multiple output formats including JSON, NDJSON, CSV, Parquet, and table formats, with the format determined by the Accept header or \_format parameter.
 It can process either resources provided directly in the request or resources available on the server, with optional filtering by patient, group, or time parameters. The operation may use chunked transfer encoding for large result sets and includes comprehensive error handling through FHIR OperationOutcome resources for validation and processing errors.
 
-See [Operation $run of ViewDefinition](OperationDefinition-ViewDefinitionRun.html)
+See [Operation $viewdefinition-run of ViewDefinition](OperationDefinition-ViewDefinitionRun.html)
+
+### Operation $sqlquery-run of Library
+
+The `$sqlquery-run` operation provides real-time, synchronous execution of a SQLQuery Library against materialised ViewDefinition tables, returning the query results in the requested format.
+It can be invoked at the system, type, or instance level, with the query supplied inline, by reference, or inferred from the URL path at instance level.
+
+See [Operation $sqlquery-run of Library](OperationDefinition-SQLQueryRun.html) and the shared [Common Operation Behavior](operations-common.html).
+
+### Operation $sqlquery-export of Library
+
+The `$sqlquery-export` operation is the asynchronous counterpart to `$sqlquery-run`, exporting SQLQuery Library results into formats such as CSV, NDJSON, or Parquet using the FHIR Asynchronous Bulk Data Request pattern.
+It accepts one or more queries to export and returns export tasks that can be monitored for progress and completion, suiting it to large-scale query execution with results delivered to file storage.
+
+See [Operation $sqlquery-export of Library](OperationDefinition-SQLQueryExport.html) and the shared [Common Operation Behavior](operations-common.html).

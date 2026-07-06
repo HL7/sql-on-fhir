@@ -8,26 +8,26 @@
 When using the GET method, the following limitations apply:
 
 1. **No Request Body Parameters**: GET requests cannot include parameters that require a request body:
-    - Cannot provide `viewResource` parameter (inline ViewDefinition)
-    - Cannot provide `resource` parameter (direct resources to transform)
+   - Cannot provide `viewResource` parameter (inline ViewDefinition)
+   - Cannot provide `resource` parameter (direct resources to transform)
 2. **Available Parameters**: Only parameters that can be passed as query parameters are supported:
-    - `_format` - Output format specification
-    - `header` - Include CSV headers (for CSV format)
-    - `patient` - Filter by patient reference
-    - `group` - Filter by group membership
-    - `_since` - Filter by last updated time
-    - `_limit` - Limit number of result rows
-    - `source` - External data source
+   - `_format` - Output format specification
+   - `header` - Include CSV headers (for CSV format)
+   - `patient` - Filter by patient reference
+   - `group` - Filter by group membership
+   - `_since` - Filter by last updated time
+   - `_limit` - Limit number of result rows
+   - `source` - External data source
 
 3. **Use Cases**: GET is suitable for:
-    - Instance-level invocations where the ViewDefinition is identified by the URL path
-    - Simple filtering and formatting of server data
-    - Quick queries without complex configuration
+   - Instance-level invocations where the ViewDefinition is identified by the URL path
+   - Simple filtering and formatting of server data
+   - Quick queries without complex configuration
 
 4. **When POST is Required**: Use POST instead of GET when you need to:
-    - Provide an inline ViewDefinition via `viewResource` parameter
-    - Supply resources directly via `resource` parameter for transformation
-    - Pass complex parameter values that cannot be represented as query strings
+   - Provide an inline ViewDefinition via `viewResource` parameter
+   - Supply resources directly via `resource` parameter for transformation
+   - Pass complex parameter values that cannot be represented as query strings
 
 #### Data Sources
 
@@ -135,7 +135,7 @@ Optional filtering parameters:
 ##### View Reference/Resource Clarification {#viewreference-clarification}
 
 Only one of the `viewReference` or `viewResource` parameters can be provided.
-When invoking this operation at the instance level (e.g. ViewDefinition/{id}/$run), the server SHALL automatically infer the `viewReference` parameter from the path parameter.
+When invoking this operation at the instance level (e.g. ViewDefinition/{id}/$viewdefinition-run), the server SHALL automatically infer the `viewReference` parameter from the path parameter.
 
 The `viewReference` parameter MAY be specified using any of the following formats:
 
@@ -222,7 +222,7 @@ resources and every unwrapped bundle entry.
 ##### Example 1: Instance-level GET with CSV output
 
 ```http
-GET /ViewDefinition/patient-demographics/$run HTTP/1.1
+GET /ViewDefinition/patient-demographics/$viewdefinition-run HTTP/1.1
 Accept: text/csv
 ```
 
@@ -240,7 +240,7 @@ pt-3,1992-07-08,Williams,Robert
 ##### Example 2: Type-level POST with inline ViewDefinition
 
 ```http
-POST /ViewDefinition/$run HTTP/1.1
+POST /ViewDefinition/$viewdefinition-run HTTP/1.1
 Accept: application/json
 Content-Type: application/fhir+json
 
@@ -278,7 +278,7 @@ Content-Type: application/json
 ##### Example 3: POST with direct resources
 
 ```http
-POST /ViewDefinition/$run HTTP/1.1
+POST /ViewDefinition/$viewdefinition-run HTTP/1.1
 Accept: text/csv
 Content-Type: application/fhir+json
 
@@ -340,7 +340,7 @@ pt-2,2012-03-30,Doe,John
 ##### Example 4: GET with filters
 
 ```http
-GET /ViewDefinition/encounters/$run?patient=Patient/123&_limit=10&_format=ndjson HTTP/1.1
+GET /ViewDefinition/encounters/$viewdefinition-run?patient=Patient/123&_limit=10&_format=ndjson HTTP/1.1
 ```
 
 ```http
@@ -360,7 +360,7 @@ against each entry. This request is equivalent to Example 3, which passed the
 two Patients as discrete `resource` values.
 
 ```http
-POST /ViewDefinition/$run HTTP/1.1
+POST /ViewDefinition/$viewdefinition-run HTTP/1.1
 Accept: text/csv
 Content-Type: application/fhir+json
 
@@ -429,7 +429,7 @@ All error responses (4xx and 5xx) SHOULD include an `OperationOutcome` resource 
 When the server does not support certain parameters, it should return `400 Bad Request`:
 
 ```http
-GET /ViewDefinition/123/$run?_since=2021-01-01 HTTP/1.1
+GET /ViewDefinition/123/$viewdefinition-run?_since=2021-01-01 HTTP/1.1
 Accept: application/json
 ```
 
@@ -455,7 +455,7 @@ Content-Type: application/fhir+json
 When the provided ViewDefinition is invalid, return `422 Unprocessable Entity`:
 
 ```http
-POST /ViewDefinition/$run HTTP/1.1
+POST /ViewDefinition/$viewdefinition-run HTTP/1.1
 Content-Type: application/fhir+json
 Accept: application/json
 
@@ -498,7 +498,7 @@ Content-Type: application/fhir+json
 When the referenced ViewDefinition does not exist:
 
 ```http
-GET /ViewDefinition/non-existent/$run HTTP/1.1
+GET /ViewDefinition/non-existent/$viewdefinition-run HTTP/1.1
 Accept: application/json
 ```
 
@@ -523,7 +523,7 @@ Content-Type: application/fhir+json
 When required parameters are missing:
 
 ```http
-POST /ViewDefinition/$run HTTP/1.1
+POST /ViewDefinition/$viewdefinition-run HTTP/1.1
 Content-Type: application/fhir+json
 Accept: text/csv
 
@@ -554,7 +554,7 @@ Content-Type: application/fhir+json
 When an unsupported format is requested:
 
 ```http
-GET /ViewDefinition/123/$run?_format=xml HTTP/1.1
+GET /ViewDefinition/123/$viewdefinition-run?_format=xml HTTP/1.1
 ```
 
 ```http
@@ -579,7 +579,7 @@ Content-Type: application/fhir+json
 When filtering by a patient that doesn't exist:
 
 ```http
-GET /ViewDefinition/lab-results/$run?patient=Patient/non-existent HTTP/1.1
+GET /ViewDefinition/lab-results/$viewdefinition-run?patient=Patient/non-existent HTTP/1.1
 Accept: application/json
 ```
 
