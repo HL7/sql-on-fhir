@@ -50,7 +50,7 @@ Title: "Materialized View"
 Parent: DomainResource
 Characteristics: #can-be-target
 Description: """
-A MaterializedView is a server-managed, persisted representation of the output of a single ViewDefinition or SQLView (a SQLQuery `Library`) — its data processed into an efficient form for future query or load, such as a SQL table or view, or a Parquet/CSV file. It is an infrastructure/configuration resource (like `Subscription`): it has its own lifecycle, identity, and dependency graph, but is not itself reusable, versioned canonical content.
+A MaterializedView is a server-managed, persisted representation of the output of a single ViewDefinition or SQLView (a SQLQuery `Library`) — its data processed into an efficient form for future query or load, such as a SQL table or view, or a Parquet/CSV file.
 """
 * ^url = "https://sql-on-fhir.org/ig/StructureDefinition/MaterializedView"
 * ^status = #draft

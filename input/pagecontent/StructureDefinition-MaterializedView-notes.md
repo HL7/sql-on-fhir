@@ -85,6 +85,8 @@ model, this guide does not (yet) define formal `SearchParameter` resources for i
 | `status` | token | `MaterializedView.status` | Filter by lifecycle status (e.g. `ready`, `stale`, `failed`). |
 | `identifier` | token | `MaterializedView.identifier` | Find by business identifier. |
 
+## Examples
+
 ### Materialize several views, then query across them
 
 **1. Materialize two base views** on the `analytics` destination (each builds
