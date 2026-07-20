@@ -7,9 +7,6 @@
 # Publisher bug?
 Error in constraint 'sql-expressions' with expression '(path | forEach | forEachOrNull | union).count() = 1': Cannot assign field "sourceDefinition" because "res" is null
 
-# Not an official HL7 project
-When HL7 is publishing a resource, the owning committee must be stated using the http://hl7.org/fhir/StructureDefinition/structuredefinition-wg extension
-
 # ViewDefinition names are deliberately snake_case so they can be used directly
 # as SQL table and column identifiers (enforced by the sql-name invariant). This
 # is incompatible with the cnl-0 canonical-resource name pattern, which expects
