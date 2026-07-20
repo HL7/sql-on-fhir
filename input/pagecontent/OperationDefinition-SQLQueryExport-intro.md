@@ -29,5 +29,5 @@ export pattern from [`$viewdefinition-export`](OperationDefinition-ViewDefinitio
 **Key Features:**
 
 - **Multiple queries** per export via the repeating `query` parameter — each with its own parameters
-- **ViewDefinition table sources** via the `view` parameter — supply ViewDefinitions referenced in the Library's `relatedArtifact` entries (materialized as tables for SQL to query; only SQL query results appear in the export output)
+- **Inline table-source dependencies** via the `dependency` parameter — supply ViewDefinitions or SQLViews referenced in the Library's `relatedArtifact` entries (materialized as tables for SQL to query; only SQL query results appear in the export output)
 - **Per-query parameters** — each `query` repetition can have its own `parameters` resource
