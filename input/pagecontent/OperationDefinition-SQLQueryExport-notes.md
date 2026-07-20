@@ -140,8 +140,8 @@ the repeating `dependency` parameter. Each repetition carries one resource
 identified by its `url`, matched against the `relatedArtifact` (`depends-on`)
 entries in the transitive dependency closure of the executed queries. A supplied
 resource takes precedence over a server-stored resource with the same canonical.
-Resources supplied here are materialized as tables for the SQL to query against
-- they do **not** produce separate `output` entries; only the SQL query results
+Resources supplied here are materialized as tables for the SQL to query against;
+they do **not** produce separate `output` entries, so only the SQL query results
 appear in the export output.
 
 | Name       | Type              | Min | Max | Description                                                              |
