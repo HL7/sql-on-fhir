@@ -9,6 +9,7 @@ inside a `Parameters` resource in the request body.
 | header         | boolean    | system, type, instance | No           | 1   | Include CSV headers (default: true). Only applies to `csv` format                                     |
 | queryReference | Reference  | system, type           | Conditional¹ | 1   | Reference to a SQLQuery Library stored on the server                                                  |
 | queryResource  | Resource   | system, type           | Conditional¹ | 1   | Inline SQLQuery Library resource to execute                                                           |
+| dependency     | CanonicalResource | system, type, instance | No    | \*  | Inline ViewDefinition or SQLView table source. [Details](#table-source-dependencies)                  |
 | parameters     | Parameters | system, type, instance | No           | 1   | Input parameters bound by name to parameters declared in the SQLQuery Library                         |
 | source         | string     | system, type, instance | No           | 1   | External data source containing the ViewDefinition tables (e.g. URI, bucket name)                     |
 | \_limit        | integer    | system, type, instance | No           | 1   | Maximum number of rows to return                                                                      |
@@ -41,6 +42,21 @@ optimisation, but the observable behaviour is post-evaluation.
 Returning fewer rows than the client requested - whether because the query
 yielded fewer rows or because the server applied its own cap - is not treated
 as an error.
+
+#### Table-Source Dependencies
+
+A SQLQuery Library queries tables declared as `relatedArtifact` (`depends-on`)
+entries - ViewDefinitions or SQLView Libraries. Use the repeating `dependency`
+parameter to supply any of these table sources inline, including ones that are
+not stored on the server. A supplied resource is bound to a dependency by
+matching its `url` (and `version`, when the dependency canonical is pinned)
+against the transitive dependency closure of the executed query, and takes
+precedence over a server-stored resource with the same canonical.
+
+The full matching, precedence and error rules are defined once in
+[Table-Source Dependencies](operations-common.html#table-source-dependencies)
+and apply identically to `$sqlquery-run` and `$sqlquery-export`. See the
+[Inline Dependency Graph](#inline-dependency-graph) example below.
 
 #### Format Parameter Clarification
 
@@ -138,6 +154,72 @@ Content-Type: application/fhir+json
           "valueString": "SELECT p.id, p.name FROM p WHERE p.active = true"
         }]
       }]
+    }}
+  ]
+}
+```
+
+#### Inline Dependency Graph
+
+Supply a query and its entire table-source graph inline, with nothing stored on
+the server. The `queryResource` depends on an SQLView (`active-patients`, table
+`ap`); that SQLView in turn depends on a ViewDefinition (`patient_view`, table
+`p`). Both are provided as `dependency` repetitions and bound by `url` across
+the transitive closure (see
+[Table-Source Dependencies](operations-common.html#table-source-dependencies)):
+
+```http
+POST /Library/$sqlquery-run HTTP/1.1
+Content-Type: application/fhir+json
+
+{
+  "resourceType": "Parameters",
+  "parameter": [
+    { "name": "_format", "valueCode": "ndjson" },
+    { "name": "queryResource", "resource": {
+      "resourceType": "Library",
+      "meta": { "profile": ["https://sql-on-fhir.org/ig/StructureDefinition/SQLQuery"] },
+      "type": { "coding": [{ "system": "https://sql-on-fhir.org/ig/CodeSystem/LibraryTypesCodes", "code": "sql-query" }] },
+      "status": "active",
+      "relatedArtifact": [
+        { "type": "depends-on", "resource": "https://example.org/Library/active-patients", "label": "ap" }
+      ],
+      "content": [{
+        "contentType": "application/sql",
+        "data": "U0VMRUNUIGFwLmlkIEZST00gYXA=",
+        "extension": [{
+          "url": "https://sql-on-fhir.org/ig/StructureDefinition/sql-text",
+          "valueString": "SELECT ap.id FROM ap"
+        }]
+      }]
+    }},
+    { "name": "dependency", "resource": {
+      "resourceType": "Library",
+      "url": "https://example.org/Library/active-patients",
+      "meta": { "profile": ["https://sql-on-fhir.org/ig/StructureDefinition/SQLView"] },
+      "type": { "coding": [{ "system": "https://sql-on-fhir.org/ig/CodeSystem/LibraryTypesCodes", "code": "sql-view" }] },
+      "status": "active",
+      "relatedArtifact": [
+        { "type": "depends-on", "resource": "https://example.org/ViewDefinition/patient_view", "label": "p" }
+      ],
+      "content": [{
+        "contentType": "application/sql",
+        "data": "U0VMRUNUIHAuaWQgRlJPTSBwIFdIRVJFIHAuYWN0aXZlID0gdHJ1ZQ==",
+        "extension": [{
+          "url": "https://sql-on-fhir.org/ig/StructureDefinition/sql-text",
+          "valueString": "SELECT p.id FROM p WHERE p.active = true"
+        }]
+      }]
+    }},
+    { "name": "dependency", "resource": {
+      "resourceType": "ViewDefinition",
+      "url": "https://example.org/ViewDefinition/patient_view",
+      "status": "active",
+      "resource": "Patient",
+      "select": [{ "column": [
+        { "name": "id", "path": "getResourceKey()" },
+        { "name": "active", "path": "active" }
+      ]}]
     }}
   ]
 }
@@ -352,5 +434,8 @@ SQLQuery profile for the binding rules and the mapping from
 | Status                     | Condition                                                                                                                     |
 | -------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
 | `400 Bad Request`          | Missing required parameter, unknown parameter name, or value type mismatch                                                    |
-| `404 Not Found`            | Library or ViewDefinition not found                                                                                           |
+| `400 Bad Request`          | A supplied `dependency` resource has no `url`                                                                                 |
+| `400 Bad Request`          | A supplied `dependency` `url` matches no entry in the query's transitive dependency closure                                    |
+| `400 Bad Request`          | Two supplied `dependency` resources match the same dependency entry                                                           |
+| `404 Not Found`            | Library not found, or a dependency neither supplied via `dependency` nor resolvable by the server                             |
 | `422 Unprocessable Entity` | SQL execution error, or unsupported SQL column type when using `_format=fhir` (see [type mapping](#sql-to-fhir-type-mapping)) |
