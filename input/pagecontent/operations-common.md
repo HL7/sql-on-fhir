@@ -231,5 +231,5 @@ canonical, and when the request is rejected.
    resolvable by the server results in `404 Not Found`, as already listed in
    each operation's error table.
 7. **No output entries** (export only). Resources supplied via `dependency` are
-   materialised as tables for the SQL to query against; they do not produce
+   materialized as tables for the SQL to query against; they do not produce
    `output` entries. Only the SQL query results appear in the export output.
