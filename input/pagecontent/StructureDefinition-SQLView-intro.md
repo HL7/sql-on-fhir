@@ -31,7 +31,7 @@ in the SQL.
 ```json
 "relatedArtifact": [
   { "type": "depends-on", "resource": "https://example.org/ViewDefinition/patient_view", "label": "patient_view" },
-  { "type": "depends-on", "resource": "https://sql-on-fhir.org/ig/Library/ActivePatientsView", "label": "active_patients" }
+  { "type": "depends-on", "resource": "http://hl7.org/fhir/uv/sql-on-fhir/Library/ActivePatientsView", "label": "active_patients" }
 ]
 ```
 

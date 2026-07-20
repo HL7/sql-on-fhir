@@ -186,11 +186,11 @@ single, shareable FHIR resource:
 {
   "resourceType": "Library",
   "meta": {
-    "profile": ["https://sql-on-fhir.org/ig/StructureDefinition/SQLQuery"]
+    "profile": ["http://hl7.org/fhir/uv/sql-on-fhir/StructureDefinition/SQLQuery"]
   },
   "type": {
     "coding": [{
-      "system": "https://sql-on-fhir.org/ig/CodeSystem/LibraryTypesCodes",
+      "system": "http://hl7.org/fhir/uv/sql-on-fhir/CodeSystem/LibraryTypesCodes",
       "code": "sql-query"
     }]
   },
@@ -211,7 +211,7 @@ single, shareable FHIR resource:
   "content": [{
     "contentType": "application/sql",
     "extension": [{
-      "url": "https://sql-on-fhir.org/ig/StructureDefinition/sql-text",
+      "url": "http://hl7.org/fhir/uv/sql-on-fhir/StructureDefinition/sql-text",
       "valueString": "SELECT DATE_PART('year', AGE(pt.dob::timestamp)) AS age, pt.gender, dg.code, dg.display, count(*) FROM pt JOIN dg USING (patient_id) GROUP BY 1,2,3,4 ORDER BY 1, 5 DESC"
     }],
     "data": "U0VMRUNUIERBVEVfUEFSVCgneWVhcicsIEFHRShwdC5kb2I6OnRpbWVzdGFtcCkpIEFTIGFnZSwgcHQuZ2VuZGVyLCBkZy5jb2RlLCBkZy5kaXNwbGF5LCBjb3VudCgqKSBGUk9NIHB0IEpPSU4gZGcgVVNJTkcgKHBhdGllbnRfaWQpIEdST1VQIEJZIDEsMiwzLDQgT1JERVIgQlkgMSwgNSBERVND"
