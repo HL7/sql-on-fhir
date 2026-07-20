@@ -113,7 +113,7 @@ The resulting output:
 ## The FHIRPath Subset
 
 ViewDefinitions
-use [minimal subset of FHIRPath](https://build.fhir.org/ig/HL7/sql-on-fhir/StructureDefinition-ViewDefinition.html#fhirpath-functionality)
+use [minimal subset of FHIRPath](StructureDefinition-ViewDefinition.html#fhirpath-functionality)
 to make implementation as simple as possible.
 
 The specification also introduces two special functions:
