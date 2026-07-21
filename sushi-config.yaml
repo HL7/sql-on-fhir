@@ -32,7 +32,12 @@ publisher:
 # use cases, the value can be an object with keys for id, uri, and version.
 #
 dependencies:
-  hl7.fhir.uv.extensions.r5: 5.3.0
+  # Depend on the base extensions package (native R5) rather than the .r5
+  # repackaging. In HL7 publication mode the publisher rejects the .r5
+  # variant because the shared canonical http://hl7.org/fhir/extensions
+  # resolves to the .r4 package, which is inconsistent with the stated
+  # packageId. The base package is the conventional dependency for an R5 IG.
+  hl7.fhir.uv.extensions: 5.3.0
 #
 # The pages property corresponds to IG.definition.page. SUSHI can
 # auto-generate the page list, but if the author includes pages in
