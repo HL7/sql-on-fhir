@@ -12,7 +12,7 @@ status: draft # draft | active | retired | unknown
 version: 2.1.0-pre
 fhirVersion: 5.0.0 # https://www.hl7.org/fhir/valueset-FHIR-version.html
 copyrightYear: 2023+
-releaseLabel: release # ci-build | draft | qa-preview | ballot | trial-use | release | update | normative+trial-use
+releaseLabel: ci-build # ci-build | draft | ballot | trial-use | update | normative | normative+trial-use (HL7 template does not accept "release")
 license: CC0-1.0 # https://www.hl7.org/fhir/valueset-spdx-license.html
 jurisdiction: http://unstats.un.org/unsd/methods/m49/m49.htm#001 "World" # https://www.hl7.org/fhir/valueset-jurisdiction.html
 # HL7 publication metadata. The specification is balloted under the sponsorship

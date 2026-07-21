@@ -4,7 +4,7 @@
   "desc" : "A specification for defining portable views of FHIR data that can be easily queried using tools such as SQL.",
   "path" : "http://hl7.org/fhir/uv/sql-on-fhir/2.0.0",
   "mode" : "milestone",
-  "status" : "release",
+  "status" : "trial-use",
   "sequence" : "R2",
   "first" : false,
   "title" : "SQL on FHIR",
