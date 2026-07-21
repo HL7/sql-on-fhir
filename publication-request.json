@@ -1,14 +1,14 @@
 {
-  "package-id" : "org.sql-on-fhir.ig",
+  "package-id" : "hl7.fhir.uv.sql-on-fhir",
   "version" : "2.0.0",
   "desc" : "A specification for defining portable views of FHIR data that can be easily queried using tools such as SQL.",
-  "path" : "https://sql-on-fhir.org/ig/2.0.0",
+  "path" : "http://hl7.org/fhir/uv/sql-on-fhir/2.0.0",
   "mode" : "milestone",
   "status" : "release",
   "sequence" : "R2",
   "first" : false,
   "title" : "SQL on FHIR",
-  "ci-build" : "https://sql-on-fhir.org/ig/latest/",
+  "ci-build" : "http://build.fhir.org/ig/HL7/sql-on-fhir",
   "category" : "Infrastructure",
   "introduction" : "A specification for defining portable views of FHIR data that can be easily queried using tools such as SQL."
 }
