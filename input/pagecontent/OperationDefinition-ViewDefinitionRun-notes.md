@@ -62,7 +62,7 @@ Examples:
 - `_format=parquet` or `Accept: application/octet-stream`
 - `_format=fhir` or `Accept: application/fhir+json`
 
-The `Accept` header also governs a second, independent axis — whether the body
+The `Accept` header also governs a second, independent axis - whether the body
 is the **raw payload** (the default) or a serialized `Binary` resource envelope.
 See [Content Negotiation](operations-common.html#content-negotiation).
 
@@ -81,7 +81,7 @@ constraining the data the view sees.
 
 #### Response Format
 
-- **Success (200 OK)**: Returns the raw payload in the requested format, with `Content-Type` set to the format's native media type (not a serialized `Binary` envelope unless a FHIR media type is requested — see [Return Representation](operations-common.html#return-representation))
+- **Success (200 OK)**: Returns the raw payload in the requested format, with `Content-Type` set to the format's native media type (not a serialized `Binary` envelope unless a FHIR media type is requested - see [Return Representation](operations-common.html#return-representation))
 - **Error (4xx/5xx)**: Returns `OperationOutcome` resource
 - **Transfer framing**: The response of **any** format MAY use `Transfer-Encoding: chunked`. Chunked transfer is an HTTP transport choice, independent of the format; it is distinct from incremental result production. See [Streaming and Transfer Encoding](operations-common.html#streaming)
 - **JSON format**: Returns an array of objects

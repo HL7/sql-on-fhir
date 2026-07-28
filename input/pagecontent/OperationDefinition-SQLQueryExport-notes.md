@@ -131,9 +131,24 @@ client to negotiate a different representation for interim status responses
 
 #### Input Parameters
 
-##### Query Source — `query` Parameter (1..\*, system+type scope)
+##### Query Source - `query` Parameter (1..\*, system+type scope)
 
 Each repetition identifies a single SQLQuery Library to export. At least one `query` is required at system/type level.
+
+| Part Name      | Type       | Min | Max | Description                                                                                               |
+| -------------- | ---------- | --- | --- | --------------------------------------------------------------------------------------------------------- |
+| name           | string     | 0   | 1   | Optional friendly name for the exported query output                                                      |
+| queryCanonical | canonical  | 0¹  | 1   | Canonical URL of the SQLQuery or SQLView Library. [Details](#queryreference-clarification)                |
+| queryReference | Reference  | 0¹  | 1   | Literal location of a SQLQuery or SQLView Library on the server. [Details](#queryreference-clarification) |
+| queryResource  | Library    | 0¹  | 1   | Inline SQLQuery or SQLView Library resource. [Details](#queryreference-clarification)                     |
+| parameters     | Parameters | 0   | 1   | Input parameters for this query. [Details](#parameter-passing)                                            |
+
+{:.table-data}
+
+¹ Exactly one of `queryCanonical`, `queryReference` or `queryResource` is required
+per `query` repetition. See [Identifying each query](#queryreference-clarification).
+
+##### Instance-level invocation {#instance-level}
 
 At the instance level (`POST [base]/Library/[id]/$sqlquery-export`), the bound
 Library identified by the request URL serves as the single query source and the
@@ -169,19 +184,6 @@ Prefer: respond-async
 The response is `202 Accepted` with a `Content-Location` polling URL, the export
 scoped to those two patients and delivered as CSV, and `clientTrackingId` echoed
 in the manifest. Supplying `query` here would be out of scope.
-
-| Part Name      | Type       | Min | Max | Description                                                                                               |
-| -------------- | ---------- | --- | --- | --------------------------------------------------------------------------------------------------------- |
-| name           | string     | 0   | 1   | Optional friendly name for the exported query output                                                      |
-| queryCanonical | canonical  | 0¹  | 1   | Canonical URL of the SQLQuery or SQLView Library. [Details](#queryreference-clarification)                |
-| queryReference | Reference  | 0¹  | 1   | Literal location of a SQLQuery or SQLView Library on the server. [Details](#queryreference-clarification) |
-| queryResource  | Library    | 0¹  | 1   | Inline SQLQuery or SQLView Library resource. [Details](#queryreference-clarification)                     |
-| parameters     | Parameters | 0   | 1   | Input parameters for this query. [Details](#parameter-passing)                                            |
-
-{:.table-data}
-
-¹ Exactly one of `queryCanonical`, `queryReference` or `queryResource` is required
-per `query` repetition. See [Identifying each query](#queryreference-clarification).
 
 ##### ViewDefinition table sources
 

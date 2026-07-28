@@ -6,7 +6,9 @@ A minimal SQLQuery Library:
 {
   "resourceType": "Library",
   "meta": {
-    "profile": ["http://hl7.org/fhir/uv/sql-on-fhir/StructureDefinition/SQLQuery"]
+    "profile": [
+      "http://hl7.org/fhir/uv/sql-on-fhir/StructureDefinition/SQLQuery"
+    ]
   },
   "type": {
     "coding": [
@@ -78,6 +80,11 @@ specification.
 The [Active Patient Addresses](Library-ActivePatientAddressesQuery.html) example
 shows an SQLQuery that references the
 [Active Patients](Library-ActivePatientsView.html) SQLView.
+
+How these dependencies are resolved when a query is invoked, including how a
+client may supply one inline that the server cannot itself resolve, is specified
+in
+[ViewDefinition table sources](operations-common.html#table-sources).
 
 ### Parameter Types
 
