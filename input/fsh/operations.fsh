@@ -430,6 +430,18 @@ Description: "Execute a SQLQuery Library against ViewDefinition tables."
 * parameter[=].targetProfile[1] = Canonical(SQLView)
 * parameter[=].documentation = "Inline SQLQuery or SQLView Library resource to execute."
 
+* parameter[+].name = #viewResource
+* parameter[=].use = #in
+* parameter[=].min = 0
+* parameter[=].max = "*"
+* parameter[=].scope[0] = #system
+* parameter[=].scope[1] = #type
+* parameter[=].scope[2] = #instance
+* parameter[=].type = #CanonicalResource
+* parameter[=].targetProfile[0] = Canonical(ViewDefinition)
+* parameter[=].targetProfile[1] = Canonical(SQLView)
+* parameter[=].documentation = "Inline ViewDefinition or SQLView resources supplying table sources the server cannot itself resolve. Matched by canonical URL against the dependencies in the query's transitive relatedArtifact graph. See Common Operation Behavior (operations-common.html#table-sources)."
+
 * parameter[+].name = #parameters
 * parameter[=].use = #in
 * parameter[=].min = 0

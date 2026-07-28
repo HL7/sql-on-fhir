@@ -3,16 +3,17 @@
 The operation is invoked with POST. The following input parameters are passed
 inside a `Parameters` resource in the request body.
 
-| Name           | Type       | Scope                  | Required     | Max | Description                                                                                               |
-| -------------- | ---------- | ---------------------- | ------------ | --- | --------------------------------------------------------------------------------------------------------- |
-| \_format       | code       | system, type, instance | No           | 1   | Output format: `json`, `ndjson`, `csv`, `parquet`, `fhir`. [Details](#format-parameter-clarification)     |
-| header         | boolean    | system, type, instance | No           | 1   | Include CSV headers (default: true). Only applies to `csv` format                                         |
-| queryCanonical | canonical  | system, type           | Conditional¹ | 1   | Canonical URL of the SQLQuery or SQLView Library. [Details](#queryreference-clarification)                |
-| queryReference | Reference  | system, type           | Conditional¹ | 1   | Literal location of a SQLQuery or SQLView Library on the server. [Details](#queryreference-clarification) |
-| queryResource  | Library    | system, type           | Conditional¹ | 1   | Inline SQLQuery or SQLView Library resource to execute. [Details](#queryreference-clarification)          |
-| parameters     | Parameters | system, type, instance | No           | 1   | Input parameters bound by name to parameters declared in the SQLQuery Library                             |
-| source         | string     | system, type, instance | No           | 1   | External data source containing the ViewDefinition tables (e.g. URI, bucket name)                         |
-| \_limit        | integer    | system, type, instance | No           | 1   | Maximum number of rows to return                                                                          |
+| Name           | Type                      | Scope                  | Required     | Max | Description                                                                                               |
+| -------------- | ------------------------- | ---------------------- | ------------ | --- | --------------------------------------------------------------------------------------------------------- |
+| \_format       | code                      | system, type, instance | No           | 1   | Output format: `json`, `ndjson`, `csv`, `parquet`, `fhir`. [Details](#format-parameter-clarification)     |
+| header         | boolean                   | system, type, instance | No           | 1   | Include CSV headers (default: true). Only applies to `csv` format                                         |
+| queryCanonical | canonical                 | system, type           | Conditional¹ | 1   | Canonical URL of the SQLQuery or SQLView Library. [Details](#queryreference-clarification)                |
+| queryReference | Reference                 | system, type           | Conditional¹ | 1   | Literal location of a SQLQuery or SQLView Library on the server. [Details](#queryreference-clarification) |
+| queryResource  | Library                   | system, type           | Conditional¹ | 1   | Inline SQLQuery or SQLView Library resource to execute. [Details](#queryreference-clarification)          |
+| viewResource   | ViewDefinition \| SQLView | system, type, instance | No           | \*  | Inline table source, matched to a dependency by canonical URL. [Details](#table-sources)                  |
+| parameters     | Parameters                | system, type, instance | No           | 1   | Input parameters bound by name to parameters declared in the SQLQuery Library                             |
+| source         | string                    | system, type, instance | No           | 1   | External data source containing the ViewDefinition tables (e.g. URI, bucket name)                         |
+| \_limit        | integer                   | system, type, instance | No           | 1   | Maximum number of rows to return                                                                          |
 
 {:.table-data}
 
@@ -61,6 +62,29 @@ artefact registry, by dereferencing the URL, or not at all - is an implementatio
 matter. A server that supports only some of these parameters declares the subset
 it supports as described in
 [Declaring partial operation support](operations-capability.html#partial-operation-support).
+
+#### ViewDefinition table sources {#table-sources}
+
+The query's table sources are named by its `relatedArtifact` entries and are
+normally resolved by the server. Where the server cannot resolve one - typically
+because the view exists only on the client - the client supplies it inline with
+the repeating `viewResource` parameter, which accepts a ViewDefinition or a
+[SQLView](StructureDefinition-SQLView.html).
+
+The matching, precedence and error rules are specified once in
+[ViewDefinition table sources](operations-common.html#table-sources) and apply
+identically here and on
+[`$sqlquery-export`](OperationDefinition-SQLQueryExport.html). That section
+governs; in outline, the supplied entries form one pool matched by canonical URL
+against every dependency in the query's transitive dependency graph, a supplied
+resource outranks one the server could itself resolve, an entry that cannot be
+bound or matches nothing is rejected with `400 Bad Request`, and a dependency
+neither supplied nor resolvable is rejected with `404 Not Found`.
+
+Supplying every dependency inline alongside an inline `queryResource` makes a
+fully ad-hoc query possible, with nothing stored on the server. `viewResource`
+also applies at the instance level, so a client invoking a stored query can supply
+just the dependency the server cannot resolve.
 
 #### Row Limit
 
@@ -203,6 +227,162 @@ Content-Type: application/fhir+json
         }]
       }]
     }}
+  ]
+}
+```
+
+#### Fully Ad-Hoc: Inline Query with an Inline Table Source
+
+Nothing is stored on the server. The query is supplied as `queryResource` and the
+ViewDefinition its `relatedArtifact` entry depends on is supplied as
+`viewResource`, matched to that entry by `url` and materialised as table `p`:
+
+```http
+POST /$sqlquery-run HTTP/1.1
+Content-Type: application/fhir+json
+
+{
+  "resourceType": "Parameters",
+  "parameter": [
+    { "name": "_format", "valueCode": "csv" },
+    { "name": "queryResource", "resource": {
+      "resourceType": "Library",
+      "meta": { "profile": ["http://hl7.org/fhir/uv/sql-on-fhir/StructureDefinition/SQLQuery"] },
+      "type": { "coding": [{ "system": "http://hl7.org/fhir/uv/sql-on-fhir/CodeSystem/LibraryTypesCodes", "code": "sql-query" }] },
+      "status": "active",
+      "relatedArtifact": [
+        { "type": "depends-on", "resource": "https://example.org/ViewDefinition/patient_view", "label": "p" }
+      ],
+      "content": [{
+        "contentType": "application/sql",
+        "data": "U0VMRUNUIHAuaWQsIHAubmFtZSBGUk9NIHAgV0hFUkUgcC5hY3RpdmUgPSB0cnVl",
+        "extension": [{
+          "url": "http://hl7.org/fhir/uv/sql-on-fhir/StructureDefinition/sql-text",
+          "valueString": "SELECT p.id, p.name FROM p WHERE p.active = true"
+        }]
+      }]
+    }},
+    { "name": "viewResource", "resource": {
+      "resourceType": "ViewDefinition",
+      "url": "https://example.org/ViewDefinition/patient_view",
+      "status": "active",
+      "resource": "Patient",
+      "select": [{ "column": [
+        { "name": "id", "path": "getResourceKey()", "type": "string" },
+        { "name": "name", "path": "name.family.first()", "type": "string" },
+        { "name": "active", "path": "active", "type": "boolean" }
+      ]}]
+    }}
+  ]
+}
+```
+
+```http
+HTTP/1.1 200 OK
+Content-Type: text/csv
+
+id,name
+pt-1,Smith
+pt-2,Johnson
+```
+
+#### Inline SQLView with Its Own Inline Dependency
+
+A supplied SQLView brings dependencies of its own, so the pool is matched against
+the whole transitive graph. Here the first entry binds to table `ap`; traversing it
+reveals a dependency that the second entry satisfies as table `p`. Both entries
+were selected, so nothing is unmatched. The resources are abbreviated to the
+elements that drive matching:
+
+```http
+POST /$sqlquery-run HTTP/1.1
+Content-Type: application/fhir+json
+
+{
+  "resourceType": "Parameters",
+  "parameter": [
+    { "name": "queryResource", "resource": {
+      "resourceType": "Library",
+      "relatedArtifact": [
+        { "type": "depends-on", "resource": "https://example.org/SQLView/active_patients", "label": "ap" }
+      ]
+    }},
+    { "name": "viewResource", "resource": {
+      "resourceType": "Library",
+      "url": "https://example.org/SQLView/active_patients",
+      "relatedArtifact": [
+        { "type": "depends-on", "resource": "https://example.org/ViewDefinition/patient_view", "label": "p" }
+      ]
+    }},
+    { "name": "viewResource", "resource": {
+      "resourceType": "ViewDefinition",
+      "url": "https://example.org/ViewDefinition/patient_view"
+    }}
+  ]
+}
+```
+
+#### An Unmatched Table Source Is Rejected
+
+A typo in a supplied `url` binds to no dependency, and is reported where the
+mistake was made rather than resurfacing later as an SQL error naming table `p` as
+missing:
+
+```http
+POST /$sqlquery-run HTTP/1.1
+Content-Type: application/fhir+json
+
+{
+  "resourceType": "Parameters",
+  "parameter": [
+    { "name": "queryResource", "resource": {
+      "resourceType": "Library",
+      "relatedArtifact": [
+        { "type": "depends-on", "resource": "https://example.org/ViewDefinition/patient_view", "label": "p" }
+      ]
+    }},
+    { "name": "viewResource", "resource": {
+      "resourceType": "ViewDefinition",
+      "url": "https://example.org/ViewDefinition/patient_veiw"
+    }}
+  ]
+}
+```
+
+```http
+HTTP/1.1 400 Bad Request
+Content-Type: application/fhir+json
+
+{
+  "resourceType": "OperationOutcome",
+  "issue": [{
+    "severity": "error",
+    "code": "invalid",
+    "diagnostics": "Supplied viewResource 'https://example.org/ViewDefinition/patient_veiw' does not match any relatedArtifact dependency of the query",
+    "expression": ["viewResource"]
+  }]
+}
+```
+
+#### Instance-Level with a Supplied Table Source
+
+The query is identified by the request path. Its other dependencies resolve on the
+server; the supplied one covers the dependency that does not. Had the server also
+been able to resolve `local_cohort`, the supplied resource would still take
+precedence:
+
+```http
+POST /Library/patient-bp-query/$sqlquery-run HTTP/1.1
+Content-Type: application/fhir+json
+
+{
+  "resourceType": "Parameters",
+  "parameter": [
+    { "name": "viewResource", "resource": {
+      "resourceType": "ViewDefinition",
+      "url": "https://example.org/ViewDefinition/local_cohort"
+    }},
+    { "name": "_format", "valueCode": "json" }
   ]
 }
 ```
