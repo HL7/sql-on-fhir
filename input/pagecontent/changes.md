@@ -82,21 +82,32 @@ is not a breaking change at all, because none of the operations existed then.
 - [#329](https://github.com/HL7/sql-on-fhir/issues/329): Added the `SQLView`
   profile, so one query can depend on the result of another and queries can be
   composed rather than duplicated.
-- [#331](https://github.com/HL7/sql-on-fhir/issues/331): Added the terminology
-  these profiles and operations bind to: the `LibraryTypesCodes` and
-  `SQLContentTypeCodes` code systems, the `AllSQLContentTypeCodes` value set, and
-  the `OutputFormatCodes`, `ExportOutputFormatCodes` and `ExportStatusCodes`
-  code systems and value sets.
-- [#371](https://github.com/HL7/sql-on-fhir/issues/371): Added the
-  `$viewdefinition-run` operation, for synchronous evaluation of a
-  ViewDefinition with streamed results, at the system and instance levels.
-- [#304](https://github.com/HL7/sql-on-fhir/issues/304): Added the
-  `$viewdefinition-export` operation, for asynchronous bulk export of
-  ViewDefinition results to CSV, NDJSON or Parquet.
+- [#309](https://github.com/HL7/sql-on-fhir/pull/309): Added the terminology
+  these profiles use: the `LibraryTypesCodes` and `SQLContentTypeCodes` code
+  systems and the `AllSQLContentTypeCodes` value set. The `contentType` binding
+  was later relaxed to extensible
+  ([#351](https://github.com/HL7/sql-on-fhir/issues/351)). The operations added
+  the `OutputFormatCodes` and `ExportStatusCodes` code systems, and the
+  `OutputFormatCodes`, `ExportOutputFormatCodes` and `ExportStatusCodes` value
+  sets, so each operation binds to the formats it actually supports
+  ([#331](https://github.com/HL7/sql-on-fhir/issues/331)).
+- Added the `$viewdefinition-run` operation, for synchronous evaluation of a
+  ViewDefinition with streamed results. Its name was settled as
+  `$viewdefinition-run` rather than `$run`
+  ([#371](https://github.com/HL7/sql-on-fhir/issues/371)), and system-level
+  invocation was added alongside the instance level
+  ([#330](https://github.com/HL7/sql-on-fhir/issues/330)).
+- Added the `$viewdefinition-export` operation, for asynchronous bulk export of
+  ViewDefinition results to CSV, NDJSON or Parquet. It was renamed from `$export`
+  so it does not collide with Bulk Data Export
+  ([#304](https://github.com/HL7/sql-on-fhir/issues/304)), and gained a parameter
+  controlling the CSV header row
+  ([#305](https://github.com/HL7/sql-on-fhir/issues/305)).
 - [#318](https://github.com/HL7/sql-on-fhir/issues/318): Added the
   `$sqlquery-run` operation, for synchronous execution of a `SQLQuery` Library
   against materialised ViewDefinition tables, with its parameters aligned to the
-  CQL `Library/$evaluate` pattern.
+  CQL `Library/$evaluate` pattern
+  ([#322](https://github.com/HL7/sql-on-fhir/issues/322)).
 - [#319](https://github.com/HL7/sql-on-fhir/issues/319): Added the
   `$sqlquery-export` operation, the asynchronous counterpart to
   `$sqlquery-run`.
