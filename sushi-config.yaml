@@ -64,6 +64,9 @@ dependencies:
 #
 parameters:
   excludettl: true
+  # Root OID arc assigned to this IG in the FHIR ig-registry. The IG Publisher
+  # uses it to auto-assign and persist OIDs for code systems and value sets.
+  auto-oid-root: 2.16.840.1.113883.4.642.40.77
 
 #   validation: [allow-any-extensions, no-broken-links]
 #
