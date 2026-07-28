@@ -192,11 +192,13 @@ The operation can export data from:
 
 #### Filtering
 
-Optional filtering parameters:
+Optional filtering parameters, specified once in
+[Filtering](operations-common.html#filtering) and identical on all four data
+operations:
 
-- `patient` - Export only resources for this patient
-- `group` - Export only resources for this group
-- `_since` - Export only resources updated since this time
+- [`patient`](operations-common.html#patient-filter) - restrict to the patient compartments of the supplied patients
+- [`group`](operations-common.html#group-filter) - restrict to members of the supplied Groups
+- [`_since`](operations-common.html#since-filter) - restrict to resources whose state changed after the supplied instant
 
 #### Required Headers
 
@@ -264,11 +266,11 @@ The `view` parameter is a complex type that can be repeated multiple times to ex
 
 ##### Filtering
 
-| Name    | Type      | Min | Max | Description                                                                              |
-| ------- | --------- | --- | --- | ---------------------------------------------------------------------------------------- |
-| patient | Reference | 0   | \*  | Filter by patient reference. [Details](#patient-parameter-clarification)                 |
-| group   | Reference | 0   | \*  | Filter by group membership. [Details](#group-parameter-clarification)                    |
-| \_since | instant   | 0   | 1   | Export only resources updated since this time. [Details](#since-parameter-clarification) |
+| Name    | Type      | Min | Max | Description                                                                                   |
+| ------- | --------- | --- | --- | --------------------------------------------------------------------------------------------- |
+| patient | Reference | 0   | \*  | Filter by patient reference. [Details](operations-common.html#patient-filter)                 |
+| group   | Reference | 0   | \*  | Filter by group membership. [Details](operations-common.html#group-filter)                    |
+| \_since | instant   | 0   | 1   | Export only resources updated since this time. [Details](operations-common.html#since-filter) |
 
 {:.table-data}
 
@@ -328,31 +330,14 @@ this operation. The `fhir` format is available on the run operations only:
   (which here negotiates the format of the _status and result_ responses, not
   the exported files).
 
-##### Patient Parameter Clarification
+##### Filtering Parameter Clarification
 
-When provided, the server SHALL NOT return resources
-in the patient compartments belonging to patients outside of this list.
-
-If a client requests patients who are not present on the server,
-the server SHOULD return details via a FHIR `OperationOutcome` resource in an error response to the request.
-
-##### Group Parameter Clarification
-
-When provided, the server SHALL NOT return resources that are not a member of the supplied `Group`.
-
-If a client requests groups that are not present on the server,
-the server SHOULD return details via a FHIR `OperationOutcome` resource in an error response to the request.
-
-##### Since Parameter Clarification
-
-Resources will be included in the response if their state has changed after the supplied time
-(e.g., if Resource.meta.lastUpdated is later than the supplied `_since` time).
-In the case of a Group level export, the server MAY return additional resources modified prior to the supplied time
-if the resources belong to the patient compartment of a patient added to the Group after the supplied time (this behavior SHOULD be clearly documented by the server).
-For Patient- and Group-level requests, the server MAY return resources that are referenced by the resources being returned
-regardless of when the referenced resources were last updated.
-For resources where the server does not maintain a last updated time,
-the server MAY include these resources in a response irrespective of the `_since` value supplied by a client.
+`patient`, `group` and `_since` carry the same meaning on all four data
+operations, and are specified once in
+[Filtering](operations-common.html#filtering):
+[`patient`](operations-common.html#patient-filter),
+[`group`](operations-common.html#group-filter) and
+[`_since`](operations-common.html#since-filter).
 
 #### Output Parameters
 

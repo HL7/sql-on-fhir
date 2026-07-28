@@ -151,6 +151,66 @@ Two further concepts are independent of each other and of the format:
    neither required nor implied by chunked transfer encoding, and chunked
    transfer encoding is not reserved for "streamable" formats.
 
+## Filtering {#filtering}
+
+All four operations accept the same three filtering parameters, with the same
+cardinalities, the same invocation levels, and the same meaning:
+
+| Parameter | Type        | Card  | Restricts the data to                                    |
+| --------- | ----------- | ----- | -------------------------------------------------------- |
+| `patient` | `Reference` | 0..\* | The patient compartments of the supplied patients        |
+| `group`   | `Reference` | 0..\* | Members of the supplied Groups                           |
+| `_since`  | `instant`   | 0..1  | Resources whose state changed after the supplied instant |
+
+{:.table-data}
+
+They constrain the FHIR resources that feed a view before projection, and hence
+what appears in the result. On the two SQLQuery operations that means the filter
+applies to the resources feeding the query's dependency views, before the SQL
+executes: the SQL sees tables already narrowed to the requested scope, rather than
+being expected to express the filter itself.
+
+`_limit` is deliberately not one of these. It caps the rows returned to the
+client, which is meaningful only on the synchronous run operations, and it is not a
+constraint on the data feeding a view.
+
+### `patient` {#patient-filter}
+
+When provided, the server SHALL NOT return resources in the patient compartments
+belonging to patients outside of this list.
+
+If a client requests patients who are not present on the server, the server SHOULD
+return details via a FHIR `OperationOutcome` resource in an error response to the
+request.
+
+### `group` {#group-filter}
+
+When provided, the server SHALL NOT return resources that are not a member of the
+supplied `Group`.
+
+If a client requests groups that are not present on the server, the server SHOULD
+return details via a FHIR `OperationOutcome` resource in an error response to the
+request.
+
+### `_since` {#since-filter}
+
+Resources will be included in the response if their state has changed after the
+supplied time (e.g., if `Resource.meta.lastUpdated` is later than the supplied
+`_since` time).
+
+For a Group-scoped request, the server MAY return additional resources modified
+prior to the supplied time if the resources belong to the patient compartment of a
+patient added to the Group after the supplied time; this behaviour SHOULD be
+clearly documented by the server.
+
+For patient- and Group-scoped requests, the server MAY return resources that are
+referenced by the resources being returned, regardless of when the referenced
+resources were last updated.
+
+For resources where the server does not maintain a last updated time, the server
+MAY include these resources in a response irrespective of the `_since` value
+supplied by a client.
+
 ## ViewDefinition table sources {#table-sources}
 
 This section applies to the two SQLQuery operations,
