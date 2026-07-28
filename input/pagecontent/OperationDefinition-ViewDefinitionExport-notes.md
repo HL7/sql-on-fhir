@@ -230,11 +230,23 @@ client to negotiate a different representation for interim status responses
 
 ##### Core Parameters
 
-| Name | Type    | Min | Max | Description                                                                                                                                            |
-| ---- | ------- | --- | --- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| view | complex | 1   | \*  | ViewDefinition(s) to export. Can be repeated to export multiple views in a single operation. See [ViewDefinition Parameter](#viewdefinition-parameter) |
+| Name | Type    | Scope        | Min | Max | Description                                                                                                                                            |
+| ---- | ------- | ------------ | --- | --- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| view | complex | system, type | 1   | \*  | ViewDefinition(s) to export. Can be repeated to export multiple views in a single operation. See [ViewDefinition Parameter](#viewdefinition-parameter) |
 
 {:.table-data}
+
+##### Instance-level invocation {#instance-level}
+
+At the instance level (`POST [base]/ViewDefinition/[id]/$viewdefinition-export`)
+the ViewDefinition identified by the request path is the export subject, and the
+`view` parameter does not apply there: the subject is already named by the path,
+so supplying `view` as well would be ambiguous. Exporting several views in one
+operation therefore requires the system or type level.
+
+Because the subject carries no `view.name` at this level, `output.name` is
+determined from the ViewDefinition itself, as described under
+[Output Name Clarification](#output-name-clarification).
 
 ##### ViewDefinition Parameter
 

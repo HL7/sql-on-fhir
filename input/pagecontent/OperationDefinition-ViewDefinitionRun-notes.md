@@ -107,30 +107,30 @@ ViewDefinition is identified by the request path. See
 
 ##### Output Control
 
-| Name     | Type    | Scope          | Required | Max | Description                                                                                           |
-| -------- | ------- | -------------- | -------- | --- | ----------------------------------------------------------------------------------------------------- |
-| \_format | code    | type, instance | No       | 1   | Output format: `json`, `ndjson`, `csv`, `parquet`, `fhir`. [Details](#format-parameter-clarification) |
-| header   | boolean | type, instance | No       | 1   | Include CSV headers (default: true). Only applies to `csv` format                                     |
+| Name     | Type    | Scope                  | Required | Max | Description                                                                                           |
+| -------- | ------- | ---------------------- | -------- | --- | ----------------------------------------------------------------------------------------------------- |
+| \_format | code    | system, type, instance | No       | 1   | Output format: `json`, `ndjson`, `csv`, `parquet`, `fhir`. [Details](#format-parameter-clarification) |
+| header   | boolean | system, type, instance | No       | 1   | Include CSV headers (default: true). Only applies to `csv` format                                     |
 
 {:.table-data}
 
 ##### Filtering
 
-| Name    | Type      | Scope          | Required | Max | Description                                                                                                      |
-| ------- | --------- | -------------- | -------- | --- | ---------------------------------------------------------------------------------------------------------------- |
-| patient | Reference | type, instance | No       | \*  | Filter by patient reference, repeated to name several patients. [Details](operations-common.html#patient-filter) |
-| group   | Reference | type, instance | No       | \*  | Filter by group membership. [Details](operations-common.html#group-filter)                                       |
-| \_since | instant   | type, instance | No       | 1   | Include only resources modified after this time. [Details](operations-common.html#since-filter)                  |
-| \_limit | integer   | type, instance | No       | 1   | Maximum number of rows to return                                                                                 |
+| Name    | Type      | Scope                  | Required | Max | Description                                                                                                      |
+| ------- | --------- | ---------------------- | -------- | --- | ---------------------------------------------------------------------------------------------------------------- |
+| patient | Reference | system, type, instance | No       | \*  | Filter by patient reference, repeated to name several patients. [Details](operations-common.html#patient-filter) |
+| group   | Reference | system, type, instance | No       | \*  | Filter by group membership. [Details](operations-common.html#group-filter)                                       |
+| \_since | instant   | system, type, instance | No       | 1   | Include only resources modified after this time. [Details](operations-common.html#since-filter)                  |
+| \_limit | integer   | system, type, instance | No       | 1   | Maximum number of rows to return                                                                                 |
 
 {:.table-data}
 
 ##### Data Source
 
-| Name     | Type     | Scope          | Required | Max | Description                                              |
-| -------- | -------- | -------------- | -------- | --- | -------------------------------------------------------- |
-| resource | Resource | type, instance | No       | \*  | FHIR resources to transform (alternative to server data) |
-| source   | string   | type, instance | No       | 1   | External data source (e.g., URI, bucket name)            |
+| Name     | Type     | Scope                  | Required | Max | Description                                              |
+| -------- | -------- | ---------------------- | -------- | --- | -------------------------------------------------------- |
+| resource | Resource | system, type, instance | No       | \*  | FHIR resources to transform (alternative to server data) |
+| source   | string   | system, type, instance | No       | 1   | External data source (e.g., URI, bucket name)            |
 
 {:.table-data}
 
