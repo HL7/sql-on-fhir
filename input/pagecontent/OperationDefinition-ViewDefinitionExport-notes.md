@@ -458,16 +458,16 @@ Clients MUST download all parts to obtain the complete dataset for a view.
 
 The $viewdefinition-export operation uses standard HTTP status codes to indicate the outcome:
 
-| Status Code               | Description          | When to Use                                                                                                                                                          |
-| ------------------------- | -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 202 Accepted              | In Progress          | Export request accepted, still in progress during polling, or cancellation accepted                                                                                  |
-| 303 See Other             | Job Finished         | Export finished (successfully or not); `Location` header carries the result URL                                                                                      |
-| 200 OK                    | Result Available     | Result URL returns the manifest `Parameters`; download URLs return the files                                                                                         |
-| 400 Bad Request           | Client Error         | Invalid parameters, unsupported parameters, missing required headers; a `view` repetition naming no subject form or more than one; `view` supplied at instance level |
-| 404 Not Found             | Not Found            | ViewDefinition not found, including an unresolvable `view.viewCanonical` or `view.viewReference`; or a cancelled export status URL                                   |
-| 422 Unprocessable Entity  | Business Logic Error | Valid request but the resolved ViewDefinition is invalid or cannot be processed                                                                                      |
-| 429 Too Many Requests     | Excessive Polling    | Client is polling too frequently; back off exponentially, guided by `Retry-After`                                                                                    |
-| 500 Internal Server Error | Server Error         | Unexpected server error; on the result URL, the failure outcome of the export                                                                                        |
+| Status Code               | Description          | When to Use                                                                                                                                                                          |
+| ------------------------- | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 202 Accepted              | In Progress          | Export request accepted, still in progress during polling, or cancellation accepted                                                                                                  |
+| 303 See Other             | Job Finished         | Export finished (successfully or not); `Location` header carries the result URL                                                                                                      |
+| 200 OK                    | Result Available     | Result URL returns the manifest `Parameters`; download URLs return the files                                                                                                         |
+| 400 Bad Request           | Client Error         | Invalid parameters, unsupported parameters, missing required headers; a `view` repetition naming no subject form or more than one; `view` supplied at instance level                 |
+| 404 Not Found             | Not Found            | ViewDefinition not found, including an unresolvable `view.viewCanonical` or `view.viewReference`; a `patient` or `group` not present on the server; or a cancelled export status URL |
+| 422 Unprocessable Entity  | Business Logic Error | Valid request but the resolved ViewDefinition is invalid or cannot be processed                                                                                                      |
+| 429 Too Many Requests     | Excessive Polling    | Client is polling too frequently; back off exponentially, guided by `Retry-After`                                                                                                    |
+| 500 Internal Server Error | Server Error         | Unexpected server error; on the result URL, the failure outcome of the export                                                                                                        |
 
 {:.table-data}
 

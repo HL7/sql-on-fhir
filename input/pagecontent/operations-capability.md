@@ -94,6 +94,7 @@ not support:
 {
   "resourceType": "OperationDefinition",
   "url": "http://example.org/OperationDefinition/sqlquery-run-supported",
+  "name": "SQLQueryRunSupported",
   "base": "http://hl7.org/fhir/uv/sql-on-fhir/OperationDefinition/SQLQueryRun",
   "status": "active",
   "kind": "operation",
