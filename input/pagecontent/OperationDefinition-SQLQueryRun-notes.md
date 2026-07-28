@@ -342,7 +342,7 @@ type within the SQL query.
 
 Query parameters are passed as a nested `Parameters` resource, following the
 same pattern as the
-[CQL `$evaluate` operation](https://build.fhir.org/ig/HL7/cql-ig/en/OperationDefinition-cql-library-evaluate.html).
+[CQL `$evaluate` operation](https://hl7.org/fhir/uv/cql/OperationDefinition-cql-library-evaluate.html).
 See [Parameter Types](StructureDefinition-SQLQuery.html#parameter-types) on the
 SQLQuery profile for the binding rules and the mapping from
 `Library.parameter.type` to the `value[x]` element to use.

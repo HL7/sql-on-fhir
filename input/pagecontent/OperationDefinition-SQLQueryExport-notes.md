@@ -241,7 +241,7 @@ the server MAY include these resources in a response irrespective of the `_since
 Query parameters are passed as a nested `Parameters` resource within each
 `query` repetition (per-query binding via the `parameters` part), following the
 same pattern as [`$sqlquery-run`](OperationDefinition-SQLQueryRun.html) and the
-[CQL `$evaluate` operation](https://build.fhir.org/ig/HL7/cql-ig/en/OperationDefinition-cql-library-evaluate.html).
+[CQL `$evaluate` operation](https://hl7.org/fhir/uv/cql/OperationDefinition-cql-library-evaluate.html).
 See [Parameter Types](StructureDefinition-SQLQuery.html#parameter-types) on the
 SQLQuery profile for the binding rules and the mapping from
 `Library.parameter.type` to the `value[x]` element to use.
