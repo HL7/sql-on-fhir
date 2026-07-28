@@ -1,3 +1,12 @@
+<div class="stu-note" markdown="1">
+This is version 3.0.0-ballot. The canonical base of this specification changed
+in this cycle, from `https://sql-on-fhir.org/ig` to
+`http://hl7.org/fhir/uv/sql-on-fhir`, and its package identifier from
+`org.sql-on-fhir.ig` to `hl7.fhir.uv.sql-on-fhir`. Version 2.0.0 remains
+available at [its original location](https://sql-on-fhir.org/ig/2.0.0). See
+[Changes](changes.html) for what this means for an existing implementation.
+</div>
+
 _This is an evolution of the original "SQL on FHIR" draft, which
 can [still be found here](https://github.com/FHIR/sql-on-fhir-archived)._
 
