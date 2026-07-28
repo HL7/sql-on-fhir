@@ -183,7 +183,8 @@ Prefer: respond-async
 
 The response is `202 Accepted` with a `Content-Location` polling URL, the export
 scoped to those two patients and delivered as CSV, and `clientTrackingId` echoed
-in the manifest. Supplying `query` here would be out of scope.
+in the manifest. Supplying `query` here is out of scope and is rejected with
+`400 Bad Request` and an `OperationOutcome`.
 
 ##### ViewDefinition table sources
 
@@ -409,16 +410,16 @@ Clients MUST download all parts to obtain the complete dataset.
 
 The $sqlquery-export operation uses standard HTTP status codes to indicate the outcome:
 
-| Status Code               | Description          | When to Use                                                                                                                                                                                                                 |
-| ------------------------- | -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 202 Accepted              | In Progress          | Export request accepted, still in progress during polling, or cancellation accepted                                                                                                                                         |
-| 303 See Other             | Job Finished         | Export finished (successfully or not); `Location` header carries the result URL                                                                                                                                             |
-| 200 OK                    | Result Available     | Result URL returns the manifest `Parameters`; download URLs return the files                                                                                                                                                |
-| 400 Bad Request           | Client Error         | Invalid parameters, unsupported parameters, missing required headers; a `query` repetition naming no subject form or more than one; a `viewResource` with no `url`, sharing a `url` with another, or matching no dependency |
-| 404 Not Found             | Not Found            | SQLQuery Library not found, a dependency neither supplied nor resolvable, or cancelled export status URL                                                                                                                    |
-| 422 Unprocessable Entity  | Business Logic Error | Valid request but query is invalid or cannot be executed                                                                                                                                                                    |
-| 429 Too Many Requests     | Excessive Polling    | Client is polling too frequently; back off exponentially, guided by `Retry-After`                                                                                                                                           |
-| 500 Internal Server Error | Server Error         | Unexpected server error; on the result URL, the failure outcome of the export                                                                                                                                               |
+| Status Code               | Description          | When to Use                                                                                                                                                                                                                                                     |
+| ------------------------- | -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 202 Accepted              | In Progress          | Export request accepted, still in progress during polling, or cancellation accepted                                                                                                                                                                             |
+| 303 See Other             | Job Finished         | Export finished (successfully or not); `Location` header carries the result URL                                                                                                                                                                                 |
+| 200 OK                    | Result Available     | Result URL returns the manifest `Parameters`; download URLs return the files                                                                                                                                                                                    |
+| 400 Bad Request           | Client Error         | Invalid parameters, unsupported parameters, missing required headers; a `query` repetition naming no subject form or more than one; `query` supplied at instance level; a `viewResource` with no `url`, sharing a `url` with another, or matching no dependency |
+| 404 Not Found             | Not Found            | SQLQuery Library not found, a dependency neither supplied nor resolvable, or cancelled export status URL                                                                                                                                                        |
+| 422 Unprocessable Entity  | Business Logic Error | Valid request but query is invalid or cannot be executed                                                                                                                                                                                                        |
+| 429 Too Many Requests     | Excessive Polling    | Client is polling too frequently; back off exponentially, guided by `Retry-After`                                                                                                                                                                               |
+| 500 Internal Server Error | Server Error         | Unexpected server error; on the result URL, the failure outcome of the export                                                                                                                                                                                   |
 
 {:.table-data}
 

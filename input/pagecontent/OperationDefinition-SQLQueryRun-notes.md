@@ -437,10 +437,12 @@ Content-Type: application/fhir+json
     { "name": "queryReference", "valueReference": {
       "reference": "Library/patient-bp-query"
     }},
-    { "name": "parameter", "part": [
-      { "name": "name", "valueString": "patient_id" },
-      { "name": "value", "valueString": "Patient/123" }
-    ]}
+    { "name": "parameters", "resource": {
+      "resourceType": "Parameters",
+      "parameter": [
+        { "name": "patient_id", "valueString": "Patient/123" }
+      ]
+    }}
   ]
 }
 ```

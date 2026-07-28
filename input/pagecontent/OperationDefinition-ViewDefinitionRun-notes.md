@@ -460,7 +460,7 @@ The operation uses standard HTTP status codes to indicate the outcome:
 | ------------------------- | -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 200 OK                    | Success              | Operation completed successfully, results returned                                                                                                                            |
 | 400 Bad Request           | Client Error         | Invalid parameters, unsupported parameters, or malformed request; no subject form supplied at system or type level, more than one supplied, or any supplied at instance level |
-| 404 Not Found             | Not Found            | ViewDefinition not found: the instance named by the request path, or an unresolvable `viewCanonical` or `viewReference`                                                       |
+| 404 Not Found             | Not Found            | ViewDefinition not found: the instance named by the request path, or an unresolvable `viewCanonical` or `viewReference`; a `patient` or `group` not present on the server     |
 | 422 Unprocessable Entity  | Business Logic Error | Valid request but ViewDefinition is invalid or cannot be processed                                                                                                            |
 | 500 Internal Server Error | Server Error         | Unexpected server error during processing                                                                                                                                     |
 
@@ -630,7 +630,7 @@ Accept: application/json
 ```
 
 ```http
-HTTP/1.1 400 Bad Request
+HTTP/1.1 404 Not Found
 Content-Type: application/fhir+json
 
 {
@@ -645,6 +645,9 @@ Content-Type: application/fhir+json
   ]
 }
 ```
+
+The same condition returns `404 Not Found` on all four data operations; see
+[Filtering](operations-common.html#filtering).
 
 ##### 7. Resource Processing Errors
 
