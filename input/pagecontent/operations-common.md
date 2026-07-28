@@ -201,7 +201,7 @@ File downloads referenced by `output.location` are independent HTTP responses;
 their transfer framing is governed by HTTP itself and is not constrained by
 this specification.
 
-## Table-Source Dependencies (`dependency`) {#table-source-dependencies}
+## Table-Source Dependencies (`view`) {#table-source-dependencies}
 
 This section applies to the two SQLQuery operations only -
 [`$sqlquery-run`](OperationDefinition-SQLQueryRun.html) and
@@ -214,11 +214,11 @@ identifies a ViewDefinition or SQLView Library and whose `label` names the SQL
 table. A SQLView Library may itself carry `depends-on` entries, so the tables a
 query relies on form a graph rather than a flat list.
 
-Both SQLQuery operations accept a repeating `dependency` parameter. Each
-repetition carries one ViewDefinition or SQLView Library inline, letting a
-client supply table sources that are not stored on the server - up to and
-including a query whose entire dependency graph exists only client-side. A
-server resolves any dependency not supplied inline in its usual way.
+Both SQLQuery operations accept a repeating `view` parameter. Each repetition
+carries one ViewDefinition or SQLView Library inline, letting a client supply
+table sources that are not stored on the server - up to and including a query
+whose entire dependency graph exists only client-side. A server resolves any
+dependency not supplied inline in its usual way.
 
 The rules below define how a supplied resource is bound to a dependency, which
 resource wins when both a supplied and a stored resource could satisfy the same
@@ -231,9 +231,9 @@ canonical, and when the request is rejected.
    For a multi-query export the closure is the union across all executed
    queries. The `label` element names the SQL table and plays no part in
    matching.
-2. **Matching.** A resource supplied via `dependency` is bound to a dependency
-   entry when the resource's `url` equals the entry's `resource` canonical. When
-   that canonical carries a version (`url|version`), the supplied resource's
+2. **Matching.** A resource supplied via `view` is bound to a dependency entry
+   when the resource's `url` equals the entry's `resource` canonical. When that
+   canonical carries a version (`url|version`), the supplied resource's
    `version` SHALL also equal the pinned version; an unversioned canonical
    matches a supplied resource of any version.
 3. **Precedence.** A dependency satisfied by a supplied resource SHALL use that
@@ -249,9 +249,9 @@ canonical, and when the request is rejected.
    query, or when two supplied resources match the same dependency entry (for
    example, two resources sharing a `url` that an unversioned canonical would
    both satisfy).
-6. **Errors (404).** A dependency that is neither supplied via `dependency` nor
+6. **Errors (404).** A dependency that is neither supplied via `view` nor
    resolvable by the server results in `404 Not Found`, as already listed in
    each operation's error table.
-7. **No output entries** (export only). Resources supplied via `dependency` are
+7. **No output entries** (export only). Resources supplied via `view` are
    materialized as tables for the SQL to query against; they do not produce
    `output` entries. Only the SQL query results appear in the export output.

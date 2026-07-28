@@ -402,7 +402,7 @@ Description: "Execute a SQLQuery Library against ViewDefinition tables."
 * parameter[3].targetProfile[1] = Canonical(SQLView)
 * parameter[3].documentation = "Inline SQLQuery or SQLView Library resource to execute."
 
-* parameter[4].name = #dependency
+* parameter[4].name = #view
 * parameter[4].use = #in
 * parameter[4].min = 0
 * parameter[4].max = "*"
@@ -412,7 +412,7 @@ Description: "Execute a SQLQuery Library against ViewDefinition tables."
 * parameter[4].type = #CanonicalResource
 * parameter[4].targetProfile[0] = Canonical(ViewDefinition)
 * parameter[4].targetProfile[1] = Canonical(SQLView)
-* parameter[4].documentation = "Inline ViewDefinition or SQLView Library supplying a table source the query depends on. Matched by its url (and version, when the dependency canonical is versioned) to a relatedArtifact depends-on entry in the transitive dependency closure of the executed queries. See Table-Source Dependencies (operations-common.html)."
+* parameter[4].documentation = "Inline ViewDefinition or SQLView Library supplying a table source the query depends on. Matched by its url (and version, when the depends-on canonical is versioned) to a relatedArtifact depends-on entry in the transitive dependency closure of the executed queries. See Table-Source Dependencies (operations-common.html)."
 
 * parameter[5].name = #parameters
 * parameter[5].use = #in
@@ -509,7 +509,7 @@ Description: "Export SQLQuery Library results asynchronously using the FHIR Asyn
 * parameter[0].part[3].documentation = "Input parameters for this query. Parameters are bound by name to parameters declared in the SQLQuery Library (Library.parameter.name)."
 
 // Input parameters — table-source dependencies supplied inline
-* parameter[1].name = #dependency
+* parameter[1].name = #view
 * parameter[1].use = #in
 * parameter[1].min = 0
 * parameter[1].max = "*"
@@ -519,7 +519,7 @@ Description: "Export SQLQuery Library results asynchronously using the FHIR Asyn
 * parameter[1].type = #CanonicalResource
 * parameter[1].targetProfile[0] = Canonical(ViewDefinition)
 * parameter[1].targetProfile[1] = Canonical(SQLView)
-* parameter[1].documentation = "Inline ViewDefinition or SQLView Library supplying a table source the query depends on. Matched by its url (and version, when the dependency canonical is versioned) to a relatedArtifact depends-on entry in the transitive dependency closure of the executed queries. See Table-Source Dependencies (operations-common.html)."
+* parameter[1].documentation = "Inline ViewDefinition or SQLView Library supplying a table source the query depends on. Matched by its url (and version, when the depends-on canonical is versioned) to a relatedArtifact depends-on entry in the transitive dependency closure of the executed queries. See Table-Source Dependencies (operations-common.html)."
 
 // Input parameters — export control (from $viewdefinition-export)
 * parameter[2].name = #clientTrackingId
@@ -668,7 +668,7 @@ Description: "Export SQLQuery Library results asynchronously using the FHIR Asyn
 * parameter[19].use = #out
 * parameter[19].min = 0
 * parameter[19].max = "*"
-* parameter[19].documentation = "Output information for each exported SQL query result. One entry per query; resources supplied via the dependency parameter do not produce output entries."
+* parameter[19].documentation = "Output information for each exported SQL query result. One entry per query; resources supplied via the view parameter do not produce output entries."
 * parameter[19].part[0].name = #name
 * parameter[19].part[0].use = #out
 * parameter[19].part[0].min = 1
