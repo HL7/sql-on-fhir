@@ -1,17 +1,18 @@
 Execute a SQLQuery Library against ViewDefinition tables synchronously.
 
 **Use Cases:**
-* Run ad-hoc analytics queries
-* Interactive query development and testing
-* Real-time data retrieval with parameters
+
+- Run ad-hoc analytics queries
+- Interactive query development and testing
+- Real-time data retrieval with parameters
 
 **Endpoints:**
 
-| Level | Endpoint | Query Source |
-|-------|----------|--------------|
-| System | `POST [base]/$sqlquery-run` | `queryReference` or `queryResource` |
-| Type | `POST [base]/Library/$sqlquery-run` | `queryReference` or `queryResource` |
-| Instance | `POST [base]/Library/[id]/$sqlquery-run` | The Library instance |
+| Level    | Endpoint                                 | Query Source                                          |
+| -------- | ---------------------------------------- | ----------------------------------------------------- |
+| System   | `POST [base]/$sqlquery-run`              | `queryCanonical`, `queryReference` or `queryResource` |
+| Type     | `POST [base]/Library/$sqlquery-run`      | `queryCanonical`, `queryReference` or `queryResource` |
+| Instance | `POST [base]/Library/[id]/$sqlquery-run` | The Library instance named by the path                |
 
 **Execution Flow:**
 

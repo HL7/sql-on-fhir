@@ -129,16 +129,18 @@ Each repetition identifies a single SQLQuery Library to export. At least one `qu
 
 At the instance level (`POST [base]/Library/[id]/$sqlquery-export`), the bound Library identified by the request URL serves as the single query source and the `query` parameter does not apply. The export targets that one Library, optionally combined with the export control, filtering, and data source parameters listed below. Instance-level invocation does not provide a slot for per-query parameter binding; clients that need to pass parameters should use the system or type level with a `query.parameters` part.
 
-| Part Name      | Type       | Min | Max | Description                                                                             |
-| -------------- | ---------- | --- | --- | --------------------------------------------------------------------------------------- |
-| name           | string     | 0   | 1   | Optional friendly name for the exported query output                                    |
-| queryReference | Reference  | 0¹  | 1   | Reference to a SQLQuery Library on the server. [Details](#queryreference-clarification) |
-| queryResource  | Resource   | 0¹  | 1   | Inline SQLQuery Library resource                                                        |
-| parameters     | Parameters | 0   | 1   | Input parameters for this query. [Details](#parameter-passing)                          |
+| Part Name      | Type       | Min | Max | Description                                                                                               |
+| -------------- | ---------- | --- | --- | --------------------------------------------------------------------------------------------------------- |
+| name           | string     | 0   | 1   | Optional friendly name for the exported query output                                                      |
+| queryCanonical | canonical  | 0¹  | 1   | Canonical URL of the SQLQuery or SQLView Library. [Details](#queryreference-clarification)                |
+| queryReference | Reference  | 0¹  | 1   | Literal location of a SQLQuery or SQLView Library on the server. [Details](#queryreference-clarification) |
+| queryResource  | Library    | 0¹  | 1   | Inline SQLQuery or SQLView Library resource. [Details](#queryreference-clarification)                     |
+| parameters     | Parameters | 0   | 1   | Input parameters for this query. [Details](#parameter-passing)                                            |
 
 {:.table-data}
 
-¹ Either queryReference or queryResource is required per `query` repetition.
+¹ Exactly one of `queryCanonical`, `queryReference` or `queryResource` is required
+per `query` repetition. See [Identifying each query](#queryreference-clarification).
 
 ##### ViewDefinition Table Sources — `view` Parameter (0..\*, system+type scope)
 
@@ -186,16 +188,34 @@ If server does not support a parameter, request should be rejected with `400 Bad
 and `OperationOutcome` resource in the body with clarification that the parameter is not supported.
 Server should document which parameters it supports in its CapabilityStatement.
 
-##### QueryReference Clarification
+##### Identifying each query {#queryreference-clarification}
 
-The `queryReference` parameter MAY be specified using any of the following formats:
+Each `query` repetition names the SQLQuery or SQLView Library to export in exactly
+one of three ways, each with its own part so that the intended meaning is carried
+by the part's type rather than inferred from the shape of a string:
 
-- A relative URL on the server (e.g. "Library/patient-bp-query")
-- A canonical URL (e.g. "http://example.org/fhir/Library/patient-bp-query|1.0.0")
-- An absolute URL (e.g. "http://example.org/fhir/Library/patient-bp-query")
+| Part                   | Type        | Names the query by                                                                                                                                                                                                                                                                 |
+| ---------------------- | ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `query.queryCanonical` | `canonical` | Its canonical URL, optionally with a `\|version` suffix pinning a version (e.g. `http://example.org/Library/bp-summary\|2.1.0`). Absent a suffix, the server selects a version according to FHIR's [canonical resolution](https://hl7.org/fhir/R5/references.html#canonical) rules |
+| `query.queryReference` | `Reference` | A literal location: a relative URL on this server (e.g. `Library/patient-bp-query`) or an absolute URL (e.g. `http://example.org/fhir/Library/patient-bp-query`). This is not a canonical URL                                                                                      |
+| `query.queryResource`  | `Library`   | Carrying the Library itself in the request                                                                                                                                                                                                                                         |
 
-Servers MAY choose which reference formats they support.
-Servers SHALL document which reference formats they support in their CapabilityStatement.
+{:.table-data}
+
+Each `query` repetition SHALL supply exactly one of the three. Supplying none, or
+more than one, in a single repetition is rejected with `400 Bad Request` and an
+`OperationOutcome` naming the problem.
+
+A `query.queryCanonical` or `query.queryReference` the server cannot resolve is
+rejected with `404 Not Found` and an `OperationOutcome`. A resolved artefact that
+does not conform to the SQLQuery or SQLView profile is rejected with
+`422 Unprocessable Entity`.
+
+How a server resolves a canonical URL or an absolute reference - from a local
+artefact registry, by dereferencing the URL, or not at all - is an implementation
+matter. A server that supports only some of these parts declares the subset it
+supports as described in
+[Declaring partial operation support](operations-capability.html#partial-operation-support).
 
 ##### Format Parameter Clarification
 

@@ -38,6 +38,91 @@ If the server supports CRUD and search interactions for the Library resource typ
 - delete
 - create
 
+## Declaring partial operation support {#partial-operation-support}
+
+A server need not support every parameter of an operation. Which subset it does
+support SHALL be discoverable from its CapabilityStatement, using the mechanism
+base FHIR already defines for
+[`CapabilityStatement.rest.resource.operation.definition`](https://hl7.org/fhir/R5/capabilitystatement-definitions.html#CapabilityStatement.rest.resource.operation.definition):
+
+- Citing an OperationDefinition published by this guide asserts support for the
+  **full** capabilities of that operation, including every parameter it declares.
+- A server supporting only a subset SHALL publish its own OperationDefinition
+  whose `base` is the canonical URL of the one this guide publishes, declaring
+  only the parameters it supports, and SHALL point
+  `CapabilityStatement.rest.resource.operation.definition` at its own definition
+  rather than at this guide's.
+
+This applies to the three ways of naming an operation's subject as it does to any
+other parameter: a server that resolves canonical URLs and inline resources but
+not literal references declares that by omitting the `*Reference` parameter from
+its own definition. A request carrying a parameter the server does not support is
+rejected with `400 Bad Request` and an `OperationOutcome`.
+
+`operation.documentation` remains available for free-text notes, but it is not
+machine-readable, so it is not a substitute for the mechanism above.
+
+For example, a server that supports `queryCanonical` and `queryResource` on
+`$sqlquery-run` but not `queryReference` cites its own definition:
+
+```json
+{
+  "resourceType": "CapabilityStatement",
+  "rest": [
+    {
+      "mode": "server",
+      "resource": [
+        {
+          "type": "Library",
+          "operation": [
+            {
+              "name": "$sqlquery-run",
+              "definition": "http://example.org/OperationDefinition/sqlquery-run-supported"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+```
+
+That definition names this guide's as its base, and omits the parameter it does
+not support:
+
+```json
+{
+  "resourceType": "OperationDefinition",
+  "url": "http://example.org/OperationDefinition/sqlquery-run-supported",
+  "base": "http://hl7.org/fhir/uv/sql-on-fhir/OperationDefinition/SQLQueryRun",
+  "status": "active",
+  "kind": "operation",
+  "code": "sqlquery-run",
+  "system": true,
+  "type": true,
+  "instance": true,
+  "parameter": [
+    {
+      "name": "queryCanonical",
+      "use": "in",
+      "min": 0,
+      "max": "1",
+      "type": "canonical"
+    },
+    {
+      "name": "queryResource",
+      "use": "in",
+      "min": 0,
+      "max": "1",
+      "type": "Library"
+    },
+    { "name": "return", "use": "out", "min": 1, "max": "1", "type": "Binary" }
+  ]
+}
+```
+
+A client reading that definition knows not to send `queryReference`.
+
 ## Example
 
 ```http

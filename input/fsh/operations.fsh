@@ -33,13 +33,20 @@ Description: "Export a view definition. User can provide view definition referen
 * parameter[=].part[=].max = "1"
 * parameter[=].part[=].type = #string
 * parameter[=].part[=].documentation = "Optional friendly name for the exported view output."
+* parameter[=].part[+].name = #viewCanonical
+* parameter[=].part[=].use = #in
+* parameter[=].part[=].min = 0
+* parameter[=].part[=].max = "1"
+* parameter[=].part[=].type = #canonical
+* parameter[=].part[=].targetProfile = Canonical(ViewDefinition)
+* parameter[=].part[=].documentation = "Canonical URL of the ViewDefinition to export, optionally with a |version suffix pinning a version."
 * parameter[=].part[+].name = #viewReference
 * parameter[=].part[=].use = #in
 * parameter[=].part[=].min = 0
 * parameter[=].part[=].max = "1"
 * parameter[=].part[=].type = #Reference
 * parameter[=].part[=].targetProfile = Canonical(ViewDefinition)
-* parameter[=].part[=].documentation = "Reference to a ViewDefinition stored on the server."
+* parameter[=].part[=].documentation = "Literal location of a ViewDefinition: a relative URL on this server, or an absolute URL. Not a canonical URL; use viewCanonical for that."
 * parameter[=].part[+].name = #viewResource
 * parameter[=].part[=].use = #in
 * parameter[=].part[=].min = 0
@@ -249,6 +256,16 @@ Description: "Execute a view definition against supplied or server data."
 * parameter[=].type = #boolean
 * parameter[=].documentation = "Include CSV headers (default true). Applies only when csv output is requested."
 
+* parameter[+].name = #viewCanonical
+* parameter[=].use = #in
+* parameter[=].min = 0
+* parameter[=].max = "1"
+* parameter[=].scope[0] = #system
+* parameter[=].scope[1] = #type
+* parameter[=].type = #canonical
+* parameter[=].targetProfile = Canonical(ViewDefinition)
+* parameter[=].documentation = "Canonical URL of the ViewDefinition to execute, optionally with a |version suffix pinning a version."
+
 * parameter[+].name = #viewReference
 * parameter[=].use = #in
 * parameter[=].min = 0
@@ -257,7 +274,7 @@ Description: "Execute a view definition against supplied or server data."
 * parameter[=].scope[1] = #type
 * parameter[=].type = #Reference
 * parameter[=].targetProfile = Canonical(ViewDefinition)
-* parameter[=].documentation = "Reference to a ViewDefinition stored on the server."
+* parameter[=].documentation = "Literal location of a ViewDefinition: a relative URL on this server, or an absolute URL. Not a canonical URL; use viewCanonical for that."
 
 * parameter[+].name = #viewResource
 * parameter[=].use = #in
@@ -380,6 +397,17 @@ Description: "Execute a SQLQuery Library against ViewDefinition tables."
 * parameter[=].type = #boolean
 * parameter[=].documentation = "Include CSV headers (default true). Applies only when csv output is requested."
 
+* parameter[+].name = #queryCanonical
+* parameter[=].use = #in
+* parameter[=].min = 0
+* parameter[=].max = "1"
+* parameter[=].scope[0] = #system
+* parameter[=].scope[1] = #type
+* parameter[=].type = #canonical
+* parameter[=].targetProfile[0] = Canonical(SQLQuery)
+* parameter[=].targetProfile[1] = Canonical(SQLView)
+* parameter[=].documentation = "Canonical URL of the SQLQuery or SQLView Library to execute, optionally with a |version suffix pinning a version."
+
 * parameter[+].name = #queryReference
 * parameter[=].use = #in
 * parameter[=].min = 0
@@ -389,7 +417,7 @@ Description: "Execute a SQLQuery Library against ViewDefinition tables."
 * parameter[=].type = #Reference
 * parameter[=].targetProfile[0] = Canonical(SQLQuery)
 * parameter[=].targetProfile[1] = Canonical(SQLView)
-* parameter[=].documentation = "Reference to a SQLQuery or SQLView Library stored on the server."
+* parameter[=].documentation = "Literal location of a SQLQuery or SQLView Library: a relative URL on this server, or an absolute URL. Not a canonical URL; use queryCanonical for that."
 
 * parameter[+].name = #queryResource
 * parameter[=].use = #in
@@ -473,6 +501,14 @@ Description: "Export SQLQuery Library results asynchronously using the FHIR Asyn
 * parameter[=].part[=].max = "1"
 * parameter[=].part[=].type = #string
 * parameter[=].part[=].documentation = "Optional friendly name for the exported query output."
+* parameter[=].part[+].name = #queryCanonical
+* parameter[=].part[=].use = #in
+* parameter[=].part[=].min = 0
+* parameter[=].part[=].max = "1"
+* parameter[=].part[=].type = #canonical
+* parameter[=].part[=].targetProfile[0] = Canonical(SQLQuery)
+* parameter[=].part[=].targetProfile[1] = Canonical(SQLView)
+* parameter[=].part[=].documentation = "Canonical URL of the SQLQuery or SQLView Library to export, optionally with a |version suffix pinning a version."
 * parameter[=].part[+].name = #queryReference
 * parameter[=].part[=].use = #in
 * parameter[=].part[=].min = 0
@@ -480,7 +516,7 @@ Description: "Export SQLQuery Library results asynchronously using the FHIR Asyn
 * parameter[=].part[=].type = #Reference
 * parameter[=].part[=].targetProfile[0] = Canonical(SQLQuery)
 * parameter[=].part[=].targetProfile[1] = Canonical(SQLView)
-* parameter[=].part[=].documentation = "Reference to a SQLQuery or SQLView Library stored on the server."
+* parameter[=].part[=].documentation = "Literal location of a SQLQuery or SQLView Library: a relative URL on this server, or an absolute URL. Not a canonical URL; use queryCanonical for that."
 * parameter[=].part[+].name = #queryResource
 * parameter[=].part[=].use = #in
 * parameter[=].part[=].min = 0

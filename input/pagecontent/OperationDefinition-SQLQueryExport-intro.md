@@ -9,11 +9,11 @@ Export SQLQuery Library results asynchronously using the FHIR Asynchronous Inter
 
 **Endpoints:**
 
-| Level    | Endpoint                                    | Query Source              |
-| -------- | ------------------------------------------- | ------------------------- |
-| System   | `POST [base]/$sqlquery-export`              | `query` parameter (1..\*) |
-| Type     | `POST [base]/Library/$sqlquery-export`      | `query` parameter (1..\*) |
-| Instance | `POST [base]/Library/[id]/$sqlquery-export` | Bound Library resource    |
+| Level    | Endpoint                                    | Query Source                                                                                              |
+| -------- | ------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| System   | `POST [base]/$sqlquery-export`              | `query` parameter (1..\*), each naming a Library by `queryCanonical`, `queryReference` or `queryResource` |
+| Type     | `POST [base]/Library/$sqlquery-export`      | `query` parameter (1..\*), each naming a Library by `queryCanonical`, `queryReference` or `queryResource` |
+| Instance | `POST [base]/Library/[id]/$sqlquery-export` | The bound Library named by the path                                                                       |
 
 **Execution Flow:**
 

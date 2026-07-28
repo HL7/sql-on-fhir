@@ -238,16 +238,19 @@ client to negotiate a different representation for interim status responses
 
 The `view` parameter is a complex type that can be repeated multiple times to export several ViewDefinitions in a single operation. Each `view` parameter has the following parts:
 
-| Name               | Type           | Min | Max | Description                                                                        |
-| ------------------ | -------------- | --- | --- | ---------------------------------------------------------------------------------- |
-| view               | complex        | 1   | \*  | A ViewDefinition to export                                                         |
-| view.name          | string         | 0   | 1   | Name for the export output. If not provided, ViewDefinition name will be used      |
-| view.viewReference | Reference      | 0¹  | 1   | Reference to ViewDefinition on the server. [Details](#viewreference-clarification) |
-| view.viewResource  | ViewDefinition | 0¹  | 1   | Inline ViewDefinition resource                                                     |
+| Name               | Type           | Min | Max | Description                                                                                 |
+| ------------------ | -------------- | --- | --- | ------------------------------------------------------------------------------------------- |
+| view               | complex        | 1   | \*  | A ViewDefinition to export                                                                  |
+| view.name          | string         | 0   | 1   | Name for the export output. If not provided, ViewDefinition name will be used               |
+| view.viewCanonical | canonical      | 0¹  | 1   | Canonical URL of the ViewDefinition. [Details](#viewreference-clarification)                |
+| view.viewReference | Reference      | 0¹  | 1   | Literal location of a ViewDefinition on the server. [Details](#viewreference-clarification) |
+| view.viewResource  | ViewDefinition | 0¹  | 1   | Inline ViewDefinition resource. [Details](#viewreference-clarification)                     |
 
 {:.table-data}
 
-¹ Either view.viewReference or view.viewResource is required
+¹ Exactly one of `view.viewCanonical`, `view.viewReference` or
+`view.viewResource` is required per `view` repetition. See
+[Identifying each ViewDefinition](#viewreference-clarification).
 
 ##### Export Control
 
@@ -281,23 +284,33 @@ If server does not support a parameter, request should be rejected with `400 Bad
 and `OperationOutcome` resource in the body with clarification that the parameter is not supported.
 Server should document which parameters it supports in its CapabilityStatement.
 
-##### ViewReference Clarification
+##### Identifying each ViewDefinition {#viewreference-clarification}
 
-The `view.viewReference` parameter MAY be specified using any of the following formats:
+Each `view` repetition names the ViewDefinition to export in exactly one of three
+ways, each with its own part so that the intended meaning is carried by the
+part's type rather than inferred from the shape of a string:
 
-- A relative URL on the server (e.g. "ViewDefinition/123")
-- A canonical URL (e.g. "http://specification.org/fhir/ViewDefinition/123|1.0.0")
-- An absolute URL (e.g. "http://example.org/fhir/ViewDefinition/123")
+| Part                 | Type             | Names the view by                                                                                                                                                                                                                                                                                   |
+| -------------------- | ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `view.viewCanonical` | `canonical`      | Its canonical URL, optionally with a `\|version` suffix pinning a version (e.g. `http://example.org/ViewDefinition/patient_demographics\|2.0.0`). Absent a suffix, the server selects a version according to FHIR's [canonical resolution](https://hl7.org/fhir/R5/references.html#canonical) rules |
+| `view.viewReference` | `Reference`      | A literal location: a relative URL on this server (e.g. `ViewDefinition/123`) or an absolute URL (e.g. `http://example.org/fhir/ViewDefinition/123`). This is not a canonical URL                                                                                                                   |
+| `view.viewResource`  | `ViewDefinition` | Carrying the ViewDefinition itself in the request                                                                                                                                                                                                                                                   |
 
-Servers MAY choose which reference formats they support.
-Servers SHALL document which reference formats they support in their CapabilityStatement.
+{:.table-data}
 
-For servers that want to support all types of references, it is recommended to follow the following algorithm:
+Each `view` repetition SHALL supply exactly one of the three. Supplying none, or
+more than one, in a single repetition is rejected with `400 Bad Request` and an
+`OperationOutcome` naming the problem.
 
-1. If the reference is a relative URL, resolve it on the server side.
-2. If the reference is an absolute URL, look up the available server Artifact registry for
-   a resource with the same canonical URL and version if provided.
-3. Otherwise, try to load the ViewDefinition from the provided absolute URL.
+A `view.viewCanonical` or `view.viewReference` the server cannot resolve is
+rejected with `404 Not Found` and an `OperationOutcome`. A resolved artefact that
+is not a conformant ViewDefinition is rejected with `422 Unprocessable Entity`.
+
+How a server resolves a canonical URL or an absolute reference - from a local
+artefact registry, by dereferencing the URL, or not at all - is an implementation
+matter. A server that supports only some of these parts declares the subset it
+supports as described in
+[Declaring partial operation support](operations-capability.html#partial-operation-support).
 
 ##### Format Parameter Clarification
 

@@ -11,9 +11,11 @@ When using the GET method, the following limitations apply:
    - Cannot provide `viewResource` parameter (inline ViewDefinition)
    - Cannot provide `resource` parameter (direct resources to transform)
 2. **Available Parameters**: Only parameters that can be passed as query parameters are supported:
+   - `viewCanonical` - Canonical URL of the ViewDefinition, with any `|` percent-encoded as `%7C`
+   - `viewReference` - Literal location of a ViewDefinition on the server
    - `_format` - Output format specification
    - `header` - Include CSV headers (for CSV format)
-   - `patient` - Filter by patient reference
+   - `patient` - Filter by patient reference, repeated to name several patients
    - `group` - Filter by group membership
    - `_since` - Filter by last updated time
    - `_limit` - Limit number of result rows
@@ -86,14 +88,18 @@ Optional filtering parameters:
 
 ##### Core Parameters
 
-| Name          | Type           | Scope          | Required     | Max | Description                                                                        |
-| ------------- | -------------- | -------------- | ------------ | --- | ---------------------------------------------------------------------------------- |
-| viewReference | Reference      | type, instance | Conditional¹ | 1   | Reference to ViewDefinition on the server. [Details](#viewreference-clarification) |
-| viewResource  | ViewDefinition | type           | Conditional¹ | 1   | Inline ViewDefinition resource                                                     |
+| Name          | Type           | Scope        | Required     | Max | Description                                                                                 |
+| ------------- | -------------- | ------------ | ------------ | --- | ------------------------------------------------------------------------------------------- |
+| viewCanonical | canonical      | system, type | Conditional¹ | 1   | Canonical URL of the ViewDefinition. [Details](#viewreference-clarification)                |
+| viewReference | Reference      | system, type | Conditional¹ | 1   | Literal location of a ViewDefinition on the server. [Details](#viewreference-clarification) |
+| viewResource  | ViewDefinition | system, type | Conditional¹ | 1   | Inline ViewDefinition resource. [Details](#viewreference-clarification)                     |
 
 {:.table-data}
 
-¹ Either viewReference or viewResource is required at type level; neither allowed at instance level
+¹ Exactly one of `viewCanonical`, `viewReference` or `viewResource` is required at
+the system and type levels; none is allowed at the instance level, where the
+ViewDefinition is identified by the request path. See
+[Identifying the ViewDefinition](#viewreference-clarification).
 
 ##### Output Control
 
@@ -132,26 +138,38 @@ Optional filtering parameters:
 
 {:.table-data}
 
-##### View Reference/Resource Clarification {#viewreference-clarification}
+##### Identifying the ViewDefinition {#viewreference-clarification}
 
-Only one of the `viewReference` or `viewResource` parameters can be provided.
-When invoking this operation at the instance level (e.g. ViewDefinition/{id}/$viewdefinition-run), the server SHALL automatically infer the `viewReference` parameter from the path parameter.
+The ViewDefinition to execute is named in exactly one of three ways, each with
+its own parameter so that the intended meaning is carried by the parameter's type
+rather than inferred from the shape of a string:
 
-The `viewReference` parameter MAY be specified using any of the following formats:
+| Parameter       | Type             | Names the view by                                                                                                                                                                                                                                                                                   |
+| --------------- | ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `viewCanonical` | `canonical`      | Its canonical URL, optionally with a `\|version` suffix pinning a version (e.g. `http://example.org/ViewDefinition/patient_demographics\|2.0.0`). Absent a suffix, the server selects a version according to FHIR's [canonical resolution](https://hl7.org/fhir/R5/references.html#canonical) rules |
+| `viewReference` | `Reference`      | A literal location: a relative URL on this server (e.g. `ViewDefinition/123`) or an absolute URL (e.g. `http://example.org/fhir/ViewDefinition/123`). This is not a canonical URL                                                                                                                   |
+| `viewResource`  | `ViewDefinition` | Carrying the ViewDefinition itself in the request                                                                                                                                                                                                                                                   |
 
-- A relative URL on the server (e.g. "ViewDefinition/123")
-- A canonical URL (e.g. "http://specification.org/fhir/ViewDefinition/123|1.0.0")
-- An absolute URL (e.g. "http://example.org/fhir/ViewDefinition/123")
+{:.table-data}
 
-Servers MAY choose which reference formats they support.
-Servers SHALL document which reference formats they support in their CapabilityStatement.
+At the system and type levels, a request SHALL supply exactly one of the three.
+Supplying none, or more than one, is rejected with `400 Bad Request` and an
+`OperationOutcome` naming the problem.
 
-For servers that want to support all types of references, it is recommended to use the following algorithm:
+At the instance level
+(`[base]/ViewDefinition/[id]/$viewdefinition-run`) the ViewDefinition is
+identified by the request path, so none of the three applies; supplying any of
+them is rejected with `400 Bad Request`.
 
-1. If the reference is a relative URL, resolve it on the server side.
-2. If the reference is an absolute URL, look up the available server Artifact registry for
-   a resource with the same canonical URL and version if provided.
-3. Otherwise, try to load the ViewDefinition from the provided absolute URL.
+A `viewCanonical` or `viewReference` the server cannot resolve is rejected with
+`404 Not Found` and an `OperationOutcome`. A resolved artefact that is not a
+conformant ViewDefinition is rejected with `422 Unprocessable Entity`.
+
+How a server resolves a canonical URL or an absolute reference - from a local
+artefact registry, by dereferencing the URL, or not at all - is an implementation
+matter. A server that supports only some of these parameters declares the subset
+it supports as described in
+[Declaring partial operation support](operations-capability.html#partial-operation-support).
 
 ##### Format Parameter Clarification
 
@@ -337,7 +355,28 @@ pt-1,2012-03-30,Cole,Joanie
 pt-2,2012-03-30,Doe,John
 ```
 
-##### Example 4: GET with filters
+##### Example 4: GET naming the view by canonical URL
+
+`viewCanonical` is available over GET as a query parameter. The `|` that
+separates the version is percent-encoded as `%7C`.
+
+```http
+GET /ViewDefinition/$viewdefinition-run?viewCanonical=http%3A%2F%2Fexample.org%2FViewDefinition%2Fpatient_demographics%7C2.0.0&_format=ndjson HTTP/1.1
+```
+
+```http
+HTTP/1.1 200 OK
+Content-Type: application/x-ndjson
+Transfer-Encoding: chunked
+
+{"id":"pt-1","birthDate":"1990-01-15","family":"Smith","given":"John"}
+{"id":"pt-2","birthDate":"1985-03-22","family":"Johnson","given":"Mary"}
+```
+
+Omitting `%7C2.0.0` selects a version according to FHIR's canonical resolution
+rules. A canonical URL the server cannot resolve returns `404 Not Found`.
+
+##### Example 5: GET with filters
 
 ```http
 GET /ViewDefinition/encounters/$viewdefinition-run?patient=Patient/123&_limit=10&_format=ndjson HTTP/1.1
@@ -353,7 +392,7 @@ Transfer-Encoding: chunked
 {"id":"enc-3","patient":"Patient/123","status":"in-progress","class":"inpatient","period_start":"2023-03-01T08:00:00Z"}
 ```
 
-##### Example 5: POST with a Bundle of resources
+##### Example 6: POST with a Bundle of resources
 
 A `Bundle` supplied as a `resource` value is unwrapped; the ViewDefinition runs
 against each entry. This request is equivalent to Example 3, which passed the
@@ -410,13 +449,13 @@ pt-2,2012-03-30,Doe,John
 
 The operation uses standard HTTP status codes to indicate the outcome:
 
-| Status Code               | Description          | When to Use                                                        |
-| ------------------------- | -------------------- | ------------------------------------------------------------------ |
-| 200 OK                    | Success              | Operation completed successfully, results returned                 |
-| 400 Bad Request           | Client Error         | Invalid parameters, unsupported parameters, or malformed request   |
-| 404 Not Found             | Not Found            | ViewDefinition resource not found (instance-level invocation)      |
-| 422 Unprocessable Entity  | Business Logic Error | Valid request but ViewDefinition is invalid or cannot be processed |
-| 500 Internal Server Error | Server Error         | Unexpected server error during processing                          |
+| Status Code               | Description          | When to Use                                                                                                                                                                   |
+| ------------------------- | -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 200 OK                    | Success              | Operation completed successfully, results returned                                                                                                                            |
+| 400 Bad Request           | Client Error         | Invalid parameters, unsupported parameters, or malformed request; no subject form supplied at system or type level, more than one supplied, or any supplied at instance level |
+| 404 Not Found             | Not Found            | ViewDefinition not found: the instance named by the request path, or an unresolvable `viewCanonical` or `viewReference`                                                       |
+| 422 Unprocessable Entity  | Business Logic Error | Valid request but ViewDefinition is invalid or cannot be processed                                                                                                            |
+| 500 Internal Server Error | Server Error         | Unexpected server error during processing                                                                                                                                     |
 
 {:.table-data}
 
@@ -543,7 +582,7 @@ Content-Type: application/fhir+json
     {
       "severity": "error",
       "code": "required",
-      "diagnostics": "Either viewReference or viewResource parameter is required when invoking at type level"
+      "diagnostics": "Exactly one of viewCanonical, viewReference or viewResource is required when invoking at type level"
     }
   ]
 }

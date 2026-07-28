@@ -3,21 +3,23 @@
 The operation is invoked with POST. The following input parameters are passed
 inside a `Parameters` resource in the request body.
 
-| Name           | Type       | Scope                  | Required     | Max | Description                                                                                           |
-| -------------- | ---------- | ---------------------- | ------------ | --- | ----------------------------------------------------------------------------------------------------- |
-| \_format       | code       | system, type, instance | No           | 1   | Output format: `json`, `ndjson`, `csv`, `parquet`, `fhir`. [Details](#format-parameter-clarification) |
-| header         | boolean    | system, type, instance | No           | 1   | Include CSV headers (default: true). Only applies to `csv` format                                     |
-| queryReference | Reference  | system, type           | Conditional¹ | 1   | Reference to a SQLQuery Library stored on the server                                                  |
-| queryResource  | Resource   | system, type           | Conditional¹ | 1   | Inline SQLQuery Library resource to execute                                                           |
-| parameters     | Parameters | system, type, instance | No           | 1   | Input parameters bound by name to parameters declared in the SQLQuery Library                         |
-| source         | string     | system, type, instance | No           | 1   | External data source containing the ViewDefinition tables (e.g. URI, bucket name)                     |
-| \_limit        | integer    | system, type, instance | No           | 1   | Maximum number of rows to return                                                                      |
+| Name           | Type       | Scope                  | Required     | Max | Description                                                                                               |
+| -------------- | ---------- | ---------------------- | ------------ | --- | --------------------------------------------------------------------------------------------------------- |
+| \_format       | code       | system, type, instance | No           | 1   | Output format: `json`, `ndjson`, `csv`, `parquet`, `fhir`. [Details](#format-parameter-clarification)     |
+| header         | boolean    | system, type, instance | No           | 1   | Include CSV headers (default: true). Only applies to `csv` format                                         |
+| queryCanonical | canonical  | system, type           | Conditional¹ | 1   | Canonical URL of the SQLQuery or SQLView Library. [Details](#queryreference-clarification)                |
+| queryReference | Reference  | system, type           | Conditional¹ | 1   | Literal location of a SQLQuery or SQLView Library on the server. [Details](#queryreference-clarification) |
+| queryResource  | Library    | system, type           | Conditional¹ | 1   | Inline SQLQuery or SQLView Library resource to execute. [Details](#queryreference-clarification)          |
+| parameters     | Parameters | system, type, instance | No           | 1   | Input parameters bound by name to parameters declared in the SQLQuery Library                             |
+| source         | string     | system, type, instance | No           | 1   | External data source containing the ViewDefinition tables (e.g. URI, bucket name)                         |
+| \_limit        | integer    | system, type, instance | No           | 1   | Maximum number of rows to return                                                                          |
 
 {:.table-data}
 
-¹ Either `queryReference` or `queryResource` is required at the system and type
-levels; neither is allowed at the instance level (the Library is identified by
-the path).
+¹ Exactly one of `queryCanonical`, `queryReference` or `queryResource` is required
+at the system and type levels; none is allowed at the instance level, where the
+Library is identified by the request path. See
+[Identifying the query](#queryreference-clarification).
 
 #### Output Parameter
 
@@ -26,6 +28,39 @@ the path).
 | return | Binary | Query results as a raw stream in the format's native media type, not a serialized `Binary` envelope (a `Parameters` resource when `_format=fhir` is requested). See [Return Representation](operations-common.html#return-representation) |
 
 {:.table-data}
+
+#### Identifying the query {#queryreference-clarification}
+
+The SQLQuery or SQLView Library to execute is named in exactly one of three ways,
+each with its own parameter so that the intended meaning is carried by the
+parameter's type rather than inferred from the shape of a string:
+
+| Parameter        | Type        | Names the query by                                                                                                                                                                                                                                                                       |
+| ---------------- | ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `queryCanonical` | `canonical` | Its canonical URL, optionally with a `\|version` suffix pinning a version (e.g. `http://example.org/Library/patient-bp-query\|1.0.0`). Absent a suffix, the server selects a version according to FHIR's [canonical resolution](https://hl7.org/fhir/R5/references.html#canonical) rules |
+| `queryReference` | `Reference` | A literal location: a relative URL on this server (e.g. `Library/patient-bp-query`) or an absolute URL (e.g. `http://example.org/fhir/Library/patient-bp-query`). This is not a canonical URL                                                                                            |
+| `queryResource`  | `Library`   | Carrying the Library itself in the request                                                                                                                                                                                                                                               |
+
+{:.table-data}
+
+At the system and type levels, a request SHALL supply exactly one of the three.
+Supplying none, or more than one, is rejected with `400 Bad Request` and an
+`OperationOutcome` naming the problem.
+
+At the instance level (`[base]/Library/[id]/$sqlquery-run`) the Library is
+identified by the request path, so none of the three applies; supplying any of
+them is rejected with `400 Bad Request`.
+
+A `queryCanonical` or `queryReference` the server cannot resolve is rejected with
+`404 Not Found` and an `OperationOutcome`. A resolved artefact that does not
+conform to the SQLQuery or SQLView profile is rejected with
+`422 Unprocessable Entity`.
+
+How a server resolves a canonical URL or an absolute reference - from a local
+artefact registry, by dereferencing the URL, or not at all - is an implementation
+matter. A server that supports only some of these parameters declares the subset
+it supports as described in
+[Declaring partial operation support](operations-capability.html#partial-operation-support).
 
 #### Row Limit
 
@@ -85,9 +120,38 @@ Content-Type: application/fhir+json
 }
 ```
 
+#### Type-Level with Canonical URL
+
+Name a stored Library by its canonical URL, pinning a version:
+
+```http
+POST /Library/$sqlquery-run HTTP/1.1
+Content-Type: application/fhir+json
+
+{
+  "resourceType": "Parameters",
+  "parameter": [
+    { "name": "queryCanonical", "valueCanonical": "http://example.org/Library/patient-bp-query|1.0.0" },
+    { "name": "_format", "valueCode": "csv" }
+  ]
+}
+```
+
+```http
+HTTP/1.1 200 OK
+Content-Type: text/csv
+
+patient_id,systolic,effective_date
+Patient/123,120,2024-01-15
+Patient/123,118,2024-02-20
+```
+
+Omitting `|1.0.0` selects a version according to FHIR's canonical resolution
+rules. A canonical URL the server cannot resolve returns `404 Not Found`.
+
 #### Type-Level with Reference
 
-Reference a stored Library by URL or relative reference:
+Name a stored Library by its literal location on the server:
 
 ```http
 POST /Library/$sqlquery-run HTTP/1.1
@@ -260,25 +324,25 @@ Response:
 
 ```json
 {
-    "resourceType": "Parameters",
-    "parameter": [
-        {
-            "name": "row",
-            "part": [
-                { "name": "patient_id", "valueString": "Patient/123" },
-                { "name": "systolic", "valueInteger": 120 },
-                { "name": "effective_date", "valueDate": "2024-01-15" }
-            ]
-        },
-        {
-            "name": "row",
-            "part": [
-                { "name": "patient_id", "valueString": "Patient/123" },
-                { "name": "systolic", "valueInteger": 118 },
-                { "name": "effective_date", "valueDate": "2024-02-20" }
-            ]
-        }
-    ]
+  "resourceType": "Parameters",
+  "parameter": [
+    {
+      "name": "row",
+      "part": [
+        { "name": "patient_id", "valueString": "Patient/123" },
+        { "name": "systolic", "valueInteger": 120 },
+        { "name": "effective_date", "valueDate": "2024-01-15" }
+      ]
+    },
+    {
+      "name": "row",
+      "part": [
+        { "name": "patient_id", "valueString": "Patient/123" },
+        { "name": "systolic", "valueInteger": 118 },
+        { "name": "effective_date", "valueDate": "2024-02-20" }
+      ]
+    }
+  ]
 }
 ```
 
@@ -287,7 +351,7 @@ When a query returns zero rows, the response is a Parameters resource with no
 
 ```json
 {
-    "resourceType": "Parameters"
+  "resourceType": "Parameters"
 }
 ```
 
@@ -349,8 +413,8 @@ SQLQuery profile for the binding rules and the mapping from
 
 ### Error Handling
 
-| Status                     | Condition                                                                                                                     |
-| -------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| `400 Bad Request`          | Missing required parameter, unknown parameter name, or value type mismatch                                                    |
-| `404 Not Found`            | Library or ViewDefinition not found                                                                                           |
-| `422 Unprocessable Entity` | SQL execution error, or unsupported SQL column type when using `_format=fhir` (see [type mapping](#sql-to-fhir-type-mapping)) |
+| Status                     | Condition                                                                                                                                                                                                                                            |
+| -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `400 Bad Request`          | Missing required parameter, unknown parameter name, or value type mismatch; no subject form supplied at system or type level, more than one supplied, or any supplied at instance level (see [Identifying the query](#queryreference-clarification)) |
+| `404 Not Found`            | An unresolvable `queryCanonical` or `queryReference`; the Library named by the request path not found; a dependency view neither supplied nor resolvable                                                                                             |
+| `422 Unprocessable Entity` | SQL execution error, a resolved artefact not conforming to the SQLQuery or SQLView profile, or unsupported SQL column type when using `_format=fhir` (see [type mapping](#sql-to-fhir-type-mapping))                                                 |
