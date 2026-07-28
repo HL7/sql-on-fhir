@@ -121,8 +121,8 @@ rather than silently returning raw bytes under a FHIR media type. Support for
 the envelope representation per format SHOULD be documented in the
 CapabilityStatement.
 
-These two axes are distinct: Axis 1 decides *what* is encoded, Axis 2 decides
-*how* it is wrapped.
+These two axes are distinct: Axis 1 decides _what_ is encoded, Axis 2 decides
+_how_ it is wrapped.
 
 ## Streaming and Transfer Encoding {#streaming}
 
@@ -136,7 +136,7 @@ Two further concepts are independent of each other and of the format:
 
 1. **Transfer framing** - `Transfer-Encoding: chunked` (RFC 9112 §7.1) is an
    HTTP/1.1 message-framing mechanism. It is independent of `Content-Type` and
-   of `_format`: *any* payload - CSV, JSON, NDJSON, parquet,
+   of `_format`: _any_ payload - CSV, JSON, NDJSON, parquet,
    `application/octet-stream`, or a `Binary` envelope - MAY be sent chunked. The
    choice between `Content-Length` and chunked framing depends solely on whether
    the server knows the body size before emitting the first byte, never on the
@@ -154,26 +154,48 @@ Two further concepts are independent of each other and of the format:
 ## Asynchronous Delivery {#asynchronous-delivery}
 
 The two export operations conform to the
-[FHIR Asynchronous Bulk Data Request Pattern](https://www.hl7.org/fhir/async-bulk.html).
-In particular, on completion they follow that pattern's completion response
-exactly:
+[FHIR Asynchronous Interaction Request Pattern](https://build.fhir.org/ig/HL7/api-incubator-ig/branches/simplified-async-interaction/async-interaction.html):
 
-- **Kick-off** → `202 Accepted` with a `Content-Location` header carrying the
-  status (polling) URL.
-- **Polling while processing** → `202 Accepted`, optionally with `Retry-After`
-  and `X-Progress`, and an optional interim status body.
-- **Completion** → `200 OK` whose body is the manifest `Parameters` resource
+- **Kick-off** → the client sends the request with a `Prefer: respond-async`
+  header; the server responds `202 Accepted` with a `Content-Location` header
+  carrying the status (polling) URL. An informative `Parameters` body MAY be
+  included. Invalid requests (bad or unsupported parameters, authorisation
+  failures, referenced resources not found) are rejected synchronously with the
+  relevant `4xx`/`5xx` status code and an `OperationOutcome` body - rejection
+  is never deferred to the status URL.
+- **Polling while processing** → `GET` on the status URL returns
+  `202 Accepted`, with a `Retry-After` header (recommended), an `X-Progress`
+  header (optional), and an optional, informative, implementation-defined
+  interim status body. A server MAY respond `429 Too Many Requests` to a client
+  that polls excessively; clients SHOULD apply exponential backoff, guided by
+  `Retry-After` where present.
+- **Completion and failure** → once the job has finished - whether it succeeded
+  or failed - the status poll returns `303 See Other` with a `Location` header
+  carrying the result URL and an empty body. The status endpoint reflects
+  polling machinery only; it never communicates the job's outcome.
+- **Result retrieval** → the client fetches the result URL with `GET`. For a
+  successful export, the result is the manifest `Parameters` resource
   (`exportId`, `status`, `_format`, the export-timing parameters, and the
-  repeating `output` entries with their `location` download URLs). The manifest
-  is returned **in the body of the status-poll response**; there is no
-  `303 See Other` redirect and no separate result resource to follow.
-- **Failure** → the status poll returns the relevant error status code (e.g.
-  `500 Internal Server Error`) with an `OperationOutcome` body.
+  repeating `output` entries with their `location` download URLs), returned
+  with `200 OK`. For a failed export, the result URL returns the relevant error
+  status code (e.g. `500 Internal Server Error`) with an `OperationOutcome`
+  body explaining the failure; repeated fetches return the same outcome within
+  the validity window.
 
-The deliberate deviation from that pattern is the manifest's representation:
-it is a FHIR `Parameters` resource rather than the Bulk Data JSON manifest
-object. The flow, status codes, and headers are otherwise as the pattern
-specifies.
+Clients MUST treat the status and result URLs as opaque values. Note that many
+HTTP libraries follow a `303` response to a `GET` automatically, so a polling
+client may transparently receive the result response; this is benign.
+
+The result URL and all `output.location` download URLs SHALL remain valid for
+at least 24 hours after job completion. Servers SHOULD support multiple
+retrievals within that window and MAY include an `Expires` header indicating
+when the URLs expire.
+
+The same access control applies to status-URL and result-URL requests as to
+the original kick-off request, and servers SHOULD limit access to the client
+that initiated the job; non-guessable URLs (e.g. cryptographically random
+tokens) remain documented as an alternative control. Unauthorised access
+attempts return `401 Unauthorized` or `403 Forbidden`.
 
 File downloads referenced by `output.location` are independent HTTP responses;
 their transfer framing is governed by HTTP itself and is not constrained by

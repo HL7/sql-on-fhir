@@ -4,7 +4,7 @@ Instance: ActivePatientsView
 InstanceOf: SQLView
 Description: "A reusable SQL view selecting active patients, intended to be referenced as a virtual table by other queries."
 Usage: #example
-* url = "https://sql-on-fhir.org/ig/Library/ActivePatientsView"
+* url = "http://hl7.org/fhir/uv/sql-on-fhir/Library/ActivePatientsView"
 * name = "ActivePatientsView"
 * status = #active
 * title = "Active Patients"
@@ -62,7 +62,7 @@ JOIN patient_address_view
 """
 * relatedArtifact[+]
   * type = #depends-on
-  * resource = "https://sql-on-fhir.org/ig/Library/ActivePatientsView"
+  * resource = "http://hl7.org/fhir/uv/sql-on-fhir/Library/ActivePatientsView"
   * label = "active_patients"
   * display = "Active Patients view"
 * relatedArtifact[+]

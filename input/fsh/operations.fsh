@@ -7,7 +7,7 @@ Title: "ViewDefinition Export"
 Description: "Export a view definition. User can provide view definition references and/or resources as part of the input parameters."
 
 * id = "ViewDefinitionExport"
-* url = "http://sql-on-fhir.org/OperationDefinition/$viewdefinition-export"
+* url = "http://hl7.org/fhir/uv/sql-on-fhir/OperationDefinition/ViewDefinitionExport"
 * version = "0.0.1"
 * name = "ViewDefinitionExport"
 * status = #active
@@ -213,7 +213,7 @@ Title: "ViewDefinition Run"
 Description: "Execute a view definition against supplied or server data."
 
 * id = "ViewDefinitionRun"
-* url = "http://sql-on-fhir.org/OperationDefinition/$viewdefinition-run"
+* url = "http://hl7.org/fhir/uv/sql-on-fhir/OperationDefinition/ViewDefinitionRun"
 * version = "0.0.1"
 * versionAlgorithmString = "semver"
 * name = "ViewDefinitionRun"
@@ -345,7 +345,7 @@ Title: "SQLQuery Run"
 Description: "Execute a SQLQuery Library against ViewDefinition tables."
 
 * id = "SQLQueryRun"
-* url = "http://sql-on-fhir.org/OperationDefinition/$sqlquery-run"
+* url = "http://hl7.org/fhir/uv/sql-on-fhir/OperationDefinition/SQLQueryRun"
 * version = "0.0.1"
 * versionAlgorithmString = "semver"
 * name = "SQLQueryRun"
@@ -444,10 +444,10 @@ Instance: SQLQueryExport
 Usage: #definition
 InstanceOf: OperationDefinition
 Title: "SQLQuery Export"
-Description: "Export SQLQuery Library results asynchronously using the FHIR Asynchronous Bulk Data Request Pattern."
+Description: "Export SQLQuery Library results asynchronously using the FHIR Asynchronous Interaction Request Pattern."
 
 * id = "SQLQueryExport"
-* url = "http://sql-on-fhir.org/OperationDefinition/$sqlquery-export"
+* url = "http://hl7.org/fhir/uv/sql-on-fhir/OperationDefinition/SQLQueryExport"
 * version = "0.0.1"
 * versionAlgorithmString = "semver"
 * name = "SQLQueryExport"
