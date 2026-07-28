@@ -9,10 +9,10 @@ name: SQLonFHIR
 title: SQL on FHIR
 description: A specification for defining portable views of FHIR data that can be easily queried using tools such as SQL.
 status: draft # draft | active | retired | unknown
-version: 2.1.0-pre
+version: 3.0.0-ballot
 fhirVersion: 5.0.0 # https://www.hl7.org/fhir/valueset-FHIR-version.html
 copyrightYear: 2023+
-releaseLabel: ci-build # ci-build | draft | ballot | trial-use | update | normative | normative+trial-use (HL7 template does not accept "release")
+releaseLabel: ballot # ci-build | draft | ballot | trial-use | update | normative | normative+trial-use (HL7 template does not accept "release")
 license: CC0-1.0 # https://www.hl7.org/fhir/valueset-spdx-license.html
 jurisdiction: http://unstats.un.org/unsd/methods/m49/m49.htm#001 "World" # https://www.hl7.org/fhir/valueset-jurisdiction.html
 # HL7 publication metadata. The specification is balloted under the sponsorship
@@ -67,6 +67,12 @@ parameters:
   # Root OID arc assigned to this IG in the FHIR ig-registry. The IG Publisher
   # uses it to auto-assign and persist OIDs for code systems and value sets.
   auto-oid-root: 2.16.840.1.113883.4.642.40.77
+  # Automatic comparison against the previous release is disabled. The publisher
+  # resolves the prior release through the package identifier recorded in
+  # {canonical}/package-list.json, so it cannot reach 2.0.0, which was published
+  # as org.sql-on-fhir.ig rather than hl7.fhir.uv.sql-on-fhir. The delta is
+  # hand-authored on the Changes page instead.
+  version-comparison: n/a
 
 #   validation: [allow-any-extensions, no-broken-links]
 #
