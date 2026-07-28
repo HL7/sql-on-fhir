@@ -89,6 +89,14 @@ fully ad-hoc query possible, with nothing stored on the server. `viewResource`
 also applies at the instance level, so a client invoking a stored query can supply
 just the dependency the server cannot resolve.
 
+`viewResource` supplies the _views_ a query reads from, not the FHIR resources
+those views project. This operation has no `resource` parameter for the latter:
+unlike [`$viewdefinition-run`](OperationDefinition-ViewDefinitionRun.html), where
+inline resources feed one view directly, doing so here would need its own
+semantics for how supplied resources reach each dependency view. That is
+deliberately deferred; see
+[Parameters that do not apply to every operation](operations-common.html#parameter-asymmetries).
+
 #### Filtering {#filtering}
 
 `patient`, `group` and `_since` restrict the data the query sees. They carry the

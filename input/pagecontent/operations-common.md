@@ -12,6 +12,23 @@ Each operation page references the relevant subsections below rather than
 restating these rules. Where an operation needs to deviate, that operation's
 page calls out the deviation explicitly.
 
+## Parameters that do not apply to every operation {#parameter-asymmetries}
+
+Apart from the parameters that name an operation's subject, which necessarily
+differ, the four operations offer the same input parameters at the same
+invocation levels. Two deliberate exceptions remain, recorded here so that
+neither reads as an oversight:
+
+| Parameter  | Offered on                             | Why not on the others                                                                                                                                                                                                                                      |
+| ---------- | -------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `_limit`   | `$viewdefinition-run`, `$sqlquery-run` | It caps the rows returned to the client in the operation response. An export delivers files rather than rows in a response, so there is nothing for it to cap                                                                                              |
+| `resource` | `$viewdefinition-run`                  | It carries inline FHIR resources to transform instead of using server data. Accepting it on the SQLQuery operations would need its own semantics for how supplied resources reach each dependency view, so it is deliberately deferred rather than omitted |
+
+{:.table-data}
+
+Extending `resource` to `$sqlquery-run` is a new capability rather than an
+alignment fix, and is left to a separate proposal.
+
 ## Output Formats (`_format`) {#output-formats}
 
 The four operations share a single enumeration of output formats, with one
@@ -171,8 +188,9 @@ executes: the SQL sees tables already narrowed to the requested scope, rather th
 being expected to express the filter itself.
 
 `_limit` is deliberately not one of these. It caps the rows returned to the
-client, which is meaningful only on the synchronous run operations, and it is not a
-constraint on the data feeding a view.
+client rather than constraining the data feeding a view, which is also why it is
+offered on the run operations only (see
+[Parameters that do not apply to every operation](#parameter-asymmetries)).
 
 ### `patient` {#patient-filter}
 
