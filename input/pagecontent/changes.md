@@ -77,37 +77,45 @@ is not a breaking change at all, because none of the operations existed then.
 - [#291](https://github.com/HL7/sql-on-fhir/issues/291): Added the `SQLQuery`
   profile on `Library`, which represents a single logical SQL query as a
   shareable FHIR resource, with dialect-specific variants, bound parameters, and
-  `relatedArtifact` entries naming the ViewDefinitions it reads. The SQL itself
-  is carried by the new `sql-text` extension alongside the base64 `content.data`.
+  `relatedArtifact` entries naming the ViewDefinitions it reads
+  ([#293](https://github.com/HL7/sql-on-fhir/pull/293)). The SQL is carried in a
+  readable form by the new `sql-text` extension alongside the base64
+  `content.data` ([#309](https://github.com/HL7/sql-on-fhir/pull/309)).
 - [#329](https://github.com/HL7/sql-on-fhir/issues/329): Added the `SQLView`
   profile, so one query can depend on the result of another and queries can be
   composed rather than duplicated.
-- [#309](https://github.com/HL7/sql-on-fhir/pull/309): Added the terminology
-  these profiles use: the `LibraryTypesCodes` and `SQLContentTypeCodes` code
-  systems and the `AllSQLContentTypeCodes` value set. The `contentType` binding
-  was later relaxed to extensible
-  ([#351](https://github.com/HL7/sql-on-fhir/issues/351)). The operations added
-  the `OutputFormatCodes` and `ExportStatusCodes` code systems, and the
-  `OutputFormatCodes`, `ExportOutputFormatCodes` and `ExportStatusCodes` value
-  sets, so each operation binds to the formats it actually supports
-  ([#331](https://github.com/HL7/sql-on-fhir/issues/331)).
-- Added the `$viewdefinition-run` operation, for synchronous evaluation of a
-  ViewDefinition with streamed results. Its name was settled as
-  `$viewdefinition-run` rather than `$run`
-  ([#371](https://github.com/HL7/sql-on-fhir/issues/371)), and system-level
-  invocation was added alongside the instance level
+- [#293](https://github.com/HL7/sql-on-fhir/pull/293): Added the
+  `LibraryTypesCodes` code system, which marks a Library as a SQL query or a
+  reusable SQL view.
+- [#309](https://github.com/HL7/sql-on-fhir/pull/309): Added the
+  `SQLContentTypeCodes` code system and the `AllSQLContentTypeCodes` value set,
+  which name the SQL dialect a query is written in. The `contentType` binding was
+  later relaxed to extensible
+  ([#351](https://github.com/HL7/sql-on-fhir/issues/351)).
+- [#331](https://github.com/HL7/sql-on-fhir/issues/331): Gave each operation its
+  own output format value set, drawn from the `OutputFormatCodes` and
+  `ExportStatusCodes` code systems that arrived with the operations themselves.
+  The export operations were later narrowed to `ExportOutputFormatCodes`
+  ([#365](https://github.com/HL7/sql-on-fhir/pull/365)).
+- [340dce5](https://github.com/HL7/sql-on-fhir/commit/340dce5): Added the
+  `$viewdefinition-run` operation, for synchronous evaluation of a ViewDefinition
+  with streamed results. Its name was settled as `$viewdefinition-run` rather
+  than `$run` ([#371](https://github.com/HL7/sql-on-fhir/issues/371)), and
+  system-level invocation was added alongside the instance level
   ([#330](https://github.com/HL7/sql-on-fhir/issues/330)).
-- Added the `$viewdefinition-export` operation, for asynchronous bulk export of
+- [340dce5](https://github.com/HL7/sql-on-fhir/commit/340dce5): Added the
+  `$viewdefinition-export` operation, for asynchronous bulk export of
   ViewDefinition results to CSV, NDJSON or Parquet. It was renamed from `$export`
   so it does not collide with Bulk Data Export
   ([#304](https://github.com/HL7/sql-on-fhir/issues/304)), and gained a parameter
   controlling the CSV header row
   ([#305](https://github.com/HL7/sql-on-fhir/issues/305)).
-- [#318](https://github.com/HL7/sql-on-fhir/issues/318): Added the
-  `$sqlquery-run` operation, for synchronous execution of a `SQLQuery` Library
-  against materialised ViewDefinition tables, with its parameters aligned to the
-  CQL `Library/$evaluate` pattern
-  ([#322](https://github.com/HL7/sql-on-fhir/issues/322)).
+- [#309](https://github.com/HL7/sql-on-fhir/pull/309): Added the `$sqlquery-run`
+  operation, for synchronous execution of a `SQLQuery` Library against
+  materialised ViewDefinition tables. Its parameters were then aligned to the CQL
+  `Library/$evaluate` pattern
+  ([#318](https://github.com/HL7/sql-on-fhir/issues/318),
+  [#322](https://github.com/HL7/sql-on-fhir/issues/322)).
 - [#319](https://github.com/HL7/sql-on-fhir/issues/319): Added the
   `$sqlquery-export` operation, the asynchronous counterpart to
   `$sqlquery-run`.
@@ -133,17 +141,18 @@ is not a breaking change at all, because none of the operations existed then.
 - [#290](https://github.com/HL7/sql-on-fhir/pull/290): Added default FHIR type
   to SQL type and FHIRPath type to SQL type mappings, so two runners produce
   comparable column types for the same view when no type hint is given.
-- [#261](https://github.com/HL7/sql-on-fhir/issues/261): Replaced the
+- [ff21894](https://github.com/HL7/sql-on-fhir/commit/ff21894): Replaced the
   repository's MIT licence text with the verbatim CC0 1.0 Universal dedication,
   matching the `CC0-1.0` the guide already declared, and added the contribution
   statement required by section 09.01.02 of the HL7 Governance and Operations
-  Manual.
+  Manual ([3093259](https://github.com/HL7/sql-on-fhir/commit/3093259)).
 
 #### Non-Substantive Changes
 
-- [#377](https://github.com/HL7/sql-on-fhir/issues/377): The `cnl-0` and `dom-6`
-  constraints inherited from `CanonicalResource` and `DomainResource` are now
-  reported against the ViewDefinition examples. Neither is a conformance change:
+- [8431595](https://github.com/HL7/sql-on-fhir/commit/8431595): The `cnl-0` and
+  `dom-6` constraints inherited from `CanonicalResource` and `DomainResource`
+  ([#268](https://github.com/HL7/sql-on-fhir/pull/268)) are now reported against
+  the ViewDefinition examples. Neither is a conformance change:
   `cnl-0` expects a name beginning with an uppercase letter, whereas view names
   are deliberately `snake_case` so they can be used directly as SQL identifiers,
   and `dom-6` recommends a generated narrative, which logical-model instances
@@ -163,14 +172,16 @@ is not a breaking change at all, because none of the operations existed then.
   [#361](https://github.com/HL7/sql-on-fhir/issues/361),
   [#362](https://github.com/HL7/sql-on-fhir/issues/362) and
   [#363](https://github.com/HL7/sql-on-fhir/issues/363).
-- [8a9c98f](https://github.com/HL7/sql-on-fhir/commit/8a9c98f): Moved this
-  repository to [HL7/sql-on-fhir](https://github.com/HL7/sql-on-fhir), and the
+- [48f3607](https://github.com/HL7/sql-on-fhir/commit/48f3607): Moved the
   JavaScript reference implementation, the shared test suite and the test report
-  site to
-  [FHIR/sql-on-fhir.js](https://github.com/FHIR/sql-on-fhir.js). This repository
-  now holds the specification alone.
-- [#275](https://github.com/HL7/sql-on-fhir/pull/275): Copy edits throughout the
-  narrative pages. The introduction was also restructured around the three
-  components and gained the query and API sections
-  ([#325](https://github.com/HL7/sql-on-fhir/pull/325),
-  [#300](https://github.com/HL7/sql-on-fhir/pull/300)).
+  site out to [FHIR/sql-on-fhir.js](https://github.com/FHIR/sql-on-fhir.js), so
+  this repository now holds the specification alone. The repository itself moved
+  to [HL7/sql-on-fhir](https://github.com/HL7/sql-on-fhir), and the references to
+  its old location were updated
+  ([8a9c98f](https://github.com/HL7/sql-on-fhir/commit/8a9c98f)).
+- [#325](https://github.com/HL7/sql-on-fhir/pull/325): Restructured the
+  introduction around the three components of the specification, and added the
+  query and API sections
+  ([#300](https://github.com/HL7/sql-on-fhir/pull/300)). The API page, since
+  renamed to Operations, was also copy edited
+  ([#275](https://github.com/HL7/sql-on-fhir/pull/275)).
