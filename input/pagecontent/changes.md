@@ -93,12 +93,13 @@ is not a breaking change at all, because none of the operations existed then.
   which name the SQL dialect a query is written in. The `contentType` binding was
   later relaxed to extensible
   ([#351](https://github.com/HL7/sql-on-fhir/issues/351)).
-- [#331](https://github.com/HL7/sql-on-fhir/issues/331): Bound each operation's
-  output format parameter to a value set of the formats it actually supports,
-  rather than leaving it open. The synchronous run operations bind
-  `OutputFormatCodes`; the export operations were later narrowed to
-  `ExportOutputFormatCodes`, which omits the `fhir` format that only the run
-  operations produce ([#365](https://github.com/HL7/sql-on-fhir/pull/365)).
+- [#365](https://github.com/HL7/sql-on-fhir/pull/365): Split the output format
+  bindings, which arrived with the operations, by operation kind. The two
+  synchronous run operations bind `OutputFormatCodes`, and the two export
+  operations the narrower `ExportOutputFormatCodes`, which omits the `fhir` format
+  that only the run operations produce. This resolved
+  [#331](https://github.com/HL7/sql-on-fhir/issues/331), though not as that issue
+  proposed: the formats are shared by kind rather than declared per operation.
 - [760f8f6](https://github.com/HL7/sql-on-fhir/commit/760f8f6): Added the
   `$viewdefinition-run` operation, for synchronous evaluation of a ViewDefinition
   with streamed results. It was first specified in prose and later expressed as an
