@@ -61,6 +61,7 @@ Description: "Export a view definition. User can provide view definition referen
 * parameter[=].max = "1"
 * parameter[=].scope[0] = #system
 * parameter[=].scope[1] = #type
+* parameter[=].scope[2] = #instance
 * parameter[=].type = #string
 * parameter[=].documentation = "Client-provided tracking identifier for the export operation."
 
@@ -70,6 +71,7 @@ Description: "Export a view definition. User can provide view definition referen
 * parameter[=].max = "1"
 * parameter[=].scope[0] = #system
 * parameter[=].scope[1] = #type
+* parameter[=].scope[2] = #instance
 * parameter[=].type = #code
 * parameter[=].binding.strength = #extensible
 * parameter[=].binding.valueSet = Canonical(ExportOutputFormatCodes)
@@ -81,6 +83,7 @@ Description: "Export a view definition. User can provide view definition referen
 * parameter[=].max = "1"
 * parameter[=].scope[0] = #system
 * parameter[=].scope[1] = #type
+* parameter[=].scope[2] = #instance
 * parameter[=].type = #boolean
 * parameter[=].documentation = "Include CSV headers (default true). Applies only when csv output is requested."
 
@@ -90,6 +93,7 @@ Description: "Export a view definition. User can provide view definition referen
 * parameter[=].max = "*"
 * parameter[=].scope[0] = #system
 * parameter[=].scope[1] = #type
+* parameter[=].scope[2] = #instance
 * parameter[=].type = #Reference
 * parameter[=].documentation = "Filter exported data to the supplied patient(s)."
 
@@ -99,6 +103,7 @@ Description: "Export a view definition. User can provide view definition referen
 * parameter[=].max = "*"
 * parameter[=].scope[0] = #system
 * parameter[=].scope[1] = #type
+* parameter[=].scope[2] = #instance
 * parameter[=].type = #Reference
 * parameter[=].documentation = "Filter exported data to members of the supplied group(s)."
 
@@ -108,6 +113,7 @@ Description: "Export a view definition. User can provide view definition referen
 * parameter[=].max = "1"
 * parameter[=].scope[0] = #system
 * parameter[=].scope[1] = #type
+* parameter[=].scope[2] = #instance
 * parameter[=].type = #instant
 * parameter[=].documentation = "Export only resources updated since this instant."
 
@@ -117,6 +123,7 @@ Description: "Export a view definition. User can provide view definition referen
 * parameter[=].max = "1"
 * parameter[=].scope[0] = #system
 * parameter[=].scope[1] = #type
+* parameter[=].scope[2] = #instance
 * parameter[=].type = #string
 * parameter[=].documentation = "External data source to use for the export (for example a URI or bucket name)."
 
@@ -595,6 +602,7 @@ Description: "Export SQLQuery Library results asynchronously using the FHIR Asyn
 * parameter[=].max = "1"
 * parameter[=].scope[0] = #system
 * parameter[=].scope[1] = #type
+* parameter[=].scope[2] = #instance
 * parameter[=].type = #string
 * parameter[=].documentation = "Client-provided tracking identifier for the export operation."
 
@@ -604,6 +612,7 @@ Description: "Export SQLQuery Library results asynchronously using the FHIR Asyn
 * parameter[=].max = "1"
 * parameter[=].scope[0] = #system
 * parameter[=].scope[1] = #type
+* parameter[=].scope[2] = #instance
 * parameter[=].type = #code
 * parameter[=].binding.strength = #extensible
 * parameter[=].binding.valueSet = Canonical(ExportOutputFormatCodes)
@@ -615,6 +624,7 @@ Description: "Export SQLQuery Library results asynchronously using the FHIR Asyn
 * parameter[=].max = "1"
 * parameter[=].scope[0] = #system
 * parameter[=].scope[1] = #type
+* parameter[=].scope[2] = #instance
 * parameter[=].type = #boolean
 * parameter[=].documentation = "Include CSV headers (default true). Applies only when csv output is requested."
 
@@ -625,6 +635,7 @@ Description: "Export SQLQuery Library results asynchronously using the FHIR Asyn
 * parameter[=].max = "*"
 * parameter[=].scope[0] = #system
 * parameter[=].scope[1] = #type
+* parameter[=].scope[2] = #instance
 * parameter[=].type = #Reference
 * parameter[=].documentation = "Filter exported data to the supplied patient(s)."
 
@@ -634,6 +645,7 @@ Description: "Export SQLQuery Library results asynchronously using the FHIR Asyn
 * parameter[=].max = "*"
 * parameter[=].scope[0] = #system
 * parameter[=].scope[1] = #type
+* parameter[=].scope[2] = #instance
 * parameter[=].type = #Reference
 * parameter[=].documentation = "Filter exported data to members of the supplied group(s)."
 
@@ -643,6 +655,7 @@ Description: "Export SQLQuery Library results asynchronously using the FHIR Asyn
 * parameter[=].max = "1"
 * parameter[=].scope[0] = #system
 * parameter[=].scope[1] = #type
+* parameter[=].scope[2] = #instance
 * parameter[=].type = #instant
 * parameter[=].documentation = "Export only resources updated since this instant."
 
@@ -653,6 +666,7 @@ Description: "Export SQLQuery Library results asynchronously using the FHIR Asyn
 * parameter[=].max = "1"
 * parameter[=].scope[0] = #system
 * parameter[=].scope[1] = #type
+* parameter[=].scope[2] = #instance
 * parameter[=].type = #string
 * parameter[=].documentation = "External data source containing the ViewDefinition tables."
 

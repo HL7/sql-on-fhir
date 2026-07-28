@@ -244,6 +244,11 @@ the ViewDefinition identified by the request path is the export subject, and the
 so supplying `view` as well would be ambiguous. Exporting several views in one
 operation therefore requires the system or type level.
 
+Every other input parameter does apply at the instance level, in addition to
+system and type: `clientTrackingId`, `_format`, `header`, `patient`, `group`,
+`_since` and `source`. This matches the scoping on the two run operations, where
+everything except the subject applies at all three levels.
+
 Because the subject carries no `view.name` at this level, `output.name` is
 determined from the ViewDefinition itself, as described under
 [Output Name Clarification](#output-name-clarification).

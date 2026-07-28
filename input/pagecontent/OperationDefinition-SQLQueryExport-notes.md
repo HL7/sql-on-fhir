@@ -135,7 +135,40 @@ client to negotiate a different representation for interim status responses
 
 Each repetition identifies a single SQLQuery Library to export. At least one `query` is required at system/type level.
 
-At the instance level (`POST [base]/Library/[id]/$sqlquery-export`), the bound Library identified by the request URL serves as the single query source and the `query` parameter does not apply. The export targets that one Library, optionally combined with the export control, filtering, and data source parameters listed below. Instance-level invocation does not provide a slot for per-query parameter binding; clients that need to pass parameters should use the system or type level with a `query.parameters` part.
+At the instance level (`POST [base]/Library/[id]/$sqlquery-export`), the bound
+Library identified by the request URL serves as the single query source and the
+`query` parameter does not apply: the subject is already named by the path, so
+supplying `query` as well would be ambiguous. Exporting several queries in one
+operation therefore requires the system or type level.
+
+Every other input parameter does apply at the instance level, in addition to
+system and type: `clientTrackingId`, `_format`, `header`, `patient`, `group`,
+`_since` and `source`, along with `viewResource`. Instance-level invocation does
+not provide a slot for per-query parameter binding; clients that need to pass
+parameters should use the system or type level with a `query.parameters` part.
+
+For example, exporting a stored query for two patients as CSV, under a client
+tracking identifier:
+
+```http
+POST /Library/patient-bp-query/$sqlquery-export HTTP/1.1
+Content-Type: application/fhir+json
+Prefer: respond-async
+
+{
+  "resourceType": "Parameters",
+  "parameter": [
+    { "name": "clientTrackingId", "valueString": "bp-report-2026-07" },
+    { "name": "patient", "valueReference": { "reference": "Patient/123" } },
+    { "name": "patient", "valueReference": { "reference": "Patient/456" } },
+    { "name": "_format", "valueCode": "csv" }
+  ]
+}
+```
+
+The response is `202 Accepted` with a `Content-Location` polling URL, the export
+scoped to those two patients and delivered as CSV, and `clientTrackingId` echoed
+in the manifest. Supplying `query` here would be out of scope.
 
 | Part Name      | Type       | Min | Max | Description                                                                                               |
 | -------------- | ---------- | --- | --- | --------------------------------------------------------------------------------------------------------- |
