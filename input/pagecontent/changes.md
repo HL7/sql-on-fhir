@@ -111,9 +111,12 @@ is not a breaking change at all, because none of the operations existed then.
 - [#319](https://github.com/HL7/sql-on-fhir/issues/319): Added the
   `$sqlquery-export` operation, the asynchronous counterpart to
   `$sqlquery-run`.
-- [#368](https://github.com/HL7/sql-on-fhir/issues/368): Aligned both export
+- [#369](https://github.com/HL7/sql-on-fhir/pull/369): Aligned both export
   operations to the simplified asynchronous interaction pattern, so their
-  polling, completion and error behaviour is described once and shared.
+  polling, completion and error behaviour is described once and shared. The
+  pattern is still cited from a branch build of the API incubator guide, which
+  remains to be replaced with a published link
+  ([#368](https://github.com/HL7/sql-on-fhir/issues/368)).
 - [#296](https://github.com/HL7/sql-on-fhir/pull/296): Added the `repeat`
   directive, which traverses arbitrarily nested structures such as
   `QuestionnaireResponse.item` without knowing their depth in advance.
@@ -152,9 +155,9 @@ is not a breaking change at all, because none of the operations existed then.
 - [#376](https://github.com/HL7/sql-on-fhir/issues/376): Assigned OIDs to the
   code systems and value sets, from the root arc registered for this guide.
 - [#358](https://github.com/HL7/sql-on-fhir/issues/358): Reconciled
-  inconsistencies across the four operations, covering the return type, `Accept`
-  header semantics, the supported `_format` values, streaming guidance and the
-  completion status code. See also
+  inconsistencies across the four operations, covering the return type, whether a
+  returned Bundle is unwrapped, `Accept` header semantics, the supported
+  `_format` values, streaming guidance and the completion status code. See also
   [#359](https://github.com/HL7/sql-on-fhir/issues/359),
   [#360](https://github.com/HL7/sql-on-fhir/issues/360),
   [#361](https://github.com/HL7/sql-on-fhir/issues/361),
@@ -166,7 +169,8 @@ is not a breaking change at all, because none of the operations existed then.
   site to
   [FHIR/sql-on-fhir.js](https://github.com/FHIR/sql-on-fhir.js). This repository
   now holds the specification alone.
-- [#300](https://github.com/HL7/sql-on-fhir/pull/300): Editorial and copy edits
-  throughout the narrative pages, including a restructured introduction. See also
-  [#275](https://github.com/HL7/sql-on-fhir/pull/275) and
-  [#325](https://github.com/HL7/sql-on-fhir/pull/325).
+- [#275](https://github.com/HL7/sql-on-fhir/pull/275): Copy edits throughout the
+  narrative pages. The introduction was also restructured around the three
+  components and gained the query and API sections
+  ([#325](https://github.com/HL7/sql-on-fhir/pull/325),
+  [#300](https://github.com/HL7/sql-on-fhir/pull/300)).
