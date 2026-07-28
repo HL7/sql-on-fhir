@@ -140,8 +140,8 @@ Content-Type: application/fhir+json
     { "name": "_format", "valueCode": "ndjson" },
     { "name": "queryResource", "resource": {
       "resourceType": "Library",
-      "meta": { "profile": ["https://sql-on-fhir.org/ig/StructureDefinition/SQLQuery"] },
-      "type": { "coding": [{ "system": "https://sql-on-fhir.org/ig/CodeSystem/LibraryTypesCodes", "code": "sql-query" }] },
+      "meta": { "profile": ["http://hl7.org/fhir/uv/sql-on-fhir/StructureDefinition/SQLQuery"] },
+      "type": { "coding": [{ "system": "http://hl7.org/fhir/uv/sql-on-fhir/CodeSystem/LibraryTypesCodes", "code": "sql-query" }] },
       "status": "active",
       "relatedArtifact": [
         { "type": "depends-on", "resource": "https://example.org/ViewDefinition/patient_view", "label": "p" }
@@ -150,7 +150,7 @@ Content-Type: application/fhir+json
         "contentType": "application/sql",
         "data": "U0VMRUNUIHAuaWQsIHAubmFtZSBGUk9NIHAgV0hFUkUgcC5hY3RpdmUgPSB0cnVl",
         "extension": [{
-          "url": "https://sql-on-fhir.org/ig/StructureDefinition/sql-text",
+          "url": "http://hl7.org/fhir/uv/sql-on-fhir/StructureDefinition/sql-text",
           "valueString": "SELECT p.id, p.name FROM p WHERE p.active = true"
         }]
       }]
@@ -424,7 +424,7 @@ type within the SQL query.
 
 Query parameters are passed as a nested `Parameters` resource, following the
 same pattern as the
-[CQL `$evaluate` operation](https://build.fhir.org/ig/HL7/cql-ig/en/OperationDefinition-cql-library-evaluate.html).
+[CQL `$evaluate` operation](https://hl7.org/fhir/uv/cql/OperationDefinition-cql-library-evaluate.html).
 See [Parameter Types](StructureDefinition-SQLQuery.html#parameter-types) on the
 SQLQuery profile for the binding rules and the mapping from
 `Library.parameter.type` to the `value[x]` element to use.

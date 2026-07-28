@@ -5,9 +5,9 @@
   "description": "SQL on FHIR IG Template",
   "author": "http://hl7.org/fhir",
   "canonical": "http://fhir.org/templates/hl7.fhir.uv.sql-on-fhir.ig-template",
-  "base": "fhir.base.template",
+  "base": "hl7.fhir.template",
   "dependencies": {
-    "fhir.base.template": "0.8.1"
+    "hl7.fhir.template": "1.0.0"
   },
   "version": "0.1.0"
 }

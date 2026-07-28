@@ -31,14 +31,14 @@ ShareableViewDefinition and TabularViewDefinition profiles.
 """
 Usage:  #example
 * name = "patient_demographics"
-* url = "https://sql-on-fhir.org/ig/StructureDefinition/ShareablePatientDemographics"
+* url = "http://hl7.org/fhir/uv/sql-on-fhir/StructureDefinition/ShareablePatientDemographics"
 * fhirVersion[+] = #4.0
 * fhirVersion[+] = #5.0
 * status = #draft
 * resource = #Patient
 * meta
-  * profile[+] = "https://sql-on-fhir.org/ig/StructureDefinition/ShareableViewDefinition"
-  * profile[+] = "https://sql-on-fhir.org/ig/StructureDefinition/TabularViewDefinition"
+  * profile[+] = "http://hl7.org/fhir/uv/sql-on-fhir/StructureDefinition/ShareableViewDefinition"
+  * profile[+] = "http://hl7.org/fhir/uv/sql-on-fhir/StructureDefinition/TabularViewDefinition"
 * select[+]
   * column[+]
     * path = "getResourceKey()"
