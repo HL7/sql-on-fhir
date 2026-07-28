@@ -50,7 +50,33 @@ dependencies:
 # with supported extensions (e.g., .md/.xml) will be treated as
 # sub-pages.
 #
-#
+# The list is declared here only so that a standards status can be set on the
+# Changes page, which requires a page-level extension. Because declaring any
+# page hands the whole list to the author, every authored page must appear
+# below. The titles reproduce the ones SUSHI derived automatically, so the table
+# of contents is unchanged apart from the addition of Changes.
+pages:
+  index.md:
+    title: Home
+  contributing.md:
+    title: Contributing
+  functional-model.md:
+    title: Functional Model
+  glossary.md:
+    title: Glossary
+  operations.md:
+    title: Operations
+  operations-capability.md:
+    title: Operations Capability
+  operations-common.md:
+    title: Operations Common
+  operations-materialize.md:
+    title: Operations Materialize
+  changes.md:
+    title: Changes
+    extension:
+      - url: http://hl7.org/fhir/StructureDefinition/structuredefinition-standards-status
+        valueCode: informative
 
 #
 # The parameters property represents IG.definition.parameter. Rather
@@ -104,6 +130,7 @@ menu:
   Playground: http://sql-on-fhir.org/extra/playground.html
   Tests: http://sql-on-fhir.org/extra/tests.html
   Implementations: http://sql-on-fhir.org/extra/impls.html
+  Changes: changes.html
 
 # ╭───────────────────────────Less Common Implementation Guide Properties──────────────────────────╮
 # │  Uncomment the properties below to configure additional properties on the ImplementationGuide  │

@@ -16,6 +16,20 @@ FHIR data. This specification is agnostic to the tooling used and the specific
 queries performed in this layer. 
 
 
+### canonical URL
+
+The globally unique address that identifies a FHIR artifact, such as a view
+definition or a profile. It looks like a web address and usually resolves to the
+artifact's documentation, but its purpose is identification rather than
+retrieval: two artifacts with the same canonical URL are the same artifact, and
+resources refer to each other by canonical URL rather than by name.
+
+The artifacts of this specification share a common canonical base, which is
+`http://hl7.org/fhir/uv/sql-on-fhir`. An individual artifact's canonical URL is
+that base followed by its type and id, for example
+`http://hl7.org/fhir/uv/sql-on-fhir/StructureDefinition/ViewDefinition`.
+
+
 ### data layer
 
 The optional first conceptual layer described by this specification. The
@@ -41,6 +55,16 @@ multiple sources are combined
 ### flattened
 
 Informal synonym for "tabular". Not recommended.
+
+
+### package identifier
+
+The name under which a FHIR implementation guide is distributed and installed,
+in the manner of a package on npm or PyPI. It is a dotted name, separate from the
+guide's canonical URL, and it is how one guide declares a dependency on another.
+
+This specification is distributed as `hl7.fhir.uv.sql-on-fhir`. Published version
+2.0.0 was distributed as `org.sql-on-fhir.ig`.
 
 
 ### tabular
