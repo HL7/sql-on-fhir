@@ -89,11 +89,19 @@ The operation can export data from:
 
 #### Filtering
 
-Optional filtering parameters:
+`patient`, `group` and `_since` restrict the data the queries see. They carry the
+same meaning here as on the other three data operations, and are specified once in
+[Filtering](operations-common.html#filtering):
 
-- `patient` - Export only resources for this patient
-- `group` - Export only resources for this group
-- `_since` - Export only resources updated since this time
+- `patient` - restrict to the patient compartments of the supplied patients ([details](operations-common.html#patient-filter))
+- `group` - restrict to members of the supplied Groups ([details](operations-common.html#group-filter))
+- `_since` - restrict to resources whose state changed after the supplied instant ([details](operations-common.html#since-filter))
+
+On this operation and on
+[`$sqlquery-run`](OperationDefinition-SQLQueryRun.html), the filter applies to the
+FHIR resources feeding the queries' dependency views, before the SQL executes. The
+SQL therefore sees tables already narrowed to the requested scope, rather than
+being expected to express the filter itself.
 
 #### Required Headers
 

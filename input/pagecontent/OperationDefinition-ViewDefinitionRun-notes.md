@@ -112,12 +112,12 @@ ViewDefinition is identified by the request path. See
 
 ##### Filtering
 
-| Name    | Type      | Scope          | Required | Max | Description                                                                                |
-| ------- | --------- | -------------- | -------- | --- | ------------------------------------------------------------------------------------------ |
-| patient | Reference | type, instance | No       | 1   | Filter by patient reference. [Details](#patient-parameter-clarification)                   |
-| group   | Reference | type, instance | No       | \*  | Filter by group membership. [Details](#group-parameter-clarification)                      |
-| \_since | instant   | type, instance | No       | 1   | Include only resources modified after this time. [Details](#since-parameter-clarification) |
-| \_limit | integer   | type, instance | No       | 1   | Maximum number of rows to return                                                           |
+| Name    | Type      | Scope          | Required | Max | Description                                                                                                 |
+| ------- | --------- | -------------- | -------- | --- | ----------------------------------------------------------------------------------------------------------- |
+| patient | Reference | type, instance | No       | \*  | Filter by patient reference, repeated to name several patients. [Details](#patient-parameter-clarification) |
+| group   | Reference | type, instance | No       | \*  | Filter by group membership. [Details](#group-parameter-clarification)                                       |
+| \_since | instant   | type, instance | No       | 1   | Include only resources modified after this time. [Details](#since-parameter-clarification)                  |
+| \_limit | integer   | type, instance | No       | 1   | Maximum number of rows to return                                                                            |
 
 {:.table-data}
 
@@ -392,7 +392,27 @@ Transfer-Encoding: chunked
 {"id":"enc-3","patient":"Patient/123","status":"in-progress","class":"inpatient","period_start":"2023-03-01T08:00:00Z"}
 ```
 
-##### Example 6: POST with a Bundle of resources
+##### Example 6: GET naming two patients
+
+`patient` repeats, so a cohort of a few known patients needs no `Group`:
+
+```http
+GET /ViewDefinition/encounters/$viewdefinition-run?patient=Patient/123&patient=Patient/456&_format=csv HTTP/1.1
+```
+
+```http
+HTTP/1.1 200 OK
+Content-Type: text/csv
+
+id,patient,status,period_start
+enc-1,Patient/123,finished,2023-01-15T10:00:00Z
+enc-4,Patient/456,finished,2023-04-02T09:00:00Z
+```
+
+The result is restricted to those two patients' compartments. Over POST the same
+filter is expressed by repeating the `patient` parameter in the `Parameters` body.
+
+##### Example 7: POST with a Bundle of resources
 
 A `Bundle` supplied as a `resource` value is unwrapped; the ViewDefinition runs
 against each entry. This request is equivalent to Example 3, which passed the

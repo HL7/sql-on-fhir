@@ -290,12 +290,12 @@ Description: "Execute a view definition against supplied or server data."
 * parameter[+].name = #patient
 * parameter[=].use = #in
 * parameter[=].min = 0
-* parameter[=].max = "1"
+* parameter[=].max = "*"
 * parameter[=].scope[0] = #system
 * parameter[=].scope[1] = #type
 * parameter[=].scope[2] = #instance
 * parameter[=].type = #Reference
-* parameter[=].documentation = "Restrict execution to the specified patient."
+* parameter[=].documentation = "Restrict execution to the supplied patient(s)."
 
 * parameter[+].name = #group
 * parameter[=].use = #in
@@ -451,6 +451,37 @@ Description: "Execute a SQLQuery Library against ViewDefinition tables."
 * parameter[=].scope[2] = #instance
 * parameter[=].type = #Parameters
 * parameter[=].documentation = "Input parameters for the query. Parameters are bound by name to parameters declared in the SQLQuery Library (Library.parameter.name). Parameter types are mapped using the appropriate value[x] type matching the declared parameter type."
+
+// Input parameters - filtering (identical to the other three data operations)
+* parameter[+].name = #patient
+* parameter[=].use = #in
+* parameter[=].min = 0
+* parameter[=].max = "*"
+* parameter[=].scope[0] = #system
+* parameter[=].scope[1] = #type
+* parameter[=].scope[2] = #instance
+* parameter[=].type = #Reference
+* parameter[=].documentation = "Filter the resources feeding the dependency views to the supplied patient(s), before the SQL executes."
+
+* parameter[+].name = #group
+* parameter[=].use = #in
+* parameter[=].min = 0
+* parameter[=].max = "*"
+* parameter[=].scope[0] = #system
+* parameter[=].scope[1] = #type
+* parameter[=].scope[2] = #instance
+* parameter[=].type = #Reference
+* parameter[=].documentation = "Filter the resources feeding the dependency views to members of the supplied group(s), before the SQL executes."
+
+* parameter[+].name = #_since
+* parameter[=].use = #in
+* parameter[=].min = 0
+* parameter[=].max = "1"
+* parameter[=].scope[0] = #system
+* parameter[=].scope[1] = #type
+* parameter[=].scope[2] = #instance
+* parameter[=].type = #instant
+* parameter[=].documentation = "Include only resources updated since this instant when feeding the dependency views, before the SQL executes."
 
 * parameter[+].name = #source
 * parameter[=].use = #in

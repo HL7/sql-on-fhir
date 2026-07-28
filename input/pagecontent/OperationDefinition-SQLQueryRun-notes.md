@@ -12,6 +12,9 @@ inside a `Parameters` resource in the request body.
 | queryResource  | Library                   | system, type           | Conditional¹ | 1   | Inline SQLQuery or SQLView Library resource to execute. [Details](#queryreference-clarification)          |
 | viewResource   | ViewDefinition \| SQLView | system, type, instance | No           | \*  | Inline table source, matched to a dependency by canonical URL. [Details](#table-sources)                  |
 | parameters     | Parameters                | system, type, instance | No           | 1   | Input parameters bound by name to parameters declared in the SQLQuery Library                             |
+| patient        | Reference                 | system, type, instance | No           | \*  | Filter by patient reference, repeated to name several patients. [Details](#filtering)                     |
+| group          | Reference                 | system, type, instance | No           | \*  | Filter by group membership. [Details](#filtering)                                                         |
+| \_since        | instant                   | system, type, instance | No           | 1   | Include only resources modified after this time. [Details](#filtering)                                    |
 | source         | string                    | system, type, instance | No           | 1   | External data source containing the ViewDefinition tables (e.g. URI, bucket name)                         |
 | \_limit        | integer                   | system, type, instance | No           | 1   | Maximum number of rows to return                                                                          |
 
@@ -85,6 +88,29 @@ Supplying every dependency inline alongside an inline `queryResource` makes a
 fully ad-hoc query possible, with nothing stored on the server. `viewResource`
 also applies at the instance level, so a client invoking a stored query can supply
 just the dependency the server cannot resolve.
+
+#### Filtering {#filtering}
+
+`patient`, `group` and `_since` restrict the data the query sees. They carry the
+same meaning here as on the other three data operations, and are specified once in
+[Filtering](operations-common.html#filtering):
+
+| Parameter | Max | Restricts the data to                                                                                     |
+| --------- | --- | --------------------------------------------------------------------------------------------------------- |
+| `patient` | \*  | The patient compartments of the supplied patients ([details](operations-common.html#patient-filter))      |
+| `group`   | \*  | Members of the supplied Groups ([details](operations-common.html#group-filter))                           |
+| `_since`  | 1   | Resources whose state changed after the supplied instant ([details](operations-common.html#since-filter)) |
+
+{:.table-data}
+
+On this operation and on
+[`$sqlquery-export`](OperationDefinition-SQLQueryExport.html), the filter applies
+to the FHIR resources feeding the query's dependency views, before the SQL
+executes. The SQL therefore sees tables already narrowed to the requested scope,
+rather than being expected to express the filter itself.
+
+A `patient` or `group` the server cannot find is reported with an error response
+carrying an `OperationOutcome`.
 
 #### Row Limit
 
@@ -440,6 +466,40 @@ Content-Type: application/x-ndjson
 {"patient_id":"Patient/123","systolic":118,"effective_date":"2024-02-20"}
 ```
 
+#### Scoping a Query to Patients and a Time Window
+
+`patient`, `group` and `_since` apply here exactly as they do on
+[`$sqlquery-export`](OperationDefinition-SQLQueryExport.html), so moving between
+synchronous and asynchronous execution is purely a change of operation: the body
+below is accepted by both, with `Prefer: respond-async` added for the export.
+
+```http
+POST /Library/patient-bp-query/$sqlquery-run HTTP/1.1
+Content-Type: application/fhir+json
+
+{
+  "resourceType": "Parameters",
+  "parameter": [
+    { "name": "patient", "valueReference": { "reference": "Patient/123" } },
+    { "name": "patient", "valueReference": { "reference": "Patient/456" } },
+    { "name": "_since", "valueInstant": "2026-01-01T00:00:00Z" },
+    { "name": "_format", "valueCode": "csv" }
+  ]
+}
+```
+
+```http
+HTTP/1.1 200 OK
+Content-Type: text/csv
+
+patient_id,systolic,effective_date
+Patient/123,120,2026-01-15
+Patient/456,135,2026-01-20
+```
+
+The filters apply to the resources feeding the query's dependency views, before
+the SQL executes.
+
 #### Capping Result Rows with `_limit`
 
 Use `_limit` to ask the server to return at most a given number of rows. The
@@ -593,8 +653,8 @@ SQLQuery profile for the binding rules and the mapping from
 
 ### Error Handling
 
-| Status                     | Condition                                                                                                                                                                                                                                            |
-| -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `400 Bad Request`          | Missing required parameter, unknown parameter name, or value type mismatch; no subject form supplied at system or type level, more than one supplied, or any supplied at instance level (see [Identifying the query](#queryreference-clarification)) |
-| `404 Not Found`            | An unresolvable `queryCanonical` or `queryReference`; the Library named by the request path not found; a dependency view neither supplied nor resolvable                                                                                             |
-| `422 Unprocessable Entity` | SQL execution error, a resolved artefact not conforming to the SQLQuery or SQLView profile, or unsupported SQL column type when using `_format=fhir` (see [type mapping](#sql-to-fhir-type-mapping))                                                 |
+| Status                     | Condition                                                                                                                                                                                                                                                                                                                                     |
+| -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `400 Bad Request`          | Missing required parameter, unknown parameter name, or value type mismatch; no subject form supplied at system or type level, more than one supplied, or any supplied at instance level (see [Identifying the query](#queryreference-clarification)); a `viewResource` with no `url`, sharing a `url` with another, or matching no dependency |
+| `404 Not Found`            | An unresolvable `queryCanonical` or `queryReference`; the Library named by the request path not found; a dependency view neither supplied nor resolvable; a `patient` or `group` not present on the server                                                                                                                                    |
+| `422 Unprocessable Entity` | SQL execution error, a resolved artefact not conforming to the SQLQuery or SQLView profile, or unsupported SQL column type when using `_format=fhir` (see [type mapping](#sql-to-fhir-type-mapping))                                                                                                                                          |
