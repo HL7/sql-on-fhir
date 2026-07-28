@@ -151,6 +151,130 @@ Two further concepts are independent of each other and of the format:
    neither required nor implied by chunked transfer encoding, and chunked
    transfer encoding is not reserved for "streamable" formats.
 
+## ViewDefinition table sources {#table-sources}
+
+This section applies to the two SQLQuery operations,
+[`$sqlquery-run`](OperationDefinition-SQLQueryRun.html) and
+[`$sqlquery-export`](OperationDefinition-SQLQueryExport.html). It does not apply
+to the view operations, whose subject is a ViewDefinition rather than a query
+over one.
+
+A SQLQuery names the tables it selects from through its `relatedArtifact` entries:
+each entry with `type = depends-on` carries the dependency's canonical URL in
+`resource` and the SQL identifier the query selects from in `label`. A dependency
+resolves to either a ViewDefinition, which projects FHIR resources into a table,
+or a [SQLView](StructureDefinition-SQLView.html), which wraps a query over other
+table sources and so carries dependencies of its own. The graph is therefore
+transitive, and its leaves are always ViewDefinitions.
+
+A server may be unable to resolve every dependency: a client may hold a view that
+exists only locally. The repeating `viewResource` parameter carries such views
+inline. It accepts a ViewDefinition or a SQLView, applies at the system, type and
+instance levels, and is available on both SQLQuery operations with identical
+meaning.
+
+### Matching supplied resources to dependencies {#table-source-matching}
+
+The `viewResource` entries in one request form a single **pool**, matched against
+the dependency graph as follows:
+
+1. Seed a worklist with the invoked query's `depends-on` entries. Where an
+   operation invokes several queries, seed it with the entries of all of them.
+2. Take a dependency from the worklist and resolve it, in this order:
+   1. A pool member whose `url` equals the dependency's canonical URL and, where
+      the dependency pins a version, whose `version` equals that version.
+   2. Failing that, an artefact the server can resolve for that canonical URL.
+   3. Failing that, the request fails with `404 Not Found` and an
+      `OperationOutcome` naming the unresolved canonical URL.
+3. If the resolved artefact is a SQLView, add its own `depends-on` entries to the
+   worklist. If it is a ViewDefinition, it is a leaf.
+4. Repeat from step 2 until the worklist is empty.
+5. If any pool member was never selected at step 2.1, the request fails with
+   `400 Bad Request` and an `OperationOutcome` identifying it.
+6. Bind each resolved artefact to the SQL identifier in the `label` of the
+   dependency that reached it.
+
+Step 2.1 preceding step 2.2 is the precedence rule: a supplied `viewResource`
+takes precedence over an artefact with the same canonical URL that the server
+could itself resolve. Step 5 runs after the traversal rather than during it,
+because a pool member may match a dependency reached only through a supplied
+SQLView.
+
+A dependency whose `relatedArtifact.resource` carries a version is matched only by
+a pool member whose `version` agrees. A pool member that matches no dependency
+anywhere in the graph is almost always a typo in its `url`; rejecting it reports
+the mistake where it was made, rather than letting it resurface later as an SQL
+error naming a table the client believes it supplied.
+
+### Rejected requests {#table-source-errors}
+
+| Status            | Condition                                                                     |
+| ----------------- | ----------------------------------------------------------------------------- |
+| `400 Bad Request` | A `viewResource` entry with no `url`, which cannot be bound to any dependency |
+| `400 Bad Request` | Two `viewResource` entries sharing a `url`, which makes the binding ambiguous |
+| `400 Bad Request` | A `viewResource` entry matching no dependency in the transitive graph         |
+| `404 Not Found`   | A dependency neither present in the pool nor resolvable by the server         |
+
+{:.table-data}
+
+Every such response carries an `OperationOutcome` identifying the offending
+resource or the unresolved canonical URL.
+
+### What remains implementation-defined
+
+Supplied resources are table sources, not export subjects: on
+`$sqlquery-export` they produce no `output` entries in the manifest, which
+carries one entry per query and nothing else.
+
+Consistent with what the [SQLQuery](StructureDefinition-SQLQuery.html) and
+[SQLView](StructureDefinition-SQLView.html) profiles already state, this
+specification requires nothing of servers on the following points, and they
+remain implementation decisions:
+
+- Cycle detection. Authors SHOULD keep the dependency graph acyclic.
+- Any limit on dependency depth.
+- Whether intermediate results are materialised as tables or inlined into the
+  enclosing query.
+
+### Worked example
+
+An invoked SQLQuery declares two dependencies:
+
+```json
+{
+  "relatedArtifact": [
+    {
+      "type": "depends-on",
+      "resource": "https://example.org/SQLView/active_pts",
+      "label": "ap"
+    },
+    {
+      "type": "depends-on",
+      "resource": "https://example.org/ViewDefinition/addresses",
+      "label": "ad"
+    }
+  ]
+}
+```
+
+The request supplies two pool members: a SQLView with
+`url = https://example.org/SQLView/active_pts`, which itself declares a dependency
+on `https://example.org/ViewDefinition/patients` with label `p`; and a
+ViewDefinition with `url = https://example.org/ViewDefinition/patients`. The
+traversal resolves:
+
+| Step | Dependency                                | Resolved by   | Table |
+| ---- | ----------------------------------------- | ------------- | ----- |
+| 1    | `SQLView/active_pts`                      | pool member 1 | `ap`  |
+| 2    | `ViewDefinition/addresses`                | the server    | `ad`  |
+| 3    | `ViewDefinition/patients` (from member 1) | pool member 2 | `p`   |
+
+{:.table-data}
+
+Both pool members were selected, so no entry is unmatched; every dependency
+resolved, so nothing is unresolvable. The SQL executes against tables `ap`, `ad`
+and `p`.
+
 ## Asynchronous Delivery {#asynchronous-delivery}
 
 The two export operations conform to the

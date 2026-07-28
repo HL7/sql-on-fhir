@@ -532,34 +532,18 @@ Description: "Export SQLQuery Library results asynchronously using the FHIR Asyn
 * parameter[=].part[=].type = #Parameters
 * parameter[=].part[=].documentation = "Input parameters for this query. Parameters are bound by name to parameters declared in the SQLQuery Library (Library.parameter.name)."
 
-// Input parameters - ViewDefinitions as table sources (same structure as $viewdefinition-export)
-* parameter[+].name = #view
+// Input parameters - inline ViewDefinition or SQLView table sources
+* parameter[+].name = #viewResource
 * parameter[=].use = #in
 * parameter[=].min = 0
 * parameter[=].max = "*"
 * parameter[=].scope[0] = #system
 * parameter[=].scope[1] = #type
-* parameter[=].documentation = "ViewDefinitions that serve as table sources for the SQL queries. Provides ViewDefinitions referenced in the Library's relatedArtifact entries. These are materialized as tables for the SQL to query against — they do not produce separate output entries."
-* parameter[=].part[+].name = #name
-* parameter[=].part[=].use = #in
-* parameter[=].part[=].min = 0
-* parameter[=].part[=].max = "1"
-* parameter[=].part[=].type = #string
-* parameter[=].part[=].documentation = "Optional friendly name for the ViewDefinition."
-* parameter[=].part[+].name = #viewReference
-* parameter[=].part[=].use = #in
-* parameter[=].part[=].min = 0
-* parameter[=].part[=].max = "1"
-* parameter[=].part[=].type = #Reference
-* parameter[=].part[=].targetProfile = Canonical(ViewDefinition)
-* parameter[=].part[=].documentation = "Reference to a ViewDefinition stored on the server."
-* parameter[=].part[+].name = #viewResource
-* parameter[=].part[=].use = #in
-* parameter[=].part[=].min = 0
-* parameter[=].part[=].max = "1"
-* parameter[=].part[=].type = #CanonicalResource
-* parameter[=].part[=].targetProfile = Canonical(ViewDefinition)
-* parameter[=].part[=].documentation = "Inline ViewDefinition resource."
+* parameter[=].scope[2] = #instance
+* parameter[=].type = #CanonicalResource
+* parameter[=].targetProfile[0] = Canonical(ViewDefinition)
+* parameter[=].targetProfile[1] = Canonical(SQLView)
+* parameter[=].documentation = "Inline ViewDefinition or SQLView resources supplying table sources the server cannot itself resolve. Matched by canonical URL against the dependencies in the query's transitive relatedArtifact graph. Supplied resources produce no output entries; only query results do. See Common Operation Behavior (operations-common.html#table-sources)."
 
 // Input parameters - export control (from $viewdefinition-export)
 * parameter[+].name = #clientTrackingId
@@ -708,7 +692,7 @@ Description: "Export SQLQuery Library results asynchronously using the FHIR Asyn
 * parameter[=].use = #out
 * parameter[=].min = 0
 * parameter[=].max = "*"
-* parameter[=].documentation = "Output information for each exported SQL query result. One entry per query; ViewDefinitions supplied via the view parameter do not produce output entries."
+* parameter[=].documentation = "Output information for each exported SQL query result. One entry per query; resources supplied via the viewResource parameter do not produce output entries."
 * parameter[=].part[+].name = #name
 * parameter[=].part[=].use = #out
 * parameter[=].part[=].min = 1
