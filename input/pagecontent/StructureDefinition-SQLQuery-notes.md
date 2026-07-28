@@ -6,12 +6,12 @@ A minimal SQLQuery Library:
 {
   "resourceType": "Library",
   "meta": {
-    "profile": ["https://sql-on-fhir.org/ig/StructureDefinition/SQLQuery"]
+    "profile": ["http://hl7.org/fhir/uv/sql-on-fhir/StructureDefinition/SQLQuery"]
   },
   "type": {
     "coding": [
       {
-        "system": "https://sql-on-fhir.org/ig/CodeSystem/LibraryTypesCodes",
+        "system": "http://hl7.org/fhir/uv/sql-on-fhir/CodeSystem/LibraryTypesCodes",
         "code": "sql-query"
       }
     ]
@@ -39,7 +39,7 @@ A minimal SQLQuery Library:
       "contentType": "application/sql",
       "extension": [
         {
-          "url": "https://sql-on-fhir.org/ig/StructureDefinition/sql-text",
+          "url": "http://hl7.org/fhir/uv/sql-on-fhir/StructureDefinition/sql-text",
           "valueString": "SELECT patient.id, bp.systolic FROM ..."
         }
       ],

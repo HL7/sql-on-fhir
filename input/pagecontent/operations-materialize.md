@@ -4,7 +4,7 @@
 
 The `$materialize` operation is an asynchronous operation that creates and manages a persistent, queryable view from a ViewDefinition. The server becomes responsible for keeping the materialized view up-to-date based on a defined policy, allowing clients to reliably query the transformed data without needing to re-execute the transformation logic.
 
-**Canonical URL:** `http://sql-on-fhir.org/OperationDefinition/$materialize`
+**Canonical URL:** `http://hl7.org/fhir/uv/sql-on-fhir/OperationDefinition/Materialize`
 
 **Use Cases:**
 * Creating stable, analytics-ready tables from FHIR data.

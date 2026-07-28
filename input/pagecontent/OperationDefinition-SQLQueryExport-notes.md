@@ -841,8 +841,8 @@ Prefer: respond-async
           "name": "queryResource",
           "resource": {
             "resourceType": "Library",
-            "meta": { "profile": ["https://sql-on-fhir.org/ig/StructureDefinition/SQLQuery"] },
-            "type": { "coding": [{ "system": "https://sql-on-fhir.org/ig/CodeSystem/LibraryTypesCodes", "code": "sql-query" }] },
+            "meta": { "profile": ["http://hl7.org/fhir/uv/sql-on-fhir/StructureDefinition/SQLQuery"] },
+            "type": { "coding": [{ "system": "http://hl7.org/fhir/uv/sql-on-fhir/CodeSystem/LibraryTypesCodes", "code": "sql-query" }] },
             "status": "active",
             "relatedArtifact": [
               { "type": "depends-on", "resource": "https://example.org/ViewDefinition/patient_view", "label": "p" }

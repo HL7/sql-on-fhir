@@ -6,10 +6,10 @@ The CapabilityStatement.rest.resource array SHALL contain an entry for the ViewD
 
 - An operation element with:
   - name = "$viewdefinition-export"
-  - definition = "http://sql-on-fhir.org/OperationDefinition/$viewdefinition-export"
+  - definition = "http://hl7.org/fhir/uv/sql-on-fhir/OperationDefinition/ViewDefinitionExport"
 - An operation element with:
   - name = "$viewdefinition-run"
-  - definition = "http://sql-on-fhir.org/OperationDefinition/$viewdefinition-run"
+  - definition = "http://hl7.org/fhir/uv/sql-on-fhir/OperationDefinition/ViewDefinitionRun"
 
 If the server supports CRUD and search interactions for the ViewDefinition resource type, the interaction array SHALL include the appropriate codes:
 
@@ -24,10 +24,10 @@ The CapabilityStatement.rest.resource array SHALL also contain an entry for the 
 
 - An operation element with:
   - name = "$sqlquery-run"
-  - definition = "http://sql-on-fhir.org/OperationDefinition/$sqlquery-run"
+  - definition = "http://hl7.org/fhir/uv/sql-on-fhir/OperationDefinition/SQLQueryRun"
 - An operation element with:
   - name = "$sqlquery-export"
-  - definition = "http://sql-on-fhir.org/OperationDefinition/$sqlquery-export"
+  - definition = "http://hl7.org/fhir/uv/sql-on-fhir/OperationDefinition/SQLQueryExport"
 
 If the server supports CRUD and search interactions for the Library resource type, the interaction array SHALL include the appropriate codes:
 
@@ -72,11 +72,11 @@ Content-Type: application/fhir+json
       "operation": [
         {
           "name": "$viewdefinition-export",
-          "definition": "http://sql-on-fhir.org/OperationDefinition/$viewdefinition-export"
+          "definition": "http://hl7.org/fhir/uv/sql-on-fhir/OperationDefinition/ViewDefinitionExport"
         },
         {
           "name": "$viewdefinition-run",
-          "definition": "http://sql-on-fhir.org/OperationDefinition/$viewdefinition-run"
+          "definition": "http://hl7.org/fhir/uv/sql-on-fhir/OperationDefinition/ViewDefinitionRun"
         }
       ]
     },
@@ -93,11 +93,11 @@ Content-Type: application/fhir+json
       "operation": [
         {
           "name": "$sqlquery-run",
-          "definition": "http://sql-on-fhir.org/OperationDefinition/$sqlquery-run"
+          "definition": "http://hl7.org/fhir/uv/sql-on-fhir/OperationDefinition/SQLQueryRun"
         },
         {
           "name": "$sqlquery-export",
-          "definition": "http://sql-on-fhir.org/OperationDefinition/$sqlquery-export"
+          "definition": "http://hl7.org/fhir/uv/sql-on-fhir/OperationDefinition/SQLQueryExport"
         }
       ]
     }]

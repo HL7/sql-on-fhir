@@ -28,7 +28,7 @@ a `targetProfile` on `relatedArtifact.resource`.
 ```json
 "relatedArtifact": [
   { "type": "depends-on", "resource": "https://example.org/ViewDefinition/patient_view", "label": "patient" },
-  { "type": "depends-on", "resource": "https://sql-on-fhir.org/ig/Library/ActivePatientsView", "label": "active_patients" }
+  { "type": "depends-on", "resource": "http://hl7.org/fhir/uv/sql-on-fhir/Library/ActivePatientsView", "label": "active_patients" }
 ]
 ```
 
@@ -72,7 +72,7 @@ plain-text copy for human readability.
 "content": [{
   "contentType": "application/sql",
   "extension": [{
-    "url": "https://sql-on-fhir.org/ig/StructureDefinition/sql-text",
+    "url": "http://hl7.org/fhir/uv/sql-on-fhir/StructureDefinition/sql-text",
     "valueString": "SELECT patient.id, bp.systolic FROM ..."
   }],
   "data": "U0VMRUNUIHBhdGllbnQu..."
