@@ -659,6 +659,46 @@ Content-Type: application/fhir+json
 
 #### Examples
 
+##### Naming a View by Canonical URL
+
+The simplest kick-off names a stored ViewDefinition by its canonical URL,
+pinning a version with the `|` suffix:
+
+```http
+POST /ViewDefinition/$viewdefinition-export HTTP/1.1
+Content-Type: application/fhir+json
+Prefer: respond-async
+
+{
+  "resourceType": "Parameters",
+  "parameter": [
+    {
+      "name": "view",
+      "part": [
+        { "name": "name", "valueString": "patient_demographics" },
+        {
+          "name": "viewCanonical",
+          "valueCanonical": "http://example.org/ViewDefinition/patient-demographics|2.1.0"
+        }
+      ]
+    },
+    { "name": "_format", "valueCode": "parquet" }
+  ]
+}
+```
+
+```http
+HTTP/1.1 202 Accepted
+Content-Location: https://example.com/fhir/$export-status/7f3a9c
+```
+
+Omitting the `|2.1.0` suffix selects a version according to FHIR's canonical
+resolution rules, so the export runs against whichever version the server
+resolves at the time of the request. Pinning a version is therefore the safer
+choice for a scheduled or repeated export. A canonical URL the server cannot
+resolve is rejected synchronously with `404 Not Found`; see
+[Identifying each ViewDefinition](#viewreference-clarification).
+
 ##### Complete Export Flow Example
 
 This example demonstrates the full lifecycle of an export operation from initiation through completion.
