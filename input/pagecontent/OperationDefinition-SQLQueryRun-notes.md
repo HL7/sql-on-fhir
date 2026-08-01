@@ -1,7 +1,38 @@
+### HTTP Methods
+
+- **GET**: for invocations in which every supplied input parameter is primitive.
+- **POST**: required when `parameters` or `tableSource` is supplied, since both
+  carry a resource that cannot be expressed as a query string.
+
+`$sqlquery-run` is a safe operation, so base FHIR permits `GET` whenever the
+supplied in-parameters are all primitive. This mirrors
+[`$viewdefinition-run`](OperationDefinition-ViewDefinitionRun.html), where
+`viewResource` and `resource` are the POST-only parameters.
+
+#### GET Method Limitations
+
+1. **Available parameters**: only those that can be passed as query parameters
+   are supported over `GET`:
+   - `queryCanonical` - canonical URL of the SQLQuery or SQLView Library, with
+     any `|` percent-encoded as `%7C`
+   - `queryReference` - literal location of a Library on the server
+   - `_format` - output format specification
+   - `header` - include CSV headers (for CSV format)
+   - `patient` - filter by patient reference, repeated to name several patients
+   - `group` - filter by group membership
+   - `_since` - filter by last updated time
+   - `_limit` - limit the number of result rows
+   - `source` - external data source
+
+2. **When POST is required**: use `POST` instead of `GET` when you need to:
+   - bind query parameters via `parameters`
+   - supply an inline table source via `tableSource`
+   - name the query inline via `queryResource`
+
 ### Input Parameters
 
-The operation is invoked with POST. The following input parameters are passed
-inside a `Parameters` resource in the request body.
+The following input parameters are passed as query parameters on a `GET`, or
+inside a `Parameters` resource in the request body on a `POST`.
 
 | Name           | Type                      | Scope                  | Required     | Max | Description                                                                                               |
 | -------------- | ------------------------- | ---------------------- | ------------ | --- | --------------------------------------------------------------------------------------------------------- |
@@ -206,6 +237,35 @@ Patient/123,118,2024-02-20
 
 Omitting `|1.0.0` selects a version according to FHIR's canonical resolution
 rules. A canonical URL the server cannot resolve returns `404 Not Found`.
+
+#### Type-Level over GET
+
+Every parameter in the request above is primitive, so the same invocation can be
+made with `GET`. The `|` separating the canonical URL from its version is
+percent-encoded as `%7C`:
+
+```http
+GET /Library/$sqlquery-run?queryCanonical=http%3A%2F%2Fexample.org%2FLibrary%2Fpatient-bp-query%7C1.0.0&_format=csv HTTP/1.1
+Accept: text/csv
+```
+
+```http
+HTTP/1.1 200 OK
+Content-Type: text/csv
+
+patient_id,systolic,effective_date
+Patient/123,120,2024-01-15
+Patient/123,118,2024-02-20
+```
+
+Adding a filter keeps the request within the `GET`-available subset:
+
+```http
+GET /Library/$sqlquery-run?queryCanonical=http%3A%2F%2Fexample.org%2FLibrary%2Fpatient-bp-query%7C1.0.0&patient=Patient/123&_limit=100&_format=ndjson HTTP/1.1
+```
+
+Supplying `parameters` or `tableSource` takes the request outside that subset,
+because each carries a resource; use `POST` in that case.
 
 #### Type-Level with Reference
 

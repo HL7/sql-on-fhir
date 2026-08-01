@@ -20,4 +20,5 @@ for R6 mode operation can appear on type and instance level
 | Type     | `[base]/ViewDefinition/$viewdefinition-run`      | `viewCanonical`, `viewReference` or `viewResource` |
 | Instance | `[base]/ViewDefinition/[id]/$viewdefinition-run` | The ViewDefinition instance named by the path      |
 
-Both `GET` and `POST` are supported; `viewResource` and `resource` require `POST`.
+Both `GET` and `POST` are supported; `viewResource` and `resource` require
+`POST`.

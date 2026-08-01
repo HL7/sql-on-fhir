@@ -8,11 +8,14 @@ Execute a SQLQuery Library against ViewDefinition tables synchronously.
 
 **Endpoints:**
 
-| Level    | Endpoint                                 | Query Source                                          |
-| -------- | ---------------------------------------- | ----------------------------------------------------- |
-| System   | `POST [base]/$sqlquery-run`              | `queryCanonical`, `queryReference` or `queryResource` |
-| Type     | `POST [base]/Library/$sqlquery-run`      | `queryCanonical`, `queryReference` or `queryResource` |
-| Instance | `POST [base]/Library/[id]/$sqlquery-run` | The Library instance named by the path                |
+| Level    | Endpoint                            | Query Source                                          |
+| -------- | ----------------------------------- | ----------------------------------------------------- |
+| System   | `[base]/$sqlquery-run`              | `queryCanonical`, `queryReference` or `queryResource` |
+| Type     | `[base]/Library/$sqlquery-run`      | `queryCanonical`, `queryReference` or `queryResource` |
+| Instance | `[base]/Library/[id]/$sqlquery-run` | The Library instance named by the path                |
+
+Both `GET` and `POST` are supported; `parameters`, `tableSource` and
+`queryResource` require `POST`.
 
 **Execution Flow:**
 
