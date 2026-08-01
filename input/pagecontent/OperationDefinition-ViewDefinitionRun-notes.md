@@ -77,7 +77,10 @@ operations:
 - [`_since`](operations-common.html#since-filter) - restrict to resources whose state changed after the supplied instant
 
 `_limit` is not a filter: it caps the rows returned to the client rather than
-constraining the data the view sees.
+constraining the data the view sees. Its semantics - the server's option to
+impose a smaller maximum, the application of the cap after the view has been
+evaluated, and that returning fewer rows is not an error - are specified once in
+[Row limit](operations-common.html#row-limit) and apply identically here.
 
 #### Response Format
 

@@ -123,18 +123,17 @@ A `patient` or `group` naming a resource the server cannot find is rejected with
 
 #### Row Limit
 
-When supplied, `_limit` is the maximum number of rows the server returns to the
-client.
+`_limit` caps the rows the server returns to the client. Its semantics - the
+server's option to impose a smaller maximum, the application of the cap after
+the query has been evaluated, and that returning fewer rows is not an error -
+are specified once in
+[Row limit](operations-common.html#row-limit) and apply identically here.
 
-Servers MAY enforce a maximum value, silently capping client-supplied limits at
-a smaller server-defined maximum. The cap is applied to the final result set
-after the SQL query (including any in-query `LIMIT`) has been evaluated;
-implementations are free to push the limit down into the query as an
-optimisation, but the observable behaviour is post-evaluation.
-
-Returning fewer rows than the client requested - whether because the query
-yielded fewer rows or because the server applied its own cap - is not treated
-as an error.
+On this operation, "after the query has been evaluated" includes any in-query
+`LIMIT`: implementations are free to push the cap down into the SQL as an
+optimisation, but the observable behaviour is post-evaluation. A worked example
+is given under
+[Capping Result Rows with `_limit`](#capping-result-rows-with-_limit).
 
 #### Format Parameter Clarification
 
@@ -480,9 +479,24 @@ Content-Type: application/x-ndjson
 #### Scoping a Query to Patients and a Time Window
 
 `patient`, `group` and `_since` apply here exactly as they do on
-[`$sqlquery-export`](OperationDefinition-SQLQueryExport.html), so moving between
-synchronous and asynchronous execution is purely a change of operation: the body
-below is accepted by both, with `Prefer: respond-async` added for the export.
+[`$sqlquery-export`](OperationDefinition-SQLQueryExport.html), so a body
+supplying only these, `_format`, `header`, `source` and `tableSource` is
+accepted by both, with `Prefer: respond-async` added for the export. The body
+below is such a case.
+
+Three parameters do not carry across unchanged, so the two operations are not
+interchangeable in general:
+
+- `_limit` is offered on the run operations only, since an export delivers files
+  rather than rows in a response.
+- The subject is named by `queryCanonical`, `queryReference` or `queryResource`
+  here, but by the repeating `query` parameter and its parts on the export.
+- `parameters` is a top-level parameter at every level here; on the export it is
+  a part of `query` at system and type level, with a top-level form available at
+  instance level only.
+
+See
+[Parameters that do not apply to every operation](operations-common.html#parameter-asymmetries).
 
 ```http
 POST /Library/patient-bp-query/$sqlquery-run HTTP/1.1

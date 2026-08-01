@@ -289,7 +289,10 @@ this operation. The `fhir` format is available on the run operations only:
   support `parquet`, and SHALL document supported formats in the
   CapabilityStatement.
 - If `_format` is omitted, the server SHALL produce the export output in `ndjson`
-  format.
+  format, irrespective of `Accept`.
+- When `_format` is supplied, its value SHALL take precedence over `Accept`
+  (which here negotiates the format of the _status and result_ responses, not
+  the exported files).
 
 ##### Filtering Parameter Clarification
 

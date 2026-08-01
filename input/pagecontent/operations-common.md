@@ -12,17 +12,27 @@ Each operation page references the relevant subsections below rather than
 restating these rules. Where an operation needs to deviate, that operation's
 page calls out the deviation explicitly.
 
+Every section below opens with an **Applies to** line naming the operations it
+governs: all four, the run operations only, or the export operations only. A
+section without such a line is a defect in this page.
+
 ## Parameters that do not apply to every operation {#parameter-asymmetries}
+
+**Applies to:** all four operations.
 
 Apart from the parameters that name an operation's subject, which necessarily
 differ, the four operations offer the same input parameters at the same
-invocation levels. Two deliberate exceptions remain, recorded here so that
-neither reads as an oversight:
+invocation levels. The exceptions are recorded here in full, so that none reads
+as an oversight. Every input parameter absent from at least one of the four, or
+offered in a different shape on different operations, appears in this table.
 
-| Parameter  | Offered on                             | Why not on the others                                                                                                                                                                                                                                      |
-| ---------- | -------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `_limit`   | `$viewdefinition-run`, `$sqlquery-run` | It caps the rows returned to the client in the operation response. An export delivers files rather than rows in a response, so there is nothing for it to cap                                                                                              |
-| `resource` | `$viewdefinition-run`                  | It carries inline FHIR resources to transform instead of using server data. Accepting it on the SQLQuery operations would need its own semantics for how supplied resources reach each dependency view, so it is deliberately deferred rather than omitted |
+| Parameter          | Offered on                                        | Why not on the others, or why the shape differs                                                                                                                                                                                                            |
+| ------------------ | ------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `_limit`           | `$viewdefinition-run`, `$sqlquery-run`            | It caps the rows returned to the client in the operation response. An export delivers files rather than rows in a response, so there is nothing for it to cap                                                                                              |
+| `resource`         | `$viewdefinition-run`                             | It carries inline FHIR resources to transform instead of using server data. Accepting it on the SQLQuery operations would need its own semantics for how supplied resources reach each dependency view, so it is deliberately deferred rather than omitted |
+| `clientTrackingId` | `$viewdefinition-export`, `$sqlquery-export`      | It identifies an asynchronous job across kick-off, polling and result retrieval. A run operation completes within its own response, so there is no job to track                                                                                            |
+| `tableSource`      | `$sqlquery-run`, `$sqlquery-export`               | It supplies the dependency views a query reads from. The view operations' subject is a ViewDefinition rather than a query over one, so they have no dependency graph to satisfy                                                                            |
+| `parameters`       | `$sqlquery-run` (all levels), `$sqlquery-export` (per `query`, plus a top-level form at instance level) | Both SQLQuery operations bind query parameters, but not in the same shape. At system and type level `$sqlquery-export` may carry several queries, each with its own declared parameters, so binding is per `query`; a single top-level set would be ambiguous across them. At instance level there is exactly one query and no `query` parameter, so a top-level `parameters` is unambiguous and is the form offered |
 
 {:.table-data}
 
@@ -30,6 +40,8 @@ Extending `resource` to `$sqlquery-run` is a new capability rather than an
 alignment fix, and is left to a separate proposal.
 
 ## Output Formats (`_format`) {#output-formats}
+
+**Applies to:** all four operations, except where a rule below names a subset.
 
 The four operations share a single enumeration of output formats, with one
 exception: `fhir` applies to the run operations only. The supported values,
@@ -52,10 +64,22 @@ Conformance rules that apply to every operation:
   format a server supports SHALL be declared in its CapabilityStatement, and
   any format it does not support SHALL be rejected with `400 Bad Request` and
   an `OperationOutcome`.
-- If `_format` is omitted and the format cannot be derived from the `Accept`
-  header (see [Content Negotiation](#content-negotiation)), the server SHALL use
-  `ndjson`.
+- A supplied `_format` SHALL take precedence over the `Accept` header.
 - `header` applies only to `csv` and defaults to `true`.
+
+What happens when `_format` is omitted differs between the two delivery models,
+because `Accept` describes the response the client is about to receive and only
+the run operations return the result in that response:
+
+- **Run operations** (`$viewdefinition-run`, `$sqlquery-run`): the server MAY
+  derive the format from the `Accept` header (see
+  [Content Negotiation](#content-negotiation)); if neither `_format` nor
+  `Accept` selects one, the server SHALL use `ndjson`.
+- **Export operations** (`$viewdefinition-export`, `$sqlquery-export`): the
+  server SHALL use `ndjson`, irrespective of `Accept`. On these operations
+  `Accept` governs only the representation of the kick-off, status and result
+  responses; it never selects the format of the exported files, which are
+  fetched later from the `output.location` URLs as independent HTTP responses.
 
 Apart from `fhir`, this enumeration and the return-shape rules below are
 identical for all four operations. The two delivery models differ only in
@@ -64,6 +88,8 @@ identical for all four operations. The two delivery models differ only in
 operations).
 
 ### FHIR Format (`_format=fhir`) {#fhir-format}
+
+**Applies to:** the run operations only.
 
 `fhir` is an OPTIONAL format that returns result rows as typed FHIR values
 rather than as text or binary. It is available, at the server's option, on the
@@ -78,6 +104,10 @@ column-type-to-`value[x]` mapping is defined in
 [SQL to FHIR type mapping](OperationDefinition-SQLQueryRun.html#sql-to-fhir-type-mapping).
 
 ## Return Representation and the `Binary` Parameter {#return-representation}
+
+**Applies to:** the run operations only. The export operations return no result
+payload in the operation response; see
+[Asynchronous Delivery](#asynchronous-delivery).
 
 The run operations declare their `return` parameter as `Binary`. The `Binary`
 type denotes a **binary stream**, not a serialized FHIR `Binary` resource
@@ -103,6 +133,12 @@ The worked examples on each operation page are normative for the default
 (raw-payload) case.
 
 ## Content Negotiation {#content-negotiation}
+
+**Applies to:** the run operations only. Both axes below concern the response
+body that carries the result payload, which on the export operations is not the
+operation response at all but a separately fetched file; see
+[Output Formats](#output-formats) and
+[Asynchronous Delivery](#asynchronous-delivery).
 
 Two independent axes govern the response. They are specified separately so they
 are not conflated:
@@ -143,11 +179,11 @@ _how_ it is wrapped.
 
 ## Streaming and Transfer Encoding {#streaming}
 
-This section applies to the two synchronous run operations, whose responses
-carry the result payload. It does not apply to the export operations: their
-responses follow the [asynchronous model](#asynchronous-delivery), and the
-files they produce are downloaded as ordinary HTTP responses whose transfer
-framing is governed by HTTP itself, not by this specification.
+**Applies to:** the run operations only, whose responses carry the result
+payload. The export operations follow the
+[asynchronous model](#asynchronous-delivery), and the files they produce are
+downloaded as ordinary HTTP responses whose transfer framing is governed by HTTP
+itself, not by this specification.
 
 Two further concepts are independent of each other and of the format:
 
@@ -170,7 +206,9 @@ Two further concepts are independent of each other and of the format:
 
 ## Filtering {#filtering}
 
-All four operations accept the same three filtering parameters, with the same
+**Applies to:** all four operations.
+
+All four accept the same three filtering parameters, with the same
 cardinalities, the same invocation levels, and the same meaning:
 
 | Parameter | Type        | Card  | Restricts the data to                                    |
@@ -192,7 +230,54 @@ client rather than constraining the data feeding a view, which is also why it is
 offered on the run operations only (see
 [Parameters that do not apply to every operation](#parameter-asymmetries)).
 
-#### Status code for a value that cannot be resolved {#filter-resolution-errors}
+### `patient` {#patient-filter}
+
+**Applies to:** all four operations.
+
+When provided, the server SHALL NOT return resources in the patient compartments
+belonging to patients outside of this list.
+
+If a client supplies a `patient` naming a resource the server cannot find, the
+server SHALL respond `400 Bad Request` with an `OperationOutcome` whose
+`expression` names the `patient` parameter (see
+[Status code for a value that cannot be resolved](#filter-resolution-errors)).
+
+### `group` {#group-filter}
+
+**Applies to:** all four operations.
+
+When provided, the server SHALL NOT return resources that are not a member of the
+supplied `Group`.
+
+If a client supplies a `group` naming a resource the server cannot find, the
+server SHALL respond `400 Bad Request` with an `OperationOutcome` whose
+`expression` names the `group` parameter (see
+[Status code for a value that cannot be resolved](#filter-resolution-errors)).
+
+### `_since` {#since-filter}
+
+**Applies to:** all four operations.
+
+Resources will be included in the response if their state has changed after the
+supplied time (e.g., if `Resource.meta.lastUpdated` is later than the supplied
+`_since` time).
+
+For a Group-scoped request, the server MAY return additional resources modified
+prior to the supplied time if the resources belong to the patient compartment of a
+patient added to the Group after the supplied time; this behaviour SHOULD be
+clearly documented by the server.
+
+For patient- and Group-scoped requests, the server MAY return resources that are
+referenced by the resources being returned, regardless of when the referenced
+resources were last updated.
+
+For resources where the server does not maintain a last updated time, the server
+MAY include these resources in a response irrespective of the `_since` value
+supplied by a client.
+
+### Status code for a value that cannot be resolved {#filter-resolution-errors}
+
+**Applies to:** all four operations.
 
 A filter value that names a resource the server cannot find is rejected with
 `400 Bad Request`, not `404 Not Found`. The distinction rests on a single
@@ -217,52 +302,35 @@ The response SHALL carry an `OperationOutcome` whose `expression` names the
 parameter at fault. `issue.code` remains `not-found`, since that describes the
 underlying condition accurately even where the HTTP status does not.
 
-### `patient` {#patient-filter}
+Where a request supplies both an unresolvable filter value and an unresolvable
+subject, the subject failure is the more fundamental, so the response is
+`404 Not Found` and the `OperationOutcome` reports both issues.
 
-When provided, the server SHALL NOT return resources in the patient compartments
-belonging to patients outside of this list.
+## Row limit (`_limit`) {#row-limit}
 
-If a client supplies a `patient` naming a resource the server cannot find, the
-server SHALL respond `400 Bad Request` with an `OperationOutcome` whose
-`expression` names the `patient` parameter (see
-[Status code for a value that cannot be resolved](#filter-resolution-errors)).
+**Applies to:** the run operations only. The export operations do not offer
+`_limit`; see
+[Parameters that do not apply to every operation](#parameter-asymmetries).
 
-### `group` {#group-filter}
+When supplied, `_limit` is the maximum number of rows the server returns to the
+client.
 
-When provided, the server SHALL NOT return resources that are not a member of the
-supplied `Group`.
+- Servers MAY enforce a maximum value, silently capping a client-supplied
+  `_limit` at that maximum. A server that does so SHOULD document the cap.
+- The limit is applied **after** the query has been evaluated, so it truncates
+  the result set rather than changing what the query computes. A `_limit` never
+  alters an aggregate, an ordering or a join.
+- Returning fewer rows than the requested `_limit` is not an error: it means the
+  result set was smaller than the limit, or the server capped it.
 
-If a client supplies a `group` naming a resource the server cannot find, the
-server SHALL respond `400 Bad Request` with an `OperationOutcome` whose
-`expression` names the `group` parameter (see
-[Status code for a value that cannot be resolved](#filter-resolution-errors)).
-
-### `_since` {#since-filter}
-
-Resources will be included in the response if their state has changed after the
-supplied time (e.g., if `Resource.meta.lastUpdated` is later than the supplied
-`_since` time).
-
-For a Group-scoped request, the server MAY return additional resources modified
-prior to the supplied time if the resources belong to the patient compartment of a
-patient added to the Group after the supplied time; this behaviour SHOULD be
-clearly documented by the server.
-
-For patient- and Group-scoped requests, the server MAY return resources that are
-referenced by the resources being returned, regardless of when the referenced
-resources were last updated.
-
-For resources where the server does not maintain a last updated time, the server
-MAY include these resources in a response irrespective of the `_since` value
-supplied by a client.
+Each run operation page shows a worked example.
 
 ## ViewDefinition table sources {#table-sources}
 
-This section applies to the two SQLQuery operations,
+**Applies to:** the two SQLQuery operations,
 [`$sqlquery-run`](OperationDefinition-SQLQueryRun.html) and
-[`$sqlquery-export`](OperationDefinition-SQLQueryExport.html). It does not apply
-to the view operations, whose subject is a ViewDefinition rather than a query
-over one.
+[`$sqlquery-export`](OperationDefinition-SQLQueryExport.html). Not the view
+operations, whose subject is a ViewDefinition rather than a query over one.
 
 A SQLQuery names the tables it selects from through its `relatedArtifact` entries:
 each entry with `type = depends-on` carries the dependency's canonical URL in
@@ -287,6 +355,8 @@ hand the server the same URL it has already failed to resolve. The absence is a
 consequence of what the parameter is for, not an oversight.
 
 ### Matching supplied resources to dependencies {#table-source-matching}
+
+**Applies to:** the two SQLQuery operations.
 
 The `tableSource` entries in one request form a single **pool**, matched against
 the dependency graph as follows:
@@ -321,6 +391,8 @@ error naming a table the client believes it supplied.
 
 ### Rejected requests {#table-source-errors}
 
+**Applies to:** the two SQLQuery operations.
+
 | Status            | Condition                                                                     |
 | ----------------- | ----------------------------------------------------------------------------- |
 | `400 Bad Request` | A `tableSource` entry with no `url`, which cannot be bound to any dependency |
@@ -333,7 +405,9 @@ error naming a table the client believes it supplied.
 Every such response carries an `OperationOutcome` identifying the offending
 resource or the unresolved canonical URL.
 
-### What remains implementation-defined
+### What remains implementation-defined {#table-source-undefined}
+
+**Applies to:** the two SQLQuery operations.
 
 Supplied resources are table sources, not export subjects: on
 `$sqlquery-export` they produce no `output` entries in the manifest, which
@@ -349,7 +423,9 @@ remain implementation decisions:
 - Whether intermediate results are materialised as tables or inlined into the
   enclosing query.
 
-### Worked example
+### Worked example {#table-source-example}
+
+**Applies to:** the two SQLQuery operations.
 
 An invoked SQLQuery declares two dependencies:
 
@@ -389,6 +465,8 @@ resolved, so nothing is unresolvable. The SQL executes against tables `ap`, `ad`
 and `p`.
 
 ## Asynchronous Delivery {#asynchronous-delivery}
+
+**Applies to:** the export operations only.
 
 The two export operations conform to the
 [FHIR Asynchronous Interaction Request Pattern](https://build.fhir.org/ig/HL7/api-incubator-ig/branches/simplified-async-interaction/async-interaction.html):
