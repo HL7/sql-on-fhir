@@ -45,7 +45,7 @@ inside a `Parameters` resource in the request body on a `POST`.
 | parameters     | Parameters                | system, type, instance | No           | 1   | Input parameters bound by name to parameters declared in the SQLQuery Library                             |
 | patient        | Reference                 | system, type, instance | No           | \*  | Filter by patient reference, repeated to name several patients. [Details](#filtering)                     |
 | group          | Reference                 | system, type, instance | No           | \*  | Filter by group membership. [Details](#filtering)                                                         |
-| \_since        | instant                   | system, type, instance | No           | 1   | Include only resources modified after this time. [Details](#filtering)                                    |
+| \_since        | instant                   | system, type, instance | No           | 1   | Include only resources whose state changed after this instant. [Details](#filtering)                                    |
 | source         | string                    | system, type, instance | No           | 1   | External data source containing the ViewDefinition tables (e.g. URI, bucket name)                         |
 | \_limit        | integer                   | system, type, instance | No           | 1   | Maximum number of rows to return                                                                          |
 
@@ -90,12 +90,12 @@ identified by the request path, so none of the three applies; supplying any of
 them is rejected with `400 Bad Request`.
 
 A `queryCanonical` or `queryReference` the server cannot resolve is rejected with
-`404 Not Found` and an `OperationOutcome`. A resolved artefact that does not
+`404 Not Found` and an `OperationOutcome`. A resolved artifact that does not
 conform to the SQLQuery or SQLView profile is rejected with
 `422 Unprocessable Entity`.
 
 How a server resolves a canonical URL or an absolute reference - from a local
-artefact registry, by dereferencing the URL, or not at all - is an implementation
+artifact registry, by dereferencing the URL, or not at all - is an implementation
 matter. A server that supports only some of these parameters declares the subset
 it supports as described in
 [Declaring partial operation support](operations-capability.html#partial-operation-support).
@@ -711,7 +711,7 @@ SQL NULL values are represented by omitting the corresponding part from the row
 parameter.
 
 Conversion of REAL, FLOAT, and DOUBLE PRECISION values to `valueDecimal` may
-introduce representation artefacts due to the difference between binary and
+introduce representation artifacts due to the difference between binary and
 decimal floating point.
 
 TIMESTAMP WITH TIME ZONE values may carry sub-millisecond precision (e.g.
@@ -745,4 +745,4 @@ SQLQuery profile for the binding rules and the mapping from
 | -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `400 Bad Request`          | Missing required parameter, unknown parameter name, or value type mismatch; no subject form supplied at system or type level, more than one supplied, or any supplied at instance level (see [Identifying the query](#queryreference-clarification)); a `tableSource` with no `url`, sharing a `url` with another, or matching no dependency; a `patient` or `group` naming a resource the server cannot find (see [Status code for a value that cannot be resolved](operations-common.html#filter-resolution-errors)) |
 | `404 Not Found`            | An unresolvable `queryCanonical` or `queryReference`; the Library named by the request path not found; a dependency view neither supplied nor resolvable                                                                                                                                                                                      |
-| `422 Unprocessable Entity` | SQL execution error, a resolved artefact not conforming to the SQLQuery or SQLView profile, or unsupported SQL column type when using `_format=fhir` (see [type mapping](#sql-to-fhir-type-mapping))                                                                                                                                          |
+| `422 Unprocessable Entity` | SQL execution error, a resolved artifact not conforming to the SQLQuery or SQLView profile, or unsupported SQL column type when using `_format=fhir` (see [type mapping](#sql-to-fhir-type-mapping))                                                                                                                                          |

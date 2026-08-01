@@ -306,10 +306,10 @@ supplied by a client.
 
 A filter value that names a resource the server cannot find is rejected with
 `400 Bad Request`, not `404 Not Found`. The distinction rests on a single
-principle, which applies to every unresolvable artefact named in a request to
+principle, which applies to every unresolvable artifact named in a request to
 any of the four operations:
 
-- An artefact the operation is **about**, or **requires in order to run**,
+- An artifact the operation is **about**, or **requires in order to run**,
   yields `404 Not Found` when it cannot be resolved. That covers the subject
   named by `viewCanonical`, `viewReference`, `queryCanonical` or
   `queryReference`, the instance named by the request path, and a query
@@ -391,19 +391,19 @@ the dependency graph as follows:
 2. Take a dependency from the worklist and resolve it, in this order:
    1. A pool member whose `url` equals the dependency's canonical URL and, where
       the dependency pins a version, whose `version` equals that version.
-   2. Failing that, an artefact the server can resolve for that canonical URL.
+   2. Failing that, an artifact the server can resolve for that canonical URL.
    3. Failing that, the request fails with `404 Not Found` and an
       `OperationOutcome` naming the unresolved canonical URL.
-3. If the resolved artefact is a SQLView, add its own `depends-on` entries to the
+3. If the resolved artifact is a SQLView, add its own `depends-on` entries to the
    worklist. If it is a ViewDefinition, it is a leaf.
 4. Repeat from step 2 until the worklist is empty.
 5. If any pool member was never selected at step 2.1, the request fails with
    `400 Bad Request` and an `OperationOutcome` identifying it.
-6. Bind each resolved artefact to the SQL identifier in the `label` of the
+6. Bind each resolved artifact to the SQL identifier in the `label` of the
    dependency that reached it.
 
 Step 2.1 preceding step 2.2 is the precedence rule: a supplied `tableSource`
-takes precedence over an artefact with the same canonical URL that the server
+takes precedence over an artifact with the same canonical URL that the server
 could itself resolve. Step 5 runs after the traversal rather than during it,
 because a pool member may match a dependency reached only through a supplied
 SQLView.

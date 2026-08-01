@@ -3,7 +3,7 @@
 - **GET**: For simple invocations without request body
 - **POST**: Required when providing ViewDefinition resource or resources to transform
 
-#### GET Method Limitations
+##### GET Method Limitations
 
 When using the GET method, the following limitations apply:
 
@@ -124,7 +124,7 @@ ViewDefinition is identified by the request path. See
 | ------- | --------- | ---------------------- | -------- | --- | ---------------------------------------------------------------------------------------------------------------- |
 | patient | Reference | system, type, instance | No       | \*  | Filter by patient reference, repeated to name several patients. [Details](operations-common.html#patient-filter) |
 | group   | Reference | system, type, instance | No       | \*  | Filter by group membership. [Details](operations-common.html#group-filter)                                       |
-| \_since | instant   | system, type, instance | No       | 1   | Include only resources modified after this time. [Details](operations-common.html#since-filter)                  |
+| \_since | instant   | system, type, instance | No       | 1   | Include only resources whose state changed after this instant. [Details](operations-common.html#since-filter)                  |
 | \_limit | integer   | system, type, instance | No       | 1   | Maximum number of rows to return                                                                                 |
 
 {:.table-data}
@@ -174,11 +174,11 @@ identified by the request path, so none of the three applies; supplying any of
 them is rejected with `400 Bad Request`.
 
 A `viewCanonical` or `viewReference` the server cannot resolve is rejected with
-`404 Not Found` and an `OperationOutcome`. A resolved artefact that is not a
+`404 Not Found` and an `OperationOutcome`. A resolved artifact that is not a
 conformant ViewDefinition is rejected with `422 Unprocessable Entity`.
 
 How a server resolves a canonical URL or an absolute reference - from a local
-artefact registry, by dereferencing the URL, or not at all - is an implementation
+artifact registry, by dereferencing the URL, or not at all - is an implementation
 matter. A server that supports only some of these parameters declares the subset
 it supports as described in
 [Declaring partial operation support](operations-capability.html#partial-operation-support).

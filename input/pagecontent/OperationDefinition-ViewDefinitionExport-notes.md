@@ -289,7 +289,7 @@ per `view` repetition. See
 | ------- | --------- | --- | --- | --------------------------------------------------------------------------------------------- |
 | patient | Reference | 0   | \*  | Filter by patient reference. [Details](operations-common.html#patient-filter)                 |
 | group   | Reference | 0   | \*  | Filter by group membership. [Details](operations-common.html#group-filter)                    |
-| \_since | instant   | 0   | 1   | Export only resources updated since this time. [Details](operations-common.html#since-filter) |
+| \_since | instant   | 0   | 1   | Include only resources whose state changed after this instant. [Details](operations-common.html#since-filter) |
 
 {:.table-data}
 
@@ -329,11 +329,11 @@ more than one, in a single repetition is rejected with `400 Bad Request` and an
 `OperationOutcome` naming the problem.
 
 A `view.viewCanonical` or `view.viewReference` the server cannot resolve is
-rejected with `404 Not Found` and an `OperationOutcome`. A resolved artefact that
+rejected with `404 Not Found` and an `OperationOutcome`. A resolved artifact that
 is not a conformant ViewDefinition is rejected with `422 Unprocessable Entity`.
 
 How a server resolves a canonical URL or an absolute reference - from a local
-artefact registry, by dereferencing the URL, or not at all - is an implementation
+artifact registry, by dereferencing the URL, or not at all - is an implementation
 matter. A server that supports only some of these parts declares the subset it
 supports as described in
 [Declaring partial operation support](operations-capability.html#partial-operation-support).
