@@ -117,8 +117,9 @@ to the FHIR resources feeding the query's dependency views, before the SQL
 executes. The SQL therefore sees tables already narrowed to the requested scope,
 rather than being expected to express the filter itself.
 
-A `patient` or `group` the server cannot find is reported with an error response
-carrying an `OperationOutcome`.
+A `patient` or `group` naming a resource the server cannot find is rejected with
+`400 Bad Request`; see
+[Status code for a value that cannot be resolved](operations-common.html#filter-resolution-errors).
 
 #### Row Limit
 
@@ -665,6 +666,6 @@ SQLQuery profile for the binding rules and the mapping from
 
 | Status                     | Condition                                                                                                                                                                                                                                                                                                                                     |
 | -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `400 Bad Request`          | Missing required parameter, unknown parameter name, or value type mismatch; no subject form supplied at system or type level, more than one supplied, or any supplied at instance level (see [Identifying the query](#queryreference-clarification)); a `tableSource` with no `url`, sharing a `url` with another, or matching no dependency |
-| `404 Not Found`            | An unresolvable `queryCanonical` or `queryReference`; the Library named by the request path not found; a dependency view neither supplied nor resolvable; a `patient` or `group` not present on the server                                                                                                                                    |
+| `400 Bad Request`          | Missing required parameter, unknown parameter name, or value type mismatch; no subject form supplied at system or type level, more than one supplied, or any supplied at instance level (see [Identifying the query](#queryreference-clarification)); a `tableSource` with no `url`, sharing a `url` with another, or matching no dependency; a `patient` or `group` naming a resource the server cannot find (see [Status code for a value that cannot be resolved](operations-common.html#filter-resolution-errors)) |
+| `404 Not Found`            | An unresolvable `queryCanonical` or `queryReference`; the Library named by the request path not found; a dependency view neither supplied nor resolvable                                                                                                                                                                                      |
 | `422 Unprocessable Entity` | SQL execution error, a resolved artefact not conforming to the SQLQuery or SQLView profile, or unsupported SQL column type when using `_format=fhir` (see [type mapping](#sql-to-fhir-type-mapping))                                                                                                                                          |

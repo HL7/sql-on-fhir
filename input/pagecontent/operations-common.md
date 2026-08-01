@@ -192,23 +192,50 @@ client rather than constraining the data feeding a view, which is also why it is
 offered on the run operations only (see
 [Parameters that do not apply to every operation](#parameter-asymmetries)).
 
+#### Status code for a value that cannot be resolved {#filter-resolution-errors}
+
+A filter value that names a resource the server cannot find is rejected with
+`400 Bad Request`, not `404 Not Found`. The distinction rests on a single
+principle, which applies to every unresolvable artefact named in a request to
+any of the four operations:
+
+- An artefact the operation is **about**, or **requires in order to run**,
+  yields `404 Not Found` when it cannot be resolved. That covers the subject
+  named by `viewCanonical`, `viewReference`, `queryCanonical` or
+  `queryReference`, the instance named by the request path, and a query
+  dependency neither supplied as a `tableSource` nor resolvable by the server.
+- A value that merely **scopes** the data yields `400 Bad Request`. That covers
+  `patient` and `group`.
+
+The operation in the first case cannot proceed because the thing it would act on
+is missing; in the second it was routed and understood, and a parameter value is
+at fault. HTTP ties `404` to the request target, which at system and type level
+is the operation endpoint rather than the patient, so reporting a missing
+`patient` as `404` would misdescribe what was not found.
+
+The response SHALL carry an `OperationOutcome` whose `expression` names the
+parameter at fault. `issue.code` remains `not-found`, since that describes the
+underlying condition accurately even where the HTTP status does not.
+
 ### `patient` {#patient-filter}
 
 When provided, the server SHALL NOT return resources in the patient compartments
 belonging to patients outside of this list.
 
-If a client requests patients who are not present on the server, the server SHOULD
-return details via a FHIR `OperationOutcome` resource in an error response to the
-request.
+If a client supplies a `patient` naming a resource the server cannot find, the
+server SHALL respond `400 Bad Request` with an `OperationOutcome` whose
+`expression` names the `patient` parameter (see
+[Status code for a value that cannot be resolved](#filter-resolution-errors)).
 
 ### `group` {#group-filter}
 
 When provided, the server SHALL NOT return resources that are not a member of the
 supplied `Group`.
 
-If a client requests groups that are not present on the server, the server SHOULD
-return details via a FHIR `OperationOutcome` resource in an error response to the
-request.
+If a client supplies a `group` naming a resource the server cannot find, the
+server SHALL respond `400 Bad Request` with an `OperationOutcome` whose
+`expression` names the `group` parameter (see
+[Status code for a value that cannot be resolved](#filter-resolution-errors)).
 
 ### `_since` {#since-filter}
 

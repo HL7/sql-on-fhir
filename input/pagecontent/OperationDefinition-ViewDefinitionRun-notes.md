@@ -459,8 +459,8 @@ The operation uses standard HTTP status codes to indicate the outcome:
 | Status Code               | Description          | When to Use                                                                                                                                                                   |
 | ------------------------- | -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 200 OK                    | Success              | Operation completed successfully, results returned                                                                                                                            |
-| 400 Bad Request           | Client Error         | Invalid parameters, unsupported parameters, or malformed request; no subject form supplied at system or type level, more than one supplied, or any supplied at instance level |
-| 404 Not Found             | Not Found            | ViewDefinition not found: the instance named by the request path, or an unresolvable `viewCanonical` or `viewReference`; a `patient` or `group` not present on the server     |
+| 400 Bad Request           | Client Error         | Invalid parameters, unsupported parameters, or malformed request; no subject form supplied at system or type level, more than one supplied, or any supplied at instance level; a `patient` or `group` naming a resource the server cannot find (see [Status code for a value that cannot be resolved](operations-common.html#filter-resolution-errors)) |
+| 404 Not Found             | Not Found            | ViewDefinition not found: the instance named by the request path, or an unresolvable `viewCanonical` or `viewReference`                                                       |
 | 422 Unprocessable Entity  | Business Logic Error | Valid request but ViewDefinition is invalid or cannot be processed                                                                                                            |
 | 500 Internal Server Error | Server Error         | Unexpected server error during processing                                                                                                                                     |
 
@@ -630,7 +630,7 @@ Accept: application/json
 ```
 
 ```http
-HTTP/1.1 404 Not Found
+HTTP/1.1 400 Bad Request
 Content-Type: application/fhir+json
 
 {
@@ -646,8 +646,10 @@ Content-Type: application/fhir+json
 }
 ```
 
-The same condition returns `404 Not Found` on all four data operations; see
-[Filtering](operations-common.html#filtering).
+The same condition returns `400 Bad Request` on all four data operations,
+because a filter value scopes the data rather than naming what the operation is
+about; see
+[Status code for a value that cannot be resolved](operations-common.html#filter-resolution-errors).
 
 ##### 7. Resource Processing Errors
 

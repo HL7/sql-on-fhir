@@ -463,8 +463,8 @@ The $viewdefinition-export operation uses standard HTTP status codes to indicate
 | 202 Accepted              | In Progress          | Export request accepted, still in progress during polling, or cancellation accepted                                                                                                  |
 | 303 See Other             | Job Finished         | Export finished (successfully or not); `Location` header carries the result URL                                                                                                      |
 | 200 OK                    | Result Available     | Result URL returns the manifest `Parameters`; download URLs return the files                                                                                                         |
-| 400 Bad Request           | Client Error         | Invalid parameters, unsupported parameters, missing required headers; a `view` repetition naming no subject form or more than one; `view` supplied at instance level                 |
-| 404 Not Found             | Not Found            | ViewDefinition not found, including an unresolvable `view.viewCanonical` or `view.viewReference`; a `patient` or `group` not present on the server; or a cancelled export status URL |
+| 400 Bad Request           | Client Error         | Invalid parameters, unsupported parameters, missing required headers; a `view` repetition naming no subject form or more than one; `view` supplied at instance level; a `patient` or `group` naming a resource the server cannot find (see [Status code for a value that cannot be resolved](operations-common.html#filter-resolution-errors)) |
+| 404 Not Found             | Not Found            | ViewDefinition not found, including an unresolvable `view.viewCanonical` or `view.viewReference`; or a cancelled export status URL                                                   |
 | 422 Unprocessable Entity  | Business Logic Error | Valid request but the resolved ViewDefinition is invalid or cannot be processed                                                                                                      |
 | 429 Too Many Requests     | Excessive Polling    | Client is polling too frequently; back off exponentially, guided by `Retry-After`                                                                                                    |
 | 500 Internal Server Error | Server Error         | Unexpected server error; on the result URL, the failure outcome of the export                                                                                                        |
@@ -538,10 +538,13 @@ Content-Type: application/fhir+json
 
 ##### 4. Patient or Group Not Found
 
-When filtering by patient or group that doesn't exist:
+When filtering by patient or group that doesn't exist. A filter value scopes the
+data rather than naming what the operation is about, so the rejection is
+`400 Bad Request`; see
+[Status code for a value that cannot be resolved](operations-common.html#filter-resolution-errors).
 
 ```http
-HTTP/1.1 404 Not Found
+HTTP/1.1 400 Bad Request
 Content-Type: application/fhir+json
 
 {
@@ -550,7 +553,8 @@ Content-Type: application/fhir+json
     {
       "severity": "error",
       "code": "not-found",
-      "diagnostics": "Patient with reference 'Patient/12345' not found"
+      "diagnostics": "Patient with reference 'Patient/12345' not found",
+      "expression": ["patient"]
     }
   ]
 }
@@ -559,7 +563,7 @@ Content-Type: application/fhir+json
 For group references:
 
 ```http
-HTTP/1.1 404 Not Found
+HTTP/1.1 400 Bad Request
 Content-Type: application/fhir+json
 
 {
@@ -568,7 +572,8 @@ Content-Type: application/fhir+json
     {
       "severity": "error",
       "code": "not-found",
-      "diagnostics": "Group with reference 'Group/diabetes-cohort' not found"
+      "diagnostics": "Group with reference 'Group/diabetes-cohort' not found",
+      "expression": ["group"]
     }
   ]
 }
