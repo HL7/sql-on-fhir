@@ -158,7 +158,7 @@ operation therefore requires the system or type level.
 
 Every other input parameter does apply at the instance level, in addition to
 system and type: `clientTrackingId`, `_format`, `header`, `patient`, `group`,
-`_since` and `source`, along with `viewResource`. Instance-level invocation does
+`_since` and `source`, along with `tableSource`. Instance-level invocation does
 not provide a slot for per-query parameter binding; clients that need to pass
 parameters should use the system or type level with a `query.parameters` part.
 
@@ -191,11 +191,11 @@ in the manifest. Supplying `query` here is out of scope and is rejected with
 A query's table sources are named by its `relatedArtifact` entries and are
 normally resolved by the server. Where the server cannot resolve one - typically
 because the view exists only on the client - the client supplies it inline with
-`viewResource`.
+`tableSource`.
 
 | Name         | Type                      | Min | Max | Description                                                                                                    |
 | ------------ | ------------------------- | --- | --- | -------------------------------------------------------------------------------------------------------------- |
-| viewResource | ViewDefinition \| SQLView | 0   | \*  | Inline table source, matched to a dependency by canonical URL. [Details](operations-common.html#table-sources) |
+| tableSource | ViewDefinition \| SQLView | 0   | \*  | Inline table source, matched to a dependency by canonical URL. [Details](operations-common.html#table-sources) |
 
 {:.table-data}
 
@@ -213,7 +213,7 @@ Supplied resources are table sources, not export subjects: they produce no
 `output` entries in the manifest, which carries one entry per query and nothing
 else.
 
-Unlike the `query` parameter, `viewResource` applies at the instance level as
+Unlike the `query` parameter, `tableSource` applies at the instance level as
 well as at system and type level, because a stored query can depend on a view the
 server cannot resolve.
 
@@ -343,7 +343,7 @@ the export is still in progress.
 
 | Name            | Type    | Min | Max | Description                                                                                                                                  |
 | --------------- | ------- | --- | --- | -------------------------------------------------------------------------------------------------------------------------------------------- |
-| output          | complex | 0   | \*  | Output information for each exported SQL query result (one per `query`; resources supplied via `viewResource` do not produce output entries) |
+| output          | complex | 0   | \*  | Output information for each exported SQL query result (one per `query`; resources supplied via `tableSource` do not produce output entries) |
 | output.name     | string  | 1   | 1   | The name of the exported output. [Details](#output-name-clarification)                                                                       |
 | output.location | uri     | 1   | \*  | URL(s) to download the exported file(s). [Details](#output-partitioning)                                                                     |
 
@@ -415,7 +415,7 @@ The $sqlquery-export operation uses standard HTTP status codes to indicate the o
 | 202 Accepted              | In Progress          | Export request accepted, still in progress during polling, or cancellation accepted                                                                                                                                                                             |
 | 303 See Other             | Job Finished         | Export finished (successfully or not); `Location` header carries the result URL                                                                                                                                                                                 |
 | 200 OK                    | Result Available     | Result URL returns the manifest `Parameters`; download URLs return the files                                                                                                                                                                                    |
-| 400 Bad Request           | Client Error         | Invalid parameters, unsupported parameters, missing required headers; a `query` repetition naming no subject form or more than one; `query` supplied at instance level; a `viewResource` with no `url`, sharing a `url` with another, or matching no dependency |
+| 400 Bad Request           | Client Error         | Invalid parameters, unsupported parameters, missing required headers; a `query` repetition naming no subject form or more than one; `query` supplied at instance level; a `tableSource` with no `url`, sharing a `url` with another, or matching no dependency |
 | 404 Not Found             | Not Found            | SQLQuery Library not found, a dependency neither supplied nor resolvable, a `patient` or `group` not present on the server, or a cancelled export status URL                                                                                                    |
 | 422 Unprocessable Entity  | Business Logic Error | Valid request but query is invalid or cannot be executed                                                                                                                                                                                                        |
 | 429 Too Many Requests     | Excessive Polling    | Client is polling too frequently; back off exponentially, guided by `Retry-After`                                                                                                                                                                               |
@@ -933,7 +933,7 @@ Prefer: respond-async
 ##### Multi-Query Export with ViewDefinition Table Sources
 
 Export multiple queries in one operation, providing a ViewDefinition table source
-inline. One pool of `viewResource` entries serves every query in the request: the
+inline. One pool of `tableSource` entries serves every query in the request: the
 pool is matched against the transitive dependency graph of both queries, so an
 entry matching either one's dependencies is bound, and an entry matching neither
 is rejected with `400 Bad Request`.
@@ -991,7 +991,7 @@ Prefer: respond-async
       ]
     },
     {
-      "name": "viewResource",
+      "name": "tableSource",
       "resource": {
         "resourceType": "ViewDefinition",
         "url": "https://example.org/ViewDefinition/local_cohort",
@@ -1015,4 +1015,4 @@ Prefer: respond-async
 ```
 
 The completed manifest carries exactly two `output` entries, `bp-summary` and
-`lab-summary`. The supplied `viewResource` produces none.
+`lab-summary`. The supplied `tableSource` produces none.

@@ -437,7 +437,7 @@ Description: "Execute a SQLQuery Library against ViewDefinition tables."
 * parameter[=].targetProfile[1] = Canonical(SQLView)
 * parameter[=].documentation = "Inline SQLQuery or SQLView Library resource to execute."
 
-* parameter[+].name = #viewResource
+* parameter[+].name = #tableSource
 * parameter[=].use = #in
 * parameter[=].min = 0
 * parameter[=].max = "*"
@@ -447,7 +447,7 @@ Description: "Execute a SQLQuery Library against ViewDefinition tables."
 * parameter[=].type = #CanonicalResource
 * parameter[=].targetProfile[0] = Canonical(ViewDefinition)
 * parameter[=].targetProfile[1] = Canonical(SQLView)
-* parameter[=].documentation = "Inline ViewDefinition or SQLView resources supplying table sources the server cannot itself resolve. Matched by canonical URL against the dependencies in the query's transitive relatedArtifact graph. See Common Operation Behavior (operations-common.html#table-sources)."
+* parameter[=].documentation = "Inline ViewDefinition or SQLView resources supplying table sources the server cannot itself resolve. Matched by canonical URL against the dependencies in the query's transitive relatedArtifact graph. Accepts inline resources only; there is no tableSource by canonical URL, because a URL is exactly what the server has already failed to resolve. See Common Operation Behavior (operations-common.html#table-sources)."
 
 * parameter[+].name = #parameters
 * parameter[=].use = #in
@@ -583,7 +583,7 @@ Description: "Export SQLQuery Library results asynchronously using the FHIR Asyn
 * parameter[=].part[=].documentation = "Input parameters for this query. Parameters are bound by name to parameters declared in the SQLQuery Library (Library.parameter.name)."
 
 // Input parameters - inline ViewDefinition or SQLView table sources
-* parameter[+].name = #viewResource
+* parameter[+].name = #tableSource
 * parameter[=].use = #in
 * parameter[=].min = 0
 * parameter[=].max = "*"
@@ -593,7 +593,7 @@ Description: "Export SQLQuery Library results asynchronously using the FHIR Asyn
 * parameter[=].type = #CanonicalResource
 * parameter[=].targetProfile[0] = Canonical(ViewDefinition)
 * parameter[=].targetProfile[1] = Canonical(SQLView)
-* parameter[=].documentation = "Inline ViewDefinition or SQLView resources supplying table sources the server cannot itself resolve. Matched by canonical URL against the dependencies in the query's transitive relatedArtifact graph. Supplied resources produce no output entries; only query results do. See Common Operation Behavior (operations-common.html#table-sources)."
+* parameter[=].documentation = "Inline ViewDefinition or SQLView resources supplying table sources the server cannot itself resolve. Matched by canonical URL against the dependencies in the query's transitive relatedArtifact graph. Accepts inline resources only; there is no tableSource by canonical URL, because a URL is exactly what the server has already failed to resolve. Supplied resources produce no output entries; only query results do. See Common Operation Behavior (operations-common.html#table-sources)."
 
 // Input parameters - export control (from $viewdefinition-export)
 * parameter[+].name = #clientTrackingId
@@ -749,7 +749,7 @@ Description: "Export SQLQuery Library results asynchronously using the FHIR Asyn
 * parameter[=].use = #out
 * parameter[=].min = 0
 * parameter[=].max = "*"
-* parameter[=].documentation = "Output information for each exported SQL query result. One entry per query; resources supplied via the viewResource parameter do not produce output entries."
+* parameter[=].documentation = "Output information for each exported SQL query result. One entry per query; resources supplied via the tableSource parameter do not produce output entries."
 * parameter[=].part[+].name = #name
 * parameter[=].part[=].use = #out
 * parameter[=].part[=].min = 1

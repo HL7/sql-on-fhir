@@ -246,14 +246,22 @@ table sources and so carries dependencies of its own. The graph is therefore
 transitive, and its leaves are always ViewDefinitions.
 
 A server may be unable to resolve every dependency: a client may hold a view that
-exists only locally. The repeating `viewResource` parameter carries such views
+exists only locally. The repeating `tableSource` parameter carries such views
 inline. It accepts a ViewDefinition or a SQLView, applies at the system, type and
 instance levels, and is available on both SQLQuery operations with identical
 meaning.
 
+`tableSource` accepts inline resources only. There is deliberately no
+`tableSourceCanonical` or `tableSourceReference` sibling, even though the
+parameters naming an operation's subject come in exactly that trio. Dependencies
+are matched to the pool _by_ canonical URL, and the parameter exists precisely
+for dependencies the server cannot resolve, so naming one by canonical URL would
+hand the server the same URL it has already failed to resolve. The absence is a
+consequence of what the parameter is for, not an oversight.
+
 ### Matching supplied resources to dependencies {#table-source-matching}
 
-The `viewResource` entries in one request form a single **pool**, matched against
+The `tableSource` entries in one request form a single **pool**, matched against
 the dependency graph as follows:
 
 1. Seed a worklist with the invoked query's `depends-on` entries. Where an
@@ -272,7 +280,7 @@ the dependency graph as follows:
 6. Bind each resolved artefact to the SQL identifier in the `label` of the
    dependency that reached it.
 
-Step 2.1 preceding step 2.2 is the precedence rule: a supplied `viewResource`
+Step 2.1 preceding step 2.2 is the precedence rule: a supplied `tableSource`
 takes precedence over an artefact with the same canonical URL that the server
 could itself resolve. Step 5 runs after the traversal rather than during it,
 because a pool member may match a dependency reached only through a supplied
@@ -288,9 +296,9 @@ error naming a table the client believes it supplied.
 
 | Status            | Condition                                                                     |
 | ----------------- | ----------------------------------------------------------------------------- |
-| `400 Bad Request` | A `viewResource` entry with no `url`, which cannot be bound to any dependency |
-| `400 Bad Request` | Two `viewResource` entries sharing a `url`, which makes the binding ambiguous |
-| `400 Bad Request` | A `viewResource` entry matching no dependency in the transitive graph         |
+| `400 Bad Request` | A `tableSource` entry with no `url`, which cannot be bound to any dependency |
+| `400 Bad Request` | Two `tableSource` entries sharing a `url`, which makes the binding ambiguous |
+| `400 Bad Request` | A `tableSource` entry matching no dependency in the transitive graph         |
 | `404 Not Found`   | A dependency neither present in the pool nor resolvable by the server         |
 
 {:.table-data}

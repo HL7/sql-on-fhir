@@ -10,7 +10,7 @@ inside a `Parameters` resource in the request body.
 | queryCanonical | canonical                 | system, type           | Conditional¹ | 1   | Canonical URL of the SQLQuery or SQLView Library. [Details](#queryreference-clarification)                |
 | queryReference | Reference                 | system, type           | Conditional¹ | 1   | Literal location of a SQLQuery or SQLView Library on the server. [Details](#queryreference-clarification) |
 | queryResource  | Library                   | system, type           | Conditional¹ | 1   | Inline SQLQuery or SQLView Library resource to execute. [Details](#queryreference-clarification)          |
-| viewResource   | ViewDefinition \| SQLView | system, type, instance | No           | \*  | Inline table source, matched to a dependency by canonical URL. [Details](#table-sources)                  |
+| tableSource   | ViewDefinition \| SQLView | system, type, instance | No           | \*  | Inline table source, matched to a dependency by canonical URL. [Details](#table-sources)                  |
 | parameters     | Parameters                | system, type, instance | No           | 1   | Input parameters bound by name to parameters declared in the SQLQuery Library                             |
 | patient        | Reference                 | system, type, instance | No           | \*  | Filter by patient reference, repeated to name several patients. [Details](#filtering)                     |
 | group          | Reference                 | system, type, instance | No           | \*  | Filter by group membership. [Details](#filtering)                                                         |
@@ -71,7 +71,7 @@ it supports as described in
 The query's table sources are named by its `relatedArtifact` entries and are
 normally resolved by the server. Where the server cannot resolve one - typically
 because the view exists only on the client - the client supplies it inline with
-the repeating `viewResource` parameter, which accepts a ViewDefinition or a
+the repeating `tableSource` parameter, which accepts a ViewDefinition or a
 [SQLView](StructureDefinition-SQLView.html).
 
 The matching, precedence and error rules are specified once in
@@ -85,11 +85,11 @@ bound or matches nothing is rejected with `400 Bad Request`, and a dependency
 neither supplied nor resolvable is rejected with `404 Not Found`.
 
 Supplying every dependency inline alongside an inline `queryResource` makes a
-fully ad-hoc query possible, with nothing stored on the server. `viewResource`
+fully ad-hoc query possible, with nothing stored on the server. `tableSource`
 also applies at the instance level, so a client invoking a stored query can supply
 just the dependency the server cannot resolve.
 
-`viewResource` supplies the _views_ a query reads from, not the FHIR resources
+`tableSource` supplies the _views_ a query reads from, not the FHIR resources
 those views project. This operation has no `resource` parameter for the latter:
 unlike [`$viewdefinition-run`](OperationDefinition-ViewDefinitionRun.html), where
 inline resources feed one view directly, doing so here would need its own
@@ -269,7 +269,7 @@ Content-Type: application/fhir+json
 
 Nothing is stored on the server. The query is supplied as `queryResource` and the
 ViewDefinition its `relatedArtifact` entry depends on is supplied as
-`viewResource`, matched to that entry by `url` and materialised as table `p`:
+`tableSource`, matched to that entry by `url` and materialised as table `p`:
 
 ```http
 POST /$sqlquery-run HTTP/1.1
@@ -296,7 +296,7 @@ Content-Type: application/fhir+json
         }]
       }]
     }},
-    { "name": "viewResource", "resource": {
+    { "name": "tableSource", "resource": {
       "resourceType": "ViewDefinition",
       "url": "https://example.org/ViewDefinition/patient_view",
       "status": "active",
@@ -341,14 +341,14 @@ Content-Type: application/fhir+json
         { "type": "depends-on", "resource": "https://example.org/SQLView/active_patients", "label": "ap" }
       ]
     }},
-    { "name": "viewResource", "resource": {
+    { "name": "tableSource", "resource": {
       "resourceType": "Library",
       "url": "https://example.org/SQLView/active_patients",
       "relatedArtifact": [
         { "type": "depends-on", "resource": "https://example.org/ViewDefinition/patient_view", "label": "p" }
       ]
     }},
-    { "name": "viewResource", "resource": {
+    { "name": "tableSource", "resource": {
       "resourceType": "ViewDefinition",
       "url": "https://example.org/ViewDefinition/patient_view"
     }}
@@ -375,7 +375,7 @@ Content-Type: application/fhir+json
         { "type": "depends-on", "resource": "https://example.org/ViewDefinition/patient_view", "label": "p" }
       ]
     }},
-    { "name": "viewResource", "resource": {
+    { "name": "tableSource", "resource": {
       "resourceType": "ViewDefinition",
       "url": "https://example.org/ViewDefinition/patient_veiw"
     }}
@@ -392,8 +392,8 @@ Content-Type: application/fhir+json
   "issue": [{
     "severity": "error",
     "code": "invalid",
-    "diagnostics": "Supplied viewResource 'https://example.org/ViewDefinition/patient_veiw' does not match any relatedArtifact dependency of the query",
-    "expression": ["viewResource"]
+    "diagnostics": "Supplied tableSource 'https://example.org/ViewDefinition/patient_veiw' does not match any relatedArtifact dependency of the query",
+    "expression": ["tableSource"]
   }]
 }
 ```
@@ -412,7 +412,7 @@ Content-Type: application/fhir+json
 {
   "resourceType": "Parameters",
   "parameter": [
-    { "name": "viewResource", "resource": {
+    { "name": "tableSource", "resource": {
       "resourceType": "ViewDefinition",
       "url": "https://example.org/ViewDefinition/local_cohort"
     }},
@@ -665,6 +665,6 @@ SQLQuery profile for the binding rules and the mapping from
 
 | Status                     | Condition                                                                                                                                                                                                                                                                                                                                     |
 | -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `400 Bad Request`          | Missing required parameter, unknown parameter name, or value type mismatch; no subject form supplied at system or type level, more than one supplied, or any supplied at instance level (see [Identifying the query](#queryreference-clarification)); a `viewResource` with no `url`, sharing a `url` with another, or matching no dependency |
+| `400 Bad Request`          | Missing required parameter, unknown parameter name, or value type mismatch; no subject form supplied at system or type level, more than one supplied, or any supplied at instance level (see [Identifying the query](#queryreference-clarification)); a `tableSource` with no `url`, sharing a `url` with another, or matching no dependency |
 | `404 Not Found`            | An unresolvable `queryCanonical` or `queryReference`; the Library named by the request path not found; a dependency view neither supplied nor resolvable; a `patient` or `group` not present on the server                                                                                                                                    |
 | `422 Unprocessable Entity` | SQL execution error, a resolved artefact not conforming to the SQLQuery or SQLView profile, or unsupported SQL column type when using `_format=fhir` (see [type mapping](#sql-to-fhir-type-mapping))                                                                                                                                          |

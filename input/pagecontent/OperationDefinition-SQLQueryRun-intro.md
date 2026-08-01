@@ -16,7 +16,7 @@ Execute a SQLQuery Library against ViewDefinition tables synchronously.
 
 **Execution Flow:**
 
-1. Resolve each `relatedArtifact` dependency, preferring a table source supplied inline via `viewResource` over one the server can itself resolve
+1. Resolve each `relatedArtifact` dependency, preferring a table source supplied inline via `tableSource` over one the server can itself resolve
 2. Materialize each resolved ViewDefinition as a table
 3. Bind `parameters` values to SQL placeholders
 4. Execute SQL query
