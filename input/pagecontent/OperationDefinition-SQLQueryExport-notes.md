@@ -158,9 +158,36 @@ operation therefore requires the system or type level.
 
 Every other input parameter does apply at the instance level, in addition to
 system and type: `clientTrackingId`, `_format`, `header`, `patient`, `group`,
-`_since` and `source`, along with `tableSource`. Instance-level invocation does
-not provide a slot for per-query parameter binding; clients that need to pass
-parameters should use the system or type level with a `query.parameters` part.
+`_since` and `source`, along with `tableSource`.
+
+A parameterised query is bound through the top-level `parameters` parameter,
+which is available **at the instance level only**:
+
+| Name         | Type         | Min | Max | Scope        | Description                                                              |
+| ------------ | ------------ | --- | --- | ------------ | ------------------------------------------------------------------------ |
+| `parameters` | `Parameters` | 0   | 1   | instance     | Values bound by name to the parameters the bound Library declares in `Library.parameter.name` |
+
+{:.table-data}
+
+Binding follows the same rules as
+[`$sqlquery-run`](OperationDefinition-SQLQueryRun.html#parameter-passing): each
+supplied value is matched by name to a `Library.parameter` entry, using the
+`value[x]` type that corresponds to the declared `Library.parameter.type`. A
+name the bound Library does not declare, or a value whose type does not match
+the declared type, is rejected with `400 Bad Request` and an `OperationOutcome`
+naming the parameter.
+
+The restriction to the instance level is deliberate rather than an oversight. At
+system and type level a request may carry several `query` repetitions, each
+declaring its own parameters, so a single top-level set would be ambiguous: it
+would need rules for whether it applies to every query or only to those
+supplying none, for how it combines with a per-query set, and for what happens
+when two queries declare the same name with different
+`Library.parameter.type` - a case in which one binding would be simultaneously
+valid against one query and a type mismatch against another. At the instance
+level there is exactly one query and no `query` parameter, so none of these
+questions arises. Supplying a top-level `parameters` at system or type level is
+therefore rejected with `400 Bad Request`; use `query.parameters` there instead.
 
 For example, exporting a stored query for two patients as CSV, under a client
 tracking identifier:
@@ -185,6 +212,40 @@ The response is `202 Accepted` with a `Content-Location` polling URL, the export
 scoped to those two patients and delivered as CSV, and `clientTrackingId` echoed
 in the manifest. Supplying `query` here is out of scope and is rejected with
 `400 Bad Request` and an `OperationOutcome`.
+
+Where the bound Library declares parameters, their values are supplied in the
+same request. Given a Library declaring `min_systolic` as an `integer` and
+`observation_status` as a `code`:
+
+```http
+POST /Library/bp-threshold-query/$sqlquery-export HTTP/1.1
+Content-Type: application/fhir+json
+Prefer: respond-async
+
+{
+  "resourceType": "Parameters",
+  "parameter": [
+    {
+      "name": "parameters",
+      "resource": {
+        "resourceType": "Parameters",
+        "parameter": [
+          { "name": "min_systolic", "valueInteger": 140 },
+          { "name": "observation_status", "valueCode": "final" }
+        ]
+      }
+    },
+    { "name": "patient", "valueReference": { "reference": "Patient/123" } },
+    { "name": "_format", "valueCode": "ndjson" }
+  ]
+}
+```
+
+The query executes with `min_systolic` bound to `140` and
+`observation_status` to `final`, over the resources in `Patient/123`'s
+compartment, and the result is exported as NDJSON. The equivalent request at
+type level would carry a `query` repetition whose `parameters` part holds the
+same inner `Parameters` resource.
 
 ##### ViewDefinition table sources
 
@@ -418,7 +479,7 @@ The $sqlquery-export operation uses standard HTTP status codes to indicate the o
 | 202 Accepted              | In Progress          | Export request accepted, still in progress during polling, or cancellation accepted                                                                                                                                                                             |
 | 303 See Other             | Job Finished         | Export finished (successfully or not); `Location` header carries the result URL                                                                                                                                                                                 |
 | 200 OK                    | Result Available     | Result URL returns the manifest `Parameters`; download URLs return the files                                                                                                                                                                                    |
-| 400 Bad Request           | Client Error         | Invalid parameters, unsupported parameters, missing required headers; a `query` repetition naming no subject form or more than one; `query` supplied at instance level; a `tableSource` with no `url`, sharing a `url` with another, or matching no dependency; a `patient` or `group` naming a resource the server cannot find (see [Status code for a value that cannot be resolved](operations-common.html#filter-resolution-errors)) |
+| 400 Bad Request           | Client Error         | Invalid parameters, unsupported parameters, missing required headers; a `query` repetition naming no subject form or more than one; `query` supplied at instance level; a top-level `parameters` supplied at system or type level; a parameter name the bound Library does not declare, or a value whose type does not match the declared type; a `tableSource` with no `url`, sharing a `url` with another, or matching no dependency; a `patient` or `group` naming a resource the server cannot find (see [Status code for a value that cannot be resolved](operations-common.html#filter-resolution-errors)) |
 | 404 Not Found             | Not Found            | SQLQuery Library not found, a dependency neither supplied nor resolvable, or a cancelled export status URL                                                                                                                                                      |
 | 422 Unprocessable Entity  | Business Logic Error | Valid request but query is invalid or cannot be executed                                                                                                                                                                                                        |
 | 429 Too Many Requests     | Excessive Polling    | Client is polling too frequently; back off exponentially, guided by `Retry-After`                                                                                                                                                                               |

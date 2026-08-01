@@ -595,6 +595,15 @@ Description: "Export SQLQuery Library results asynchronously using the FHIR Asyn
 * parameter[=].targetProfile[1] = Canonical(SQLView)
 * parameter[=].documentation = "Inline ViewDefinition or SQLView resources supplying table sources the server cannot itself resolve. Matched by canonical URL against the dependencies in the query's transitive relatedArtifact graph. Accepts inline resources only; there is no tableSource by canonical URL, because a URL is exactly what the server has already failed to resolve. Supplied resources produce no output entries; only query results do. See Common Operation Behavior (operations-common.html#table-sources)."
 
+// Input parameters - instance-level parameter binding
+* parameter[+].name = #parameters
+* parameter[=].use = #in
+* parameter[=].min = 0
+* parameter[=].max = "1"
+* parameter[=].scope[0] = #instance
+* parameter[=].type = #Parameters
+* parameter[=].documentation = "Input parameters for the query bound by the request URL. Parameters are bound by name to parameters declared in the SQLQuery Library (Library.parameter.name). Applies at instance level only: at system and type level several queries may be present, each declaring its own parameters, so binding is per query through the query.parameters part instead. Supplying this parameter at system or type level is rejected with 400 Bad Request."
+
 // Input parameters - export control (from $viewdefinition-export)
 * parameter[+].name = #clientTrackingId
 * parameter[=].use = #in
