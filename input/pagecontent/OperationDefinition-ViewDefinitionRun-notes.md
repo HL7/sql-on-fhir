@@ -39,8 +39,6 @@ The operation can process data from:
 2. **Server resources** - From the server's data store (default)
 3. **External source** - Specified via `source` parameter
 
-#### Request Format
-
 #### Output Format
 
 This operation uses the shared output-format enumeration (`json`, `ndjson`,
@@ -120,7 +118,7 @@ ViewDefinition is identified by the request path. See
 
 {:.table-data}
 
-##### Filtering
+###### Filtering
 
 | Name    | Type      | Scope                  | Required | Max | Description                                                                                                      |
 | ------- | --------- | ---------------------- | -------- | --- | ---------------------------------------------------------------------------------------------------------------- |
@@ -131,7 +129,7 @@ ViewDefinition is identified by the request path. See
 
 {:.table-data}
 
-##### Data Source
+###### Data Source
 
 | Name     | Type     | Scope                  | Required | Max | Description                                              |
 | -------- | -------- | ---------------------- | -------- | --- | -------------------------------------------------------- |
@@ -234,7 +232,7 @@ resources and every unwrapped bundle entry.
 
 ##### Successful Requests
 
-##### Example 1: Instance-level GET with CSV output
+###### Example 1: Instance-level GET with CSV output
 
 ```http
 GET /ViewDefinition/patient-demographics/$viewdefinition-run HTTP/1.1
@@ -252,7 +250,7 @@ pt-2,1985-03-22,Johnson,Mary
 pt-3,1992-07-08,Williams,Robert
 ```
 
-##### Example 2: Type-level POST with inline ViewDefinition
+###### Example 2: Type-level POST with inline ViewDefinition
 
 ```http
 POST /ViewDefinition/$viewdefinition-run HTTP/1.1
@@ -290,7 +288,7 @@ Content-Type: application/json
 ]
 ```
 
-##### Example 3: POST with direct resources
+###### Example 3: POST with direct resources
 
 ```http
 POST /ViewDefinition/$viewdefinition-run HTTP/1.1
@@ -352,7 +350,7 @@ pt-1,2012-03-30,Cole,Joanie
 pt-2,2012-03-30,Doe,John
 ```
 
-##### Example 4: GET naming the view by canonical URL
+###### Example 4: GET naming the view by canonical URL
 
 `viewCanonical` is available over GET as a query parameter. The `|` that
 separates the version is percent-encoded as `%7C`.
@@ -373,7 +371,7 @@ Transfer-Encoding: chunked
 Omitting `%7C2.0.0` selects a version according to FHIR's canonical resolution
 rules. A canonical URL the server cannot resolve returns `404 Not Found`.
 
-##### Example 5: GET with filters
+###### Example 5: GET with filters
 
 ```http
 GET /ViewDefinition/encounters/$viewdefinition-run?patient=Patient/123&_limit=10&_format=ndjson HTTP/1.1
@@ -389,7 +387,7 @@ Transfer-Encoding: chunked
 {"id":"enc-3","patient":"Patient/123","status":"in-progress","class":"inpatient","period_start":"2023-03-01T08:00:00Z"}
 ```
 
-##### Example 6: GET naming two patients
+###### Example 6: GET naming two patients
 
 `patient` repeats, so a cohort of a few known patients needs no `Group`:
 
@@ -409,7 +407,7 @@ enc-4,Patient/456,finished,2023-04-02T09:00:00Z
 The result is restricted to those two patients' compartments. Over POST the same
 filter is expressed by repeating the `patient` parameter in the `Parameters` body.
 
-##### Example 7: POST with a Bundle of resources
+###### Example 7: POST with a Bundle of resources
 
 A `Bundle` supplied as a `resource` value is unwrapped; the ViewDefinition runs
 against each entry. This request is equivalent to Example 3, which passed the
@@ -480,7 +478,7 @@ All error responses (4xx and 5xx) SHOULD include an `OperationOutcome` resource 
 
 ##### Common Error Scenarios
 
-##### 1. Unsupported Parameters
+###### 1. Unsupported Parameters
 
 When the server does not support certain parameters, it should return `400 Bad Request`:
 
@@ -506,7 +504,7 @@ Content-Type: application/fhir+json
 }
 ```
 
-##### 2. Invalid ViewDefinition
+###### 2. Invalid ViewDefinition
 
 When the provided ViewDefinition is invalid, return `422 Unprocessable Entity`:
 
@@ -549,7 +547,7 @@ Content-Type: application/fhir+json
 }
 ```
 
-##### 3. ViewDefinition Not Found
+###### 3. ViewDefinition Not Found
 
 When the referenced ViewDefinition does not exist:
 
@@ -574,7 +572,7 @@ Content-Type: application/fhir+json
 }
 ```
 
-##### 4. Missing Required Parameters
+###### 4. Missing Required Parameters
 
 When required parameters are missing:
 
@@ -605,7 +603,7 @@ Content-Type: application/fhir+json
 }
 ```
 
-##### 5. Invalid Format
+###### 5. Invalid Format
 
 When an unsupported format is requested:
 
@@ -630,7 +628,7 @@ Content-Type: application/fhir+json
 }
 ```
 
-##### 6. Patient Not Found
+###### 6. Patient Not Found
 
 When filtering by a patient that doesn't exist:
 
@@ -661,7 +659,7 @@ because a filter value scopes the data rather than naming what the operation is
 about; see
 [Status code for a value that cannot be resolved](operations-common.html#filter-resolution-errors).
 
-##### 7. Resource Processing Errors
+###### 7. Resource Processing Errors
 
 When errors occur during data transformation:
 

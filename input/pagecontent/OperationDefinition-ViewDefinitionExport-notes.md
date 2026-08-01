@@ -226,9 +226,9 @@ client to negotiate a different representation for interim status responses
 
 #### Parameters
 
-#### Input Parameters
+##### Input Parameters
 
-##### Core Parameters
+###### Core Parameters
 
 | Name | Type    | Scope        | Min | Max | Description                                                                                                                                            |
 | ---- | ------- | ------------ | --- | --- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -236,7 +236,7 @@ client to negotiate a different representation for interim status responses
 
 {:.table-data}
 
-##### Instance-level invocation {#instance-level}
+###### Instance-level invocation {#instance-level}
 
 At the instance level (`POST [base]/ViewDefinition/[id]/$viewdefinition-export`)
 the ViewDefinition identified by the request path is the export subject, and the
@@ -283,7 +283,7 @@ per `view` repetition. See
 
 {:.table-data}
 
-##### Filtering
+###### Filtering
 
 | Name    | Type      | Min | Max | Description                                                                                   |
 | ------- | --------- | --- | --- | --------------------------------------------------------------------------------------------- |
@@ -293,7 +293,7 @@ per `view` repetition. See
 
 {:.table-data}
 
-##### Data Source
+###### Data Source
 
 | Name   | Type   | Min | Max | Description                                                                |
 | ------ | ------ | --- | --- | -------------------------------------------------------------------------- |
@@ -338,7 +338,7 @@ matter. A server that supports only some of these parts declares the subset it
 supports as described in
 [Declaring partial operation support](operations-capability.html#partial-operation-support).
 
-##### Format Parameter Clarification
+###### Format Parameter Clarification
 
 The supported formats (`json`, `ndjson`, `csv`, `parquet`) and the default are
 defined in
@@ -354,7 +354,7 @@ this operation. The `fhir` format is available on the run operations only:
   (which here negotiates the format of the _status and result_ responses, not
   the exported files).
 
-##### Filtering Parameter Clarification
+###### Filtering Parameter Clarification
 
 `patient`, `group` and `_since` carry the same meaning on all four data
 operations, and are specified once in
@@ -482,7 +482,7 @@ All error responses (4xx and 5xx) SHOULD include an `OperationOutcome` resource 
 
 ##### Common Error Scenarios
 
-##### 1. Unsupported Parameters
+###### 1. Unsupported Parameters
 
 When the server does not support certain parameters, it returns `400 Bad Request`:
 
@@ -502,7 +502,7 @@ Content-Type: application/fhir+json
 }
 ```
 
-##### 2. Invalid ViewDefinition
+###### 2. Invalid ViewDefinition
 
 When a provided ViewDefinition is invalid:
 
@@ -523,7 +523,7 @@ Content-Type: application/fhir+json
 }
 ```
 
-##### 3. ViewDefinition Not Found
+###### 3. ViewDefinition Not Found
 
 When a referenced ViewDefinition does not exist:
 
@@ -543,7 +543,7 @@ Content-Type: application/fhir+json
 }
 ```
 
-##### 4. Patient or Group Not Found
+###### 4. Patient or Group Not Found
 
 When filtering by patient or group that doesn't exist. A filter value scopes the
 data rather than naming what the operation is about, so the rejection is
@@ -586,7 +586,7 @@ Content-Type: application/fhir+json
 }
 ```
 
-##### 5. Multiple ViewDefinitions with Errors
+###### 5. Multiple ViewDefinitions with Errors
 
 When processing multiple ViewDefinitions, servers SHOULD validate all of them before starting the export:
 

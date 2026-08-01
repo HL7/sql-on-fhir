@@ -129,9 +129,9 @@ client to negotiate a different representation for interim status responses
 
 #### Parameters
 
-#### Input Parameters
+##### Input Parameters
 
-##### Query Source - `query` Parameter (1..\*, system+type scope)
+###### Query Source - `query` Parameter (1..\*, system+type scope)
 
 Each repetition identifies a single SQLQuery Library to export. At least one `query` is required at system/type level.
 
@@ -148,7 +148,7 @@ Each repetition identifies a single SQLQuery Library to export. At least one `qu
 ¹ Exactly one of `queryCanonical`, `queryReference` or `queryResource` is required
 per `query` repetition. See [Identifying each query](#queryreference-clarification).
 
-##### Instance-level invocation {#instance-level}
+###### Instance-level invocation {#instance-level}
 
 At the instance level (`POST [base]/Library/[id]/$sqlquery-export`), the bound
 Library identified by the request URL serves as the single query source and the
@@ -247,7 +247,7 @@ compartment, and the result is exported as NDJSON. The equivalent request at
 type level would carry a `query` repetition whose `parameters` part holds the
 same inner `Parameters` resource.
 
-##### ViewDefinition table sources
+###### ViewDefinition table sources
 
 A query's table sources are named by its `relatedArtifact` entries and are
 normally resolved by the server. Where the server cannot resolve one - typically
@@ -282,7 +282,7 @@ Unlike the `query` parameter, `tableSource` applies at the instance level as
 well as at system and type level, because a stored query can depend on a view the
 server cannot resolve.
 
-##### Export Control
+###### Export Control
 
 | Name             | Type    | Min | Max | Description                                                                                   |
 | ---------------- | ------- | --- | --- | --------------------------------------------------------------------------------------------- |
@@ -292,7 +292,7 @@ server cannot resolve.
 
 {:.table-data}
 
-##### Filtering
+###### Filtering
 
 | Name    | Type      | Min | Max | Description                                                                                   |
 | ------- | --------- | --- | --- | --------------------------------------------------------------------------------------------- |
@@ -302,7 +302,7 @@ server cannot resolve.
 
 {:.table-data}
 
-##### Data Source
+###### Data Source
 
 | Name   | Type   | Min | Max | Description                                                                |
 | ------ | ------ | --- | --- | -------------------------------------------------------------------------- |
@@ -344,7 +344,7 @@ matter. A server that supports only some of these parts declares the subset it
 supports as described in
 [Declaring partial operation support](operations-capability.html#partial-operation-support).
 
-##### Format Parameter Clarification
+###### Format Parameter Clarification
 
 The supported formats (`json`, `ndjson`, `csv`, `parquet`) and the default are
 defined in
@@ -360,7 +360,7 @@ this operation. The `fhir` format is available on the run operations only:
   (which here negotiates the format of the _status and result_ responses, not
   the exported files).
 
-##### Filtering Parameter Clarification
+###### Filtering Parameter Clarification
 
 `patient`, `group` and `_since` carry the same meaning on all four data
 operations, and are specified once in
@@ -496,7 +496,7 @@ All error responses (4xx and 5xx) SHOULD include an `OperationOutcome` resource 
 
 ##### Common Error Scenarios
 
-##### 1. Unsupported Parameters
+###### 1. Unsupported Parameters
 
 When the server does not support certain parameters, it returns `400 Bad Request`:
 
@@ -516,7 +516,7 @@ Content-Type: application/fhir+json
 }
 ```
 
-##### 2. Invalid SQLQuery Library
+###### 2. Invalid SQLQuery Library
 
 When a provided SQLQuery Library is invalid:
 
@@ -536,7 +536,7 @@ Content-Type: application/fhir+json
 }
 ```
 
-##### 3. SQLQuery Library Not Found
+###### 3. SQLQuery Library Not Found
 
 When a referenced SQLQuery Library does not exist:
 
@@ -556,7 +556,7 @@ Content-Type: application/fhir+json
 }
 ```
 
-##### 4. Parameter Type Mismatch
+###### 4. Parameter Type Mismatch
 
 When a query parameter value type does not match the declared Library.parameter.type:
 
@@ -576,7 +576,7 @@ Content-Type: application/fhir+json
 }
 ```
 
-##### 5. Patient or Group Not Found
+###### 5. Patient or Group Not Found
 
 When filtering by patient or group that doesn't exist. A filter value scopes the
 data rather than naming what the operation is about, so the rejection is

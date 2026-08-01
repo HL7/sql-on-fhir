@@ -1,4 +1,4 @@
-### HTTP Methods
+#### HTTP Methods
 
 - **GET**: for invocations in which every supplied input parameter is primitive.
 - **POST**: required when `parameters` or `tableSource` is supplied, since both
@@ -9,7 +9,7 @@ supplied in-parameters are all primitive. This mirrors
 [`$viewdefinition-run`](OperationDefinition-ViewDefinitionRun.html), where
 `viewResource` and `resource` are the POST-only parameters.
 
-#### GET Method Limitations
+##### GET Method Limitations
 
 1. **Available parameters**: only those that can be passed as query parameters
    are supported over `GET`:
@@ -29,7 +29,7 @@ supplied in-parameters are all primitive. This mirrors
    - supply an inline table source via `tableSource`
    - name the query inline via `queryResource`
 
-### Input Parameters
+#### Input Parameters
 
 The following input parameters are passed as query parameters on a `GET`, or
 inside a `Parameters` resource in the request body on a `POST`.
@@ -67,7 +67,7 @@ Library is identified by the request path. See
 
 {:.table-data}
 
-#### Identifying the query {#queryreference-clarification}
+##### Identifying the query {#queryreference-clarification}
 
 The SQLQuery or SQLView Library to execute is named in exactly one of three ways,
 each with its own parameter so that the intended meaning is carried by the
@@ -100,7 +100,7 @@ matter. A server that supports only some of these parameters declares the subset
 it supports as described in
 [Declaring partial operation support](operations-capability.html#partial-operation-support).
 
-#### ViewDefinition table sources {#table-sources}
+##### ViewDefinition table sources {#table-sources}
 
 The query's table sources are named by its `relatedArtifact` entries and are
 normally resolved by the server. Where the server cannot resolve one - typically
@@ -131,7 +131,7 @@ semantics for how supplied resources reach each dependency view. That is
 deliberately deferred; see
 [Parameters that do not apply to every operation](operations-common.html#parameter-asymmetries).
 
-#### Filtering {#filtering}
+##### Filtering {#filtering}
 
 `patient`, `group` and `_since` restrict the data the query sees. They carry the
 same meaning here as on the other three data operations, and are specified once in
@@ -155,7 +155,7 @@ A `patient` or `group` naming a resource the server cannot find is rejected with
 `400 Bad Request`; see
 [Status code for a value that cannot be resolved](operations-common.html#filter-resolution-errors).
 
-#### Row Limit
+##### Row Limit
 
 `_limit` caps the rows the server returns to the client. Its semantics - the
 server's option to impose a smaller maximum, the application of the cap after
@@ -169,7 +169,7 @@ optimisation, but the observable behaviour is post-evaluation. A worked example
 is given under
 [Capping Result Rows with `_limit`](#capping-result-rows-with-_limit).
 
-#### Format Parameter Clarification
+##### Format Parameter Clarification
 
 The supported formats (`json`, `ndjson`, `csv`, `parquet`, `fhir`), the default,
 the `Accept`-vs-`_format` precedence rule, the raw-vs-envelope representation
@@ -187,9 +187,9 @@ this operation:
   transfer is independent of the format. See
   [Streaming and Transfer Encoding](operations-common.html#streaming).
 
-### Examples
+#### Examples
 
-#### Instance-Level (Library on Server)
+##### Instance-Level (Library on Server)
 
 When the SQLQuery Library is stored on the server, invoke directly on the instance:
 
@@ -212,7 +212,7 @@ Content-Type: application/fhir+json
 }
 ```
 
-#### Type-Level with Canonical URL
+##### Type-Level with Canonical URL
 
 Name a stored Library by its canonical URL, pinning a version:
 
@@ -241,7 +241,7 @@ Patient/123,118,2024-02-20
 Omitting `|1.0.0` selects a version according to FHIR's canonical resolution
 rules. A canonical URL the server cannot resolve returns `404 Not Found`.
 
-#### Type-Level over GET
+##### Type-Level over GET
 
 Every parameter in the request above is primitive, so the same invocation can be
 made with `GET`. The `|` separating the canonical URL from its version is
@@ -270,7 +270,7 @@ GET /Library/$sqlquery-run?queryCanonical=http%3A%2F%2Fexample.org%2FLibrary%2Fp
 Supplying `parameters` or `tableSource` takes the request outside that subset,
 because each carries a resource; use `POST` in that case.
 
-#### Type-Level with Reference
+##### Type-Level with Reference
 
 Name a stored Library by its literal location on the server:
 
@@ -295,7 +295,7 @@ Content-Type: application/fhir+json
 }
 ```
 
-#### Type-Level with Inline Resource
+##### Type-Level with Inline Resource
 
 Pass the SQLQuery Library inline for ad-hoc queries:
 
@@ -328,7 +328,7 @@ Content-Type: application/fhir+json
 }
 ```
 
-#### Fully Ad-Hoc: Inline Query with an Inline Table Source
+##### Fully Ad-Hoc: Inline Query with an Inline Table Source
 
 Nothing is stored on the server. The query is supplied as `queryResource` and the
 ViewDefinition its `relatedArtifact` entry depends on is supplied as
@@ -383,7 +383,7 @@ pt-1,Smith
 pt-2,Johnson
 ```
 
-#### Inline SQLView with Its Own Inline Dependency
+##### Inline SQLView with Its Own Inline Dependency
 
 A supplied SQLView brings dependencies of its own, so the pool is matched against
 the whole transitive graph. Here the first entry binds to table `ap`; traversing it
@@ -419,7 +419,7 @@ Content-Type: application/fhir+json
 }
 ```
 
-#### An Unmatched Table Source Is Rejected
+##### An Unmatched Table Source Is Rejected
 
 A typo in a supplied `url` binds to no dependency, and is reported where the
 mistake was made rather than resurfacing later as an SQL error naming table `p` as
@@ -461,7 +461,7 @@ Content-Type: application/fhir+json
 }
 ```
 
-#### Instance-Level with a Supplied Table Source
+##### Instance-Level with a Supplied Table Source
 
 The query is identified by the request path. Its other dependencies resolve on the
 server; the supplied one covers the dependency that does not. Had the server also
@@ -484,7 +484,7 @@ Content-Type: application/fhir+json
 }
 ```
 
-#### System-Level
+##### System-Level
 
 Invoke at the server base without a resource type. This is useful when the server
 supports SQLQuery Libraries but does not expose them as FHIR Library resources:
@@ -510,7 +510,7 @@ Content-Type: application/fhir+json
 }
 ```
 
-#### Default Format (`_format` omitted)
+##### Default Format (`_format` omitted)
 
 When `_format` is omitted, the server returns the result in `ndjson` format:
 
@@ -539,7 +539,7 @@ Content-Type: application/x-ndjson
 {"patient_id":"Patient/123","systolic":118,"effective_date":"2024-02-20"}
 ```
 
-#### Scoping a Query to Patients and a Time Window
+##### Scoping a Query to Patients and a Time Window
 
 `patient`, `group` and `_since` apply here exactly as they do on
 [`$sqlquery-export`](OperationDefinition-SQLQueryExport.html), so a body
@@ -588,7 +588,7 @@ Patient/456,135,2026-01-20
 The filters apply to the resources feeding the query's dependency views, before
 the SQL executes.
 
-#### Capping Result Rows with `_limit`
+##### Capping Result Rows with `_limit`
 
 Use `_limit` to ask the server to return at most a given number of rows. The
 server may return fewer rows if the query yields fewer or if its configured
@@ -607,7 +607,7 @@ Content-Type: application/fhir+json
 }
 ```
 
-#### Response
+##### Response
 
 For flat formats (`csv`, `json`, `ndjson`, `parquet`), the response body is the
 raw payload in the format's native media type (the `Binary` stream), not a
@@ -625,7 +625,7 @@ Patient/123,120,2024-01-15
 Patient/123,118,2024-02-20
 ```
 
-#### FHIR Format Response
+##### FHIR Format Response
 
 When `_format=fhir`, the response is a FHIR Parameters resource with each row as a
 repeating `row` parameter.
@@ -683,7 +683,7 @@ When a query returns zero rows, the response is a Parameters resource with no
 }
 ```
 
-### SQL to FHIR type mapping
+#### SQL to FHIR type mapping
 
 When `_format=fhir`, each result column must be encoded using a FHIR `value[x]`
 type. The following table defines the mapping from
@@ -730,7 +730,7 @@ unsupported type, the server MUST return a `422 Unprocessable Entity` error.
 Query authors can work around this by casting unsupported types to a supported
 type within the SQL query.
 
-### Parameter Passing
+#### Parameter Passing
 
 Query parameters are passed as a nested `Parameters` resource, following the
 same pattern as the
@@ -739,7 +739,7 @@ See [Parameter Types](StructureDefinition-SQLQuery.html#parameter-types) on the
 SQLQuery profile for the binding rules and the mapping from
 `Library.parameter.type` to the `value[x]` element to use.
 
-### Error Handling
+#### Error Handling
 
 | Status                     | Condition                                                                                                                                                                                                                                                                                                                                     |
 | -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
