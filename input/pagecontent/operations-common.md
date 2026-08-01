@@ -1,6 +1,6 @@
 # Common Operation Behavior
 
-This page defines behaviour that is **shared by all four SQL on FHIR data
+This page defines behavior that is **shared by all four SQL on FHIR data
 operations** so that it is specified once and applied identically across them:
 
 - [`$viewdefinition-run`](OperationDefinition-ViewDefinitionRun.html) - synchronous
@@ -38,6 +38,31 @@ offered in a different shape on different operations, appears in this table.
 
 Extending `resource` to `$sqlquery-run` is a new capability rather than an
 alignment fix, and is left to a separate proposal.
+
+### Why the declared type is `CanonicalResource` {#declared-type}
+
+**Applies to:** all four operations.
+
+The parameter tables on the operation pages give the type of an inline
+ViewDefinition as `ViewDefinition`, because that is what a client sends. The
+generated OperationDefinitions declare it as `CanonicalResource`, which is a
+consequence of how this guide models ViewDefinition rather than a difference in
+meaning.
+
+ViewDefinition is defined here as a FHIR **logical model**, not as a resource in
+the FHIR specification, so `ViewDefinition` is not a value `parameter.type`
+accepts: that element is bound to the list of FHIR-defined types.
+`CanonicalResource` is the narrowest of those that admits a ViewDefinition, and
+the actual constraint is carried by `parameter.targetProfile`, which names this
+guide's [ViewDefinition](StructureDefinition-ViewDefinition.html) profile. A
+validator therefore enforces exactly what the prose says; only the type code
+reads more loosely.
+
+The same applies to `tableSource`, whose `targetProfile` names both
+[ViewDefinition](StructureDefinition-ViewDefinition.html) and
+[SQLView](StructureDefinition-SQLView.html). It does not apply to
+`queryResource` or `query.queryResource`, which carry a `Library` and so declare
+that type directly.
 
 ## Output Formats (`_format`) {#output-formats}
 
@@ -145,7 +170,7 @@ are not conflated:
 
 **Axis 1 - which format (`_format` vs `Accept`).** When `_format` is supplied,
 its value SHALL take precedence over the `Accept` header. When `_format` is not
-supplied, the server MAY honour `Accept` to select an
+supplied, the server MAY honor `Accept` to select an
 [output format](#output-formats); if neither selects a format, the server uses
 `ndjson`.
 
@@ -199,7 +224,7 @@ Two further concepts are independent of each other and of the format:
 2. **Incremental result production** - whether the server can emit output before
    the full result set is materialized. This is a server/engine capability that
    genuinely varies by format: NDJSON and CSV are trivially row-incremental; a
-   JSON array needs bracket/comma bookkeeping; parquet must finalise its footer
+   JSON array needs bracket/comma bookkeeping; parquet must finalize its footer
    last but can still flush row groups progressively. Incremental production is
    neither required nor implied by chunked transfer encoding, and chunked
    transfer encoding is not reserved for "streamable" formats.
@@ -264,7 +289,7 @@ supplied time (e.g., if `Resource.meta.lastUpdated` is later than the supplied
 
 For a Group-scoped request, the server MAY return additional resources modified
 prior to the supplied time if the resources belong to the patient compartment of a
-patient added to the Group after the supplied time; this behaviour SHOULD be
+patient added to the Group after the supplied time; this behavior SHOULD be
 clearly documented by the server.
 
 For patient- and Group-scoped requests, the server MAY return resources that are
@@ -420,7 +445,7 @@ remain implementation decisions:
 
 - Cycle detection. Authors SHOULD keep the dependency graph acyclic.
 - Any limit on dependency depth.
-- Whether intermediate results are materialised as tables or inlined into the
+- Whether intermediate results are materialized as tables or inlined into the
   enclosing query.
 
 ### Worked example {#table-source-example}

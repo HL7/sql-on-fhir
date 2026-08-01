@@ -256,9 +256,13 @@ because the view exists only on the client - the client supplies it inline with
 
 | Name         | Type                      | Min | Max | Description                                                                                                    |
 | ------------ | ------------------------- | --- | --- | -------------------------------------------------------------------------------------------------------------- |
-| tableSource | ViewDefinition \| SQLView | 0   | \*  | Inline table source, matched to a dependency by canonical URL. [Details](operations-common.html#table-sources) |
+| tableSource | ViewDefinition \| SQLView² | 0   | \*  | Inline table source, matched to a dependency by canonical URL. [Details](operations-common.html#table-sources) |
 
 {:.table-data}
+
+
+² Declared as `CanonicalResource` in the OperationDefinition; see
+[Why the declared type is `CanonicalResource`](operations-common.html#declared-type).
 
 The matching, precedence and error rules are specified once in
 [ViewDefinition table sources](operations-common.html#table-sources) and apply
@@ -306,11 +310,12 @@ server cannot resolve.
 
 {:.table-data}
 
-If server does not support a parameter, request should be rejected with `400 Bad Request`
-and `OperationOutcome` resource in the body with clarification that the parameter is not supported.
-Server should document which parameters it supports in its CapabilityStatement.
+A server that does not support a parameter declares that through the mechanism
+described in
+[Declaring partial operation support](operations-capability.html#partial-operation-support),
+and rejects a request supplying it as specified there.
 
-##### Identifying each query {#queryreference-clarification}
+###### Identifying each query {#queryreference-clarification}
 
 Each `query` repetition names the SQLQuery or SQLView Library to export in exactly
 one of three ways, each with its own part so that the intended meaning is carried
@@ -983,8 +988,11 @@ Prefer: respond-async
             ],
             "content": [{
               "contentType": "application/sql",
-              "title": "SELECT p.id, p.name FROM p WHERE p.active = true",
-              "data": "U0VMRUNUIHAuaWQsIHAubmFtZSBGUk9NIHAgV0hFUkUgcC5hY3RpdmUgPSB0cnVl"
+              "data": "U0VMRUNUIHAuaWQsIHAubmFtZSBGUk9NIHAgV0hFUkUgcC5hY3RpdmUgPSB0cnVl",
+              "extension": [{
+                "url": "http://hl7.org/fhir/uv/sql-on-fhir/StructureDefinition/sql-text",
+                "valueString": "SELECT p.id, p.name FROM p WHERE p.active = true"
+              }]
             }]
           }
         }

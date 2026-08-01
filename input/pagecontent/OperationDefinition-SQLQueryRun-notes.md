@@ -41,7 +41,7 @@ inside a `Parameters` resource in the request body on a `POST`.
 | queryCanonical | canonical                 | system, type           | Conditional¹ | 1   | Canonical URL of the SQLQuery or SQLView Library. [Details](#queryreference-clarification)                |
 | queryReference | Reference                 | system, type           | Conditional¹ | 1   | Literal location of a SQLQuery or SQLView Library on the server. [Details](#queryreference-clarification) |
 | queryResource  | Library                   | system, type           | Conditional¹ | 1   | Inline SQLQuery or SQLView Library resource to execute. [Details](#queryreference-clarification)          |
-| tableSource   | ViewDefinition \| SQLView | system, type, instance | No           | \*  | Inline table source, matched to a dependency by canonical URL. [Details](#table-sources)                  |
+| tableSource    | ViewDefinition \| SQLView² | system, type, instance | No           | \*  | Inline table source, matched to a dependency by canonical URL. [Details](#table-sources)                 |
 | parameters     | Parameters                | system, type, instance | No           | 1   | Input parameters bound by name to parameters declared in the SQLQuery Library                             |
 | patient        | Reference                 | system, type, instance | No           | \*  | Filter by patient reference, repeated to name several patients. [Details](#filtering)                     |
 | group          | Reference                 | system, type, instance | No           | \*  | Filter by group membership. [Details](#filtering)                                                         |
@@ -56,7 +56,10 @@ at the system and type levels; none is allowed at the instance level, where the
 Library is identified by the request path. See
 [Identifying the query](#queryreference-clarification).
 
-#### Output Parameter
+² Declared as `CanonicalResource` in the OperationDefinition; see
+[Why the declared type is `CanonicalResource`](operations-common.html#declared-type).
+
+##### Output Parameter
 
 | Name   | Type   | Description                                                                                                                                                                                                                               |
 | ------ | ------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |

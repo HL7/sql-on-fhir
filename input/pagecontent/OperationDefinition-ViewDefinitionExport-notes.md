@@ -253,25 +253,27 @@ Because the subject carries no `view.name` at this level, `output.name` is
 determined from the ViewDefinition itself, as described under
 [Output Name Clarification](#output-name-clarification).
 
-##### ViewDefinition Parameter
+###### ViewDefinition Parameter
 
 The `view` parameter is a complex type that can be repeated multiple times to export several ViewDefinitions in a single operation. Each `view` parameter has the following parts:
 
-| Name               | Type           | Min | Max | Description                                                                                 |
-| ------------------ | -------------- | --- | --- | ------------------------------------------------------------------------------------------- |
-| view               | complex        | 1   | \*  | A ViewDefinition to export                                                                  |
-| view.name          | string         | 0   | 1   | Name for the export output. If not provided, ViewDefinition name will be used               |
-| view.viewCanonical | canonical      | 0¹  | 1   | Canonical URL of the ViewDefinition. [Details](#viewreference-clarification)                |
-| view.viewReference | Reference      | 0¹  | 1   | Literal location of a ViewDefinition on the server. [Details](#viewreference-clarification) |
-| view.viewResource  | ViewDefinition | 0¹  | 1   | Inline ViewDefinition resource. [Details](#viewreference-clarification)                     |
+| Part Name     | Type            | Min | Max | Description                                                                                 |
+| ------------- | --------------- | --- | --- | ------------------------------------------------------------------------------------------- |
+| name          | string          | 0   | 1   | Name for the export output. If not provided, ViewDefinition name will be used               |
+| viewCanonical | canonical       | 0¹  | 1   | Canonical URL of the ViewDefinition. [Details](#viewreference-clarification)                |
+| viewReference | Reference       | 0¹  | 1   | Literal location of a ViewDefinition on the server. [Details](#viewreference-clarification) |
+| viewResource  | ViewDefinition² | 0¹  | 1   | Inline ViewDefinition resource. [Details](#viewreference-clarification)                     |
 
 {:.table-data}
 
-¹ Exactly one of `view.viewCanonical`, `view.viewReference` or
-`view.viewResource` is required per `view` repetition. See
+¹ Exactly one of `viewCanonical`, `viewReference` or `viewResource` is required
+per `view` repetition. See
 [Identifying each ViewDefinition](#viewreference-clarification).
 
-##### Export Control
+² Declared as `CanonicalResource` in the OperationDefinition; see
+[Why the declared type is `CanonicalResource`](operations-common.html#declared-type).
+
+###### Export Control
 
 | Name             | Type    | Min | Max | Description                                                                                   |
 | ---------------- | ------- | --- | --- | --------------------------------------------------------------------------------------------- |
@@ -299,11 +301,12 @@ The `view` parameter is a complex type that can be repeated multiple times to ex
 
 {:.table-data}
 
-If server does not support a parameter, request should be rejected with `400 Bad Request`
-and `OperationOutcome` resource in the body with clarification that the parameter is not supported.
-Server should document which parameters it supports in its CapabilityStatement.
+A server that does not support a parameter declares that through the mechanism
+described in
+[Declaring partial operation support](operations-capability.html#partial-operation-support),
+and rejects a request supplying it as specified there.
 
-##### Identifying each ViewDefinition {#viewreference-clarification}
+###### Identifying each ViewDefinition {#viewreference-clarification}
 
 Each `view` repetition names the ViewDefinition to export in exactly one of three
 ways, each with its own part so that the intended meaning is carried by the
@@ -313,9 +316,13 @@ part's type rather than inferred from the shape of a string:
 | -------------------- | ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `view.viewCanonical` | `canonical`      | Its canonical URL, optionally with a `\|version` suffix pinning a version (e.g. `http://example.org/ViewDefinition/patient_demographics\|2.0.0`). Absent a suffix, the server selects a version according to FHIR's [canonical resolution](https://hl7.org/fhir/R5/references.html#canonical) rules |
 | `view.viewReference` | `Reference`      | A literal location: a relative URL on this server (e.g. `ViewDefinition/123`) or an absolute URL (e.g. `http://example.org/fhir/ViewDefinition/123`). This is not a canonical URL                                                                                                                   |
-| `view.viewResource`  | `ViewDefinition` | Carrying the ViewDefinition itself in the request                                                                                                                                                                                                                                                   |
+| `view.viewResource`  | `ViewDefinition`² | Carrying the ViewDefinition itself in the request                                                                                                                                                                                                                                                   |
 
 {:.table-data}
+
+
+² Declared as `CanonicalResource` in the OperationDefinition; see
+[Why the declared type is `CanonicalResource`](operations-common.html#declared-type).
 
 Each `view` repetition SHALL supply exactly one of the three. Supplying none, or
 more than one, in a single repetition is rejected with `400 Bad Request` and an

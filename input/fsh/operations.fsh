@@ -9,6 +9,7 @@ Description: "Export a view definition. User can provide view definition referen
 * id = "ViewDefinitionExport"
 * url = "http://hl7.org/fhir/uv/sql-on-fhir/OperationDefinition/ViewDefinitionExport"
 * version = "0.0.1"
+* versionAlgorithmString = "semver"
 * name = "ViewDefinitionExport"
 * status = #active
 * kind = #operation
@@ -26,7 +27,7 @@ Description: "Export a view definition. User can provide view definition referen
 * parameter[=].max = "*"
 * parameter[=].scope[0] = #system
 * parameter[=].scope[1] = #type
-* parameter[=].documentation = "One or more ViewDefinitions to export. Each repetition identifies a single view."
+* parameter[=].documentation = "One or more ViewDefinitions to export. Each repetition identifies a single view. Applies at system and type level only; at instance level the ViewDefinition identified by the request URL is the view source and this parameter does not apply."
 * parameter[=].part[+].name = #name
 * parameter[=].part[=].use = #in
 * parameter[=].part[=].min = 0
@@ -115,7 +116,7 @@ Description: "Export a view definition. User can provide view definition referen
 * parameter[=].scope[1] = #type
 * parameter[=].scope[2] = #instance
 * parameter[=].type = #instant
-* parameter[=].documentation = "Export only resources updated since this instant."
+* parameter[=].documentation = "Include only resources whose state changed after this instant. See Common Operation Behavior (operations-common.html#since-filter)."
 
 * parameter[+].name = #source
 * parameter[=].use = #in
@@ -125,7 +126,7 @@ Description: "Export a view definition. User can provide view definition referen
 * parameter[=].scope[1] = #type
 * parameter[=].scope[2] = #instance
 * parameter[=].type = #string
-* parameter[=].documentation = "External data source to use for the export (for example a URI or bucket name)."
+* parameter[=].documentation = "External data source to read from instead of the server's own data (for example a URI or bucket name). On the SQLQuery operations this is where the ViewDefinition tables the query selects from are found."
 
 // Output parameters
 * parameter[+].name = #exportId
@@ -171,7 +172,7 @@ Description: "Export a view definition. User can provide view definition referen
 * parameter[=].max = "1"
 * parameter[=].type = #code
 * parameter[=].binding.strength = #extensible
-* parameter[=].binding.valueSet = Canonical(OutputFormatCodes)
+* parameter[=].binding.valueSet = Canonical(ExportOutputFormatCodes)
 * parameter[=].documentation = "Format of the exported files (echoed from input if supplied)."
 
 * parameter[+].name = #exportStartTime
@@ -322,7 +323,7 @@ Description: "Execute a view definition against supplied or server data."
 * parameter[=].scope[1] = #type
 * parameter[=].scope[2] = #instance
 * parameter[=].type = #string
-* parameter[=].documentation = "External data source to use (for example a URI or bucket name)."
+* parameter[=].documentation = "External data source to read from instead of the server's own data (for example a URI or bucket name). On the SQLQuery operations this is where the ViewDefinition tables the query selects from are found."
 
 * parameter[+].name = #resource
 * parameter[=].use = #in
@@ -352,7 +353,7 @@ Description: "Execute a view definition against supplied or server data."
 * parameter[=].scope[1] = #type
 * parameter[=].scope[2] = #instance
 * parameter[=].type = #instant
-* parameter[=].documentation = "Include only resources modified after this instant."
+* parameter[=].documentation = "Include only resources whose state changed after this instant. See Common Operation Behavior (operations-common.html#since-filter)."
 
 // Output parameter
 * parameter[+].name = #return
@@ -488,7 +489,7 @@ Description: "Execute a SQLQuery Library against ViewDefinition tables."
 * parameter[=].scope[1] = #type
 * parameter[=].scope[2] = #instance
 * parameter[=].type = #instant
-* parameter[=].documentation = "Include only resources updated since this instant when feeding the dependency views, before the SQL executes."
+* parameter[=].documentation = "Include only resources whose state changed after this instant. See Common Operation Behavior (operations-common.html#since-filter)."
 
 * parameter[+].name = #source
 * parameter[=].use = #in
@@ -498,7 +499,7 @@ Description: "Execute a SQLQuery Library against ViewDefinition tables."
 * parameter[=].scope[1] = #type
 * parameter[=].scope[2] = #instance
 * parameter[=].type = #string
-* parameter[=].documentation = "External data source containing the ViewDefinition tables."
+* parameter[=].documentation = "External data source to read from instead of the server's own data (for example a URI or bucket name). On the SQLQuery operations this is where the ViewDefinition tables the query selects from are found."
 
 * parameter[+].name = #_limit
 * parameter[=].use = #in
@@ -666,7 +667,7 @@ Description: "Export SQLQuery Library results asynchronously using the FHIR Asyn
 * parameter[=].scope[1] = #type
 * parameter[=].scope[2] = #instance
 * parameter[=].type = #instant
-* parameter[=].documentation = "Export only resources updated since this instant."
+* parameter[=].documentation = "Include only resources whose state changed after this instant. See Common Operation Behavior (operations-common.html#since-filter)."
 
 // Input parameters - data source
 * parameter[+].name = #source
@@ -677,7 +678,7 @@ Description: "Export SQLQuery Library results asynchronously using the FHIR Asyn
 * parameter[=].scope[1] = #type
 * parameter[=].scope[2] = #instance
 * parameter[=].type = #string
-* parameter[=].documentation = "External data source containing the ViewDefinition tables."
+* parameter[=].documentation = "External data source to read from instead of the server's own data (for example a URI or bucket name). On the SQLQuery operations this is where the ViewDefinition tables the query selects from are found."
 
 // Output parameters (same as $viewdefinition-export)
 * parameter[+].name = #exportId
@@ -723,7 +724,7 @@ Description: "Export SQLQuery Library results asynchronously using the FHIR Asyn
 * parameter[=].max = "1"
 * parameter[=].type = #code
 * parameter[=].binding.strength = #extensible
-* parameter[=].binding.valueSet = Canonical(OutputFormatCodes)
+* parameter[=].binding.valueSet = Canonical(ExportOutputFormatCodes)
 * parameter[=].documentation = "Format of the exported files (echoed from input if supplied)."
 
 * parameter[+].name = #exportStartTime

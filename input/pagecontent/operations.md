@@ -99,7 +99,7 @@ Administrative bodies can request bulk reports for different populations and met
 
 ## API
 
-Behaviour shared by the four data operations (`$viewdefinition-run`,
+Behavior shared by the four data operations (`$viewdefinition-run`,
 `$sqlquery-run`, `$viewdefinition-export`, `$sqlquery-export`) - the output
 format set, return representation, content negotiation, transfer framing, and
 the asynchronous delivery flow - is specified once in
@@ -118,6 +118,8 @@ The `$viewdefinition-export` operation enables bulk export of FHIR data transfor
 This asynchronous operation accepts a list of ViewDefinitions to export and returns a list of export tasks that can be monitored for progress and completion.
 The operation supports filtering by patient, group, or source system, and allows specification of output format and destination.
 
+It can be invoked at the system level ($viewdefinition-export), the type level (ViewDefinition/$viewdefinition-export) or the instance level (ViewDefinition/{id}/$viewdefinition-export). At system and type level each repeating `view` parameter names a ViewDefinition by canonical URL, by a literal reference, or supplies it inline; at instance level the ViewDefinition is named by the URL path.
+
 The export process consists of four main endpoints: start export, get export status, cancel export, and get export results.
 The operation is designed for large-scale data extraction scenarios where clients need to export transformed FHIR data for analysis, reporting, or loading into data warehouses.
 The server processes the ViewDefinitions asynchronously and provides progress updates through polling mechanisms, making it suitable for handling large datasets without blocking the client.
@@ -130,14 +132,14 @@ The `$viewdefinition-run` operation provides real-time, synchronous evaluation o
 This operation is designed for interactive development, debugging of ViewDefinitions, and real-time data streaming applications.
 It can be invoked at the system level ($viewdefinition-run), the type level (ViewDefinition/$viewdefinition-run) or the instance level (ViewDefinition/{id}/$viewdefinition-run), with the ViewDefinition named by canonical URL, by a literal reference, or supplied inline - or inferred from the URL path at instance level.
 
-The operation supports multiple output formats including JSON, NDJSON, CSV, Parquet, and table formats, with the format determined by the Accept header or \_format parameter.
+The operation supports the shared output formats (`json`, `ndjson`, `csv`, `parquet`) plus `fhir`, selected by the \_format parameter or, where \_format is absent, derived from the Accept header. See [Output Formats](operations-common.html#output-formats).
 It can process either resources provided directly in the request or resources available on the server, with optional filtering by patient, group, or time parameters. The operation may use chunked transfer encoding for large result sets and includes comprehensive error handling through FHIR OperationOutcome resources for validation and processing errors.
 
 See [Operation $viewdefinition-run of ViewDefinition](OperationDefinition-ViewDefinitionRun.html)
 
 ### Operation $sqlquery-run of Library
 
-The `$sqlquery-run` operation provides real-time, synchronous execution of a SQLQuery Library against materialised ViewDefinition tables, returning the query results in the requested format.
+The `$sqlquery-run` operation provides real-time, synchronous execution of a SQLQuery Library against materialized ViewDefinition tables, returning the query results in the requested format.
 It can be invoked at the system, type, or instance level, with the query named by canonical URL, by a literal reference, or supplied inline - or inferred from the URL path at instance level.
 
 See [Operation $sqlquery-run of Library](OperationDefinition-SQLQueryRun.html) and the shared [Common Operation Behavior](operations-common.html).
@@ -145,6 +147,7 @@ See [Operation $sqlquery-run of Library](OperationDefinition-SQLQueryRun.html) a
 ### Operation $sqlquery-export of Library
 
 The `$sqlquery-export` operation is the asynchronous counterpart to `$sqlquery-run`, exporting SQLQuery Library results into formats such as CSV, NDJSON, or Parquet using the FHIR Asynchronous Bulk Data Request pattern.
-It accepts one or more queries to export and returns export tasks that can be monitored for progress and completion, suiting it to large-scale query execution with results delivered to file storage.
+It can be invoked at the system level ($sqlquery-export), the type level (Library/$sqlquery-export) or the instance level (Library/{id}/$sqlquery-export). At system and type level each repeating `query` parameter names a Library by canonical URL, by a literal reference, or supplies it inline; at instance level the Library is named by the URL path.
+It returns export tasks that can be monitored for progress and completion, suiting it to large-scale query execution with results delivered to file storage.
 
 See [Operation $sqlquery-export of Library](OperationDefinition-SQLQueryExport.html) and the shared [Common Operation Behavior](operations-common.html).

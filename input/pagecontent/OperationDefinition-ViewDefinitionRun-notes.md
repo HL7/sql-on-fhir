@@ -93,13 +93,13 @@ evaluated, and that returning fewer rows is not an error - are specified once in
 
 ##### Input Parameters
 
-##### Core Parameters
+###### Core Parameters
 
 | Name          | Type           | Scope        | Required     | Max | Description                                                                                 |
 | ------------- | -------------- | ------------ | ------------ | --- | ------------------------------------------------------------------------------------------- |
 | viewCanonical | canonical      | system, type | Conditional¹ | 1   | Canonical URL of the ViewDefinition. [Details](#viewreference-clarification)                |
 | viewReference | Reference      | system, type | Conditional¹ | 1   | Literal location of a ViewDefinition on the server. [Details](#viewreference-clarification) |
-| viewResource  | ViewDefinition | system, type | Conditional¹ | 1   | Inline ViewDefinition resource. [Details](#viewreference-clarification)                     |
+| viewResource  | ViewDefinition² | system, type | Conditional¹ | 1   | Inline ViewDefinition resource. [Details](#viewreference-clarification)                    |
 
 {:.table-data}
 
@@ -108,7 +108,10 @@ the system and type levels; none is allowed at the instance level, where the
 ViewDefinition is identified by the request path. See
 [Identifying the ViewDefinition](#viewreference-clarification).
 
-##### Output Control
+² Declared as `CanonicalResource` in the OperationDefinition; see
+[Why the declared type is `CanonicalResource`](operations-common.html#declared-type).
+
+###### Output Control
 
 | Name     | Type    | Scope                  | Required | Max | Description                                                                                           |
 | -------- | ------- | ---------------------- | -------- | --- | ----------------------------------------------------------------------------------------------------- |
@@ -155,9 +158,13 @@ rather than inferred from the shape of a string:
 | --------------- | ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `viewCanonical` | `canonical`      | Its canonical URL, optionally with a `\|version` suffix pinning a version (e.g. `http://example.org/ViewDefinition/patient_demographics\|2.0.0`). Absent a suffix, the server selects a version according to FHIR's [canonical resolution](https://hl7.org/fhir/R5/references.html#canonical) rules |
 | `viewReference` | `Reference`      | A literal location: a relative URL on this server (e.g. `ViewDefinition/123`) or an absolute URL (e.g. `http://example.org/fhir/ViewDefinition/123`). This is not a canonical URL                                                                                                                   |
-| `viewResource`  | `ViewDefinition` | Carrying the ViewDefinition itself in the request                                                                                                                                                                                                                                                   |
+| `viewResource`  | `ViewDefinition`² | Carrying the ViewDefinition itself in the request                                                                                                                                                                                                                                                   |
 
 {:.table-data}
+
+
+² Declared as `CanonicalResource` in the OperationDefinition; see
+[Why the declared type is `CanonicalResource`](operations-common.html#declared-type).
 
 At the system and type levels, a request SHALL supply exactly one of the three.
 Supplying none, or more than one, is rejected with `400 Bad Request` and an
