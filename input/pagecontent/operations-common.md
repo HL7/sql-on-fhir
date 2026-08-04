@@ -350,93 +350,120 @@ client.
 
 Each run operation page shows a worked example.
 
-## ViewDefinition table sources {#table-sources}
+## Supporting artefacts (`context`) {#context}
 
-**Applies to:** the two SQLQuery operations,
-[`$sqlquery-run`](OperationDefinition-SQLQueryRun.html) and
-[`$sqlquery-export`](OperationDefinition-SQLQueryExport.html). Not the view
-operations, whose subject is a ViewDefinition rather than a query over one.
+**Applies to:** both operations.
 
-A SQLQuery names the tables it selects from through its `relatedArtifact` entries:
-each entry with `type = depends-on` carries the dependency's canonical URL in
-`resource` and the SQL identifier the query selects from in `label`. A dependency
-resolves to either a ViewDefinition, which projects FHIR resources into a table,
-or a [SQLView](StructureDefinition-SQLView.html), which wraps a query over other
-table sources and so carries dependencies of its own. The graph is therefore
-transitive, and its leaves are always ViewDefinitions.
+A SQLQuery or SQLView names the tables it selects from through its
+`relatedArtifact` entries: each entry with `type = depends-on` carries the
+dependency's canonical URL in `resource` and the SQL identifier the query selects
+from in `label`. A dependency resolves to either a ViewDefinition, which projects
+FHIR resources into a table, or a
+[SQLView](StructureDefinition-SQLView.html), which wraps a query over other table
+sources and so carries dependencies of its own. The graph is therefore
+transitive, and its leaves are always ViewDefinitions. A ViewDefinition subject
+contributes no dependencies at all.
 
 A server may be unable to resolve every dependency: a client may hold a view that
-exists only locally. The repeating `tableSource` parameter carries such views
-inline. It accepts a ViewDefinition or a SQLView, applies at the system, type and
-instance levels, and is available on both SQLQuery operations with identical
-meaning.
+exists only locally. The repeating `context` parameter carries such artefacts
+inline.
 
-`tableSource` accepts inline resources only. There is deliberately no
-`tableSourceCanonical` or `tableSourceReference` sibling, even though the
-parameters naming an operation's subject come in exactly that trio. Dependencies
-are matched to the pool _by_ canonical URL, and the parameter exists precisely
-for dependencies the server cannot resolve, so naming one by canonical URL would
-hand the server the same URL it has already failed to resolve. The absence is a
+`context` applies to the **job as a whole**, not to one subject. Where an export
+names several subjects, one set of entries is matched against every dependency of
+every subject, so an artefact three subjects depend on is supplied once rather
+than three times.
+
+The parameter accepts an inline ViewDefinition or SQLView **today**. It is named
+and shaped so that further artefact kinds - terminology artefacts among them -
+can be admitted later by widening the accepted `targetProfile` list alone,
+without a rename and without a second parameter. Nothing in the name commits it
+to artefacts that play the role of a table.
+
+`context` accepts inline resources only. There is deliberately no
+`contextCanonical` or `contextReference` sibling, even though the parameters
+naming an operation's subject come in exactly that trio. Dependencies are matched
+to the supplied entries _by_ canonical URL, and the parameter exists precisely for
+dependencies the server cannot resolve, so naming one by canonical URL would hand
+the server the same URL it has already failed to resolve. The absence is a
 consequence of what the parameter is for, not an oversight.
 
-### Matching supplied resources to dependencies {#table-source-matching}
+### Matching supplied artefacts to dependencies {#context-matching}
 
-**Applies to:** the two SQLQuery operations.
+**Applies to:** both operations.
 
-The `tableSource` entries in one request form a single **pool**, matched against
-the dependency graph as follows:
+The `context` entries in one request are matched against the dependency graph of
+the whole job as follows:
 
-1. Seed a worklist with the invoked query's `depends-on` entries. Where an
-   operation invokes several queries, seed it with the entries of all of them.
-2. Take a dependency from the worklist and resolve it, in this order:
-   1. A pool member whose `url` equals the dependency's canonical URL and, where
-      the dependency pins a version, whose `version` equals that version.
-   2. Failing that, an artifact the server can resolve for that canonical URL.
+1. Seed a worklist with the `depends-on` entries of every subject in the
+   invocation. On the export operation that means every `subject` repetition; on
+   the run operation there is exactly one subject.
+2. Take a dependency from the worklist. If its canonical URL has already been
+   resolved in this job, reuse that resolution and go to step 4. Otherwise resolve
+   it, in this order:
+   1. A `context` entry whose `url` equals the dependency's canonical URL and,
+      where the dependency pins a version, whose `version` equals that version.
+   2. Failing that, an artefact the server can resolve for that canonical URL.
    3. Failing that, the request fails with `404 Not Found` and an
       `OperationOutcome` naming the unresolved canonical URL.
-3. If the resolved artifact is a SQLView, add its own `depends-on` entries to the
+3. Record the resolution against that canonical URL for the remainder of the job.
+4. If the resolved artefact is a SQLView, add its own `depends-on` entries to the
    worklist. If it is a ViewDefinition, it is a leaf.
-4. Repeat from step 2 until the worklist is empty.
-5. If any pool member was never selected at step 2.1, the request fails with
-   `400 Bad Request` and an `OperationOutcome` identifying it.
-6. Bind each resolved artifact to the SQL identifier in the `label` of the
+5. Repeat from step 2 until the worklist is empty.
+6. If any ViewDefinition or SQLView `context` entry was never selected at step
+   2.1, the request fails with `400 Bad Request` and an `OperationOutcome`
+   identifying it.
+7. Bind each resolved artefact to the SQL identifier in the `label` of the
    dependency that reached it.
 
-Step 2.1 preceding step 2.2 is the precedence rule: a supplied `tableSource`
-takes precedence over an artifact with the same canonical URL that the server
-could itself resolve. Step 5 runs after the traversal rather than during it,
-because a pool member may match a dependency reached only through a supplied
-SQLView.
+Step 2's memoisation is what makes one resolution per job true: a canonical URL
+reached from two subjects is resolved once, and both subjects see the same
+artefact. What is constrained is the resolution, not the execution - whether the
+resolved artefact is then materialised once or several times is left to the
+implementation, as [below](#context-undefined).
+
+Step 2.1 preceding step 2.2 is the precedence rule: a supplied `context` entry
+takes precedence over an artefact with the same canonical URL that the server
+could itself resolve. A client that supplies an entry gets the artefact it
+supplied.
+
+Step 6 runs after the traversal rather than during it, because an entry may match
+a dependency reached only through a supplied SQLView.
 
 A dependency whose `relatedArtifact.resource` carries a version is matched only by
-a pool member whose `version` agrees. A pool member that matches no dependency
-anywhere in the graph is almost always a typo in its `url`; rejecting it reports
-the mistake where it was made, rather than letting it resurface later as an SQL
-error naming a table the client believes it supplied.
+an entry whose `version` agrees.
 
-### Rejected requests {#table-source-errors}
+### Rejected requests {#context-errors}
 
-**Applies to:** the two SQLQuery operations.
+**Applies to:** both operations.
 
-| Status            | Condition                                                                     |
-| ----------------- | ----------------------------------------------------------------------------- |
-| `400 Bad Request` | A `tableSource` entry with no `url`, which cannot be bound to any dependency |
-| `400 Bad Request` | Two `tableSource` entries sharing a `url`, which makes the binding ambiguous |
-| `400 Bad Request` | A `tableSource` entry matching no dependency in the transitive graph         |
-| `404 Not Found`   | A dependency neither present in the pool nor resolvable by the server         |
+| Status            | Condition                                                                                              |
+| ----------------- | -------------------------------------------------------------------------------------------------------- |
+| `400 Bad Request` | A `context` entry with no `url`, which cannot be bound to any dependency                               |
+| `400 Bad Request` | Two `context` entries sharing a `url`, which makes the binding ambiguous                               |
+| `400 Bad Request` | A ViewDefinition or SQLView `context` entry matching no dependency of any subject in the job           |
+| `404 Not Found`   | A dependency neither supplied as a `context` entry nor resolvable by the server                        |
 
 {:.table-data}
 
 Every such response carries an `OperationOutcome` identifying the offending
 resource or the unresolved canonical URL.
 
-### What remains implementation-defined {#table-source-undefined}
+The third rule is stated as governing ViewDefinition and SQLView entries
+specifically. Such an entry is a table source: it exists to satisfy a named
+dependency, so one that matches nothing is almost always a typo in its `url`, and
+rejecting it reports the mistake where it was made rather than letting it
+resurface as a `404` on the dependency or an SQL error naming a table the client
+believes it supplied. Scoping the rule this way means that admitting artefact
+kinds which some subjects may legitimately not use does not require revisiting
+it.
 
-**Applies to:** the two SQLQuery operations.
+### What remains implementation-defined {#context-undefined}
 
-Supplied resources are table sources, not export subjects: on
-`$sqlquery-export` they produce no `output` entries in the manifest, which
-carries one entry per query and nothing else.
+**Applies to:** both operations.
+
+Supplied artefacts are supporting artefacts, not export subjects: on
+`$sql-export` they produce no `output` entries in the manifest, which carries one
+entry per `subject` and nothing else.
 
 Consistent with what the [SQLQuery](StructureDefinition-SQLQuery.html) and
 [SQLView](StructureDefinition-SQLView.html) profiles already state, this
@@ -445,49 +472,63 @@ remain implementation decisions:
 
 - Cycle detection. Authors SHOULD keep the dependency graph acyclic.
 - Any limit on dependency depth.
-- Whether intermediate results are materialized as tables or inlined into the
+- Whether intermediate results are materialised as tables or inlined into the
   enclosing query.
+- Whether an artefact resolved once for a job is materialised once or several
+  times. Resolution is constrained so that every subject sees the same artefact;
+  how many times that artefact is computed is not.
 
-### Worked example {#table-source-example}
+### Worked example {#context-example}
 
-**Applies to:** the two SQLQuery operations.
+**Applies to:** both operations. The example below invokes `$sql-export`, because
+sharing a dependency between subjects needs more than one subject.
 
-An invoked SQLQuery declares two dependencies:
+Two SQLQuery subjects are exported in one job. Each declares a dependency on the
+same ViewDefinition, which exists only on the client:
 
 ```json
 {
-  "relatedArtifact": [
-    {
-      "type": "depends-on",
-      "resource": "https://example.org/SQLView/active_pts",
-      "label": "ap"
-    },
-    {
-      "type": "depends-on",
-      "resource": "https://example.org/ViewDefinition/addresses",
-      "label": "ad"
-    }
+  "resourceType": "Parameters",
+  "parameter": [
+    { "name": "subject", "part": [
+      { "name": "name", "valueString": "cohort_bp" },
+      { "name": "subjectCanonical", "valueCanonical": "http://example.org/Library/cohort-bp" }
+    ]},
+    { "name": "subject", "part": [
+      { "name": "name", "valueString": "cohort_labs" },
+      { "name": "subjectCanonical", "valueCanonical": "http://example.org/Library/cohort-labs" }
+    ]},
+    { "name": "context", "resource": {
+      "resourceType": "ViewDefinition",
+      "url": "https://example.org/ViewDefinition/local_cohort",
+      "status": "active",
+      "resource": "Patient",
+      "select": [{ "column": [
+        { "name": "id", "path": "getResourceKey()", "type": "string" }
+      ]}]
+    }}
   ]
 }
 ```
 
-The request supplies two pool members: a SQLView with
-`url = https://example.org/SQLView/active_pts`, which itself declares a dependency
-on `https://example.org/ViewDefinition/patients` with label `p`; and a
-ViewDefinition with `url = https://example.org/ViewDefinition/patients`. The
-traversal resolves:
+Both Libraries declare `depends-on https://example.org/ViewDefinition/local_cohort`
+with label `c`. The traversal resolves:
 
-| Step | Dependency                                | Resolved by   | Table |
-| ---- | ----------------------------------------- | ------------- | ----- |
-| 1    | `SQLView/active_pts`                      | pool member 1 | `ap`  |
-| 2    | `ViewDefinition/addresses`                | the server    | `ad`  |
-| 3    | `ViewDefinition/patients` (from member 1) | pool member 2 | `p`   |
+| Step | Dependency reached from | Canonical URL                            | Resolved by             | Table |
+| ---- | ----------------------- | ---------------------------------------- | ----------------------- | ----- |
+| 1    | `cohort_bp`             | `ViewDefinition/local_cohort`            | the `context` entry     | `c`   |
+| 2    | `cohort_labs`           | `ViewDefinition/local_cohort`            | the recorded resolution | `c`   |
 
 {:.table-data}
 
-Both pool members were selected, so no entry is unmatched; every dependency
-resolved, so nothing is unresolvable. The SQL executes against tables `ap`, `ad`
-and `p`.
+The second subject reaches an already-resolved canonical URL, so step 2's
+memoisation returns the recorded resolution rather than resolving again: both
+subjects see the same ViewDefinition. The entry was selected, so it is not
+unmatched. It is a supporting artefact rather than a subject, so the manifest
+carries two `output` entries - `cohort_bp` and `cohort_labs` - and none for it.
+
+Had the server been able to resolve `local_cohort` itself, step 2.1 would still
+have selected the supplied entry.
 
 ## Asynchronous Delivery {#asynchronous-delivery}
 
