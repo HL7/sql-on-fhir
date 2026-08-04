@@ -89,10 +89,8 @@ menu:
     Overview: operations.html
     Common Behavior: operations-common.html
     CapabilityStatement: operations-capability.html
-    $viewdefinition-export: OperationDefinition-ViewDefinitionExport.html
-    $viewdefinition-run: OperationDefinition-ViewDefinitionRun.html
-    $sqlquery-run: OperationDefinition-SQLQueryRun.html
-    $sqlquery-export: OperationDefinition-SQLQueryExport.html
+    $sql-run: OperationDefinition-SQLRun.html
+    $sql-export: OperationDefinition-SQLExport.html
   Contributing: contributing.html
   # extra/playground.html does not work - TODO: use relative ulrs
   Playground: http://sql-on-fhir.org/extra/playground.html
