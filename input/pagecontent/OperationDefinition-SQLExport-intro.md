@@ -34,3 +34,9 @@ repeating `subject` parameter rather than by the request path.
 - **Job-wide supporting artefacts** - the repeating `context` parameter supplies artefacts the server cannot itself resolve, once for the whole job however many subjects depend on them
 - **Per-subject parameters** - each `subject` repetition carries its own `parameters` resource
 - **Client tracking** - `clientTrackingId` is echoed in the manifest, correlating the job with the client's own records
+
+Where the exported files are delivered is not constrained by this
+specification. Servers commonly write them to object storage or to a local file
+system and expose them through the `output.location` download URLs; the manifest
+is the only interface this specification defines. Any storage product named
+elsewhere on this page is an informative example, not a requirement.

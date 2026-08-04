@@ -582,7 +582,36 @@ Content-Type: application/fhir+json
 }
 ```
 
-###### 5. Patient or Group Not Found
+###### 5. Several Subjects with Errors
+
+A job carries several subjects, so servers SHOULD validate all of them before
+starting the export and report every problem in one `OperationOutcome`, rather
+than failing on the first:
+
+```http
+HTTP/1.1 400 Bad Request
+Content-Type: application/fhir+json
+
+{
+  "resourceType": "OperationOutcome",
+  "issue": [
+    {
+      "severity": "error",
+      "code": "not-found",
+      "diagnostics": "Subject 'patient-vitals' not found",
+      "expression": ["subject[1].subjectCanonical"]
+    },
+    {
+      "severity": "error",
+      "code": "invalid",
+      "diagnostics": "Subject 'lab-results' contains an invalid resource type",
+      "expression": ["subject[2].subjectResource"]
+    }
+  ]
+}
+```
+
+###### 6. Patient or Group Not Found
 
 When filtering by patient or group that doesn't exist. A filter value scopes the
 data rather than naming what the operation is about, so the rejection is
