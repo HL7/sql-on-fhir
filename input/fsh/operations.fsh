@@ -402,43 +402,55 @@ Description: "Execute a SQLQuery Library against ViewDefinition tables."
 * parameter[3].targetProfile[1] = Canonical(SQLView)
 * parameter[3].documentation = "Inline SQLQuery or SQLView Library resource to execute."
 
-* parameter[4].name = #parameters
+* parameter[4].name = #view
 * parameter[4].use = #in
 * parameter[4].min = 0
-* parameter[4].max = "1"
+* parameter[4].max = "*"
 * parameter[4].scope[0] = #system
 * parameter[4].scope[1] = #type
 * parameter[4].scope[2] = #instance
-* parameter[4].type = #Parameters
-* parameter[4].documentation = "Input parameters for the query. Parameters are bound by name to parameters declared in the SQLQuery Library (Library.parameter.name). Parameter types are mapped using the appropriate value[x] type matching the declared parameter type."
+* parameter[4].type = #CanonicalResource
+* parameter[4].targetProfile[0] = Canonical(ViewDefinition)
+* parameter[4].targetProfile[1] = Canonical(SQLView)
+* parameter[4].documentation = "Inline ViewDefinition or SQLView Library supplying a table source the query depends on. Matched by its url (and version, when the depends-on canonical is versioned) to a relatedArtifact depends-on entry in the transitive dependency closure of the executed queries. See Table-Source Dependencies (operations-common.html)."
 
-* parameter[5].name = #source
+* parameter[5].name = #parameters
 * parameter[5].use = #in
 * parameter[5].min = 0
 * parameter[5].max = "1"
 * parameter[5].scope[0] = #system
 * parameter[5].scope[1] = #type
 * parameter[5].scope[2] = #instance
-* parameter[5].type = #string
-* parameter[5].documentation = "External data source containing the ViewDefinition tables."
+* parameter[5].type = #Parameters
+* parameter[5].documentation = "Input parameters for the query. Parameters are bound by name to parameters declared in the SQLQuery Library (Library.parameter.name). Parameter types are mapped using the appropriate value[x] type matching the declared parameter type."
 
-* parameter[6].name = #_limit
+* parameter[6].name = #source
 * parameter[6].use = #in
 * parameter[6].min = 0
 * parameter[6].max = "1"
 * parameter[6].scope[0] = #system
 * parameter[6].scope[1] = #type
 * parameter[6].scope[2] = #instance
-* parameter[6].type = #integer
-* parameter[6].documentation = "Maximum number of rows to return."
+* parameter[6].type = #string
+* parameter[6].documentation = "External data source containing the ViewDefinition tables."
+
+* parameter[7].name = #_limit
+* parameter[7].use = #in
+* parameter[7].min = 0
+* parameter[7].max = "1"
+* parameter[7].scope[0] = #system
+* parameter[7].scope[1] = #type
+* parameter[7].scope[2] = #instance
+* parameter[7].type = #integer
+* parameter[7].documentation = "Maximum number of rows to return."
 
 // Output parameter
-* parameter[7].name = #return
-* parameter[7].use = #out
-* parameter[7].min = 1
-* parameter[7].max = "1"
-* parameter[7].type = #Binary
-* parameter[7].documentation = "Query results in the requested output format, returned as a raw binary stream in the format's native media type, not a serialized Binary resource envelope. When _format=fhir is requested, the response is a Parameters resource instead. See Common Operation Behavior (operations-common.html)."
+* parameter[8].name = #return
+* parameter[8].use = #out
+* parameter[8].min = 1
+* parameter[8].max = "1"
+* parameter[8].type = #Binary
+* parameter[8].documentation = "Query results in the requested output format, returned as a raw binary stream in the format's native media type, not a serialized Binary resource envelope. When _format=fhir is requested, the response is a Parameters resource instead. See Common Operation Behavior (operations-common.html)."
 
 Instance: SQLQueryExport
 Usage: #definition
@@ -496,34 +508,18 @@ Description: "Export SQLQuery Library results asynchronously using the FHIR Asyn
 * parameter[0].part[3].type = #Parameters
 * parameter[0].part[3].documentation = "Input parameters for this query. Parameters are bound by name to parameters declared in the SQLQuery Library (Library.parameter.name)."
 
-// Input parameters — ViewDefinitions as table sources (same structure as $viewdefinition-export)
+// Input parameters — table-source dependencies supplied inline
 * parameter[1].name = #view
 * parameter[1].use = #in
 * parameter[1].min = 0
 * parameter[1].max = "*"
 * parameter[1].scope[0] = #system
 * parameter[1].scope[1] = #type
-* parameter[1].documentation = "ViewDefinitions that serve as table sources for the SQL queries. Provides ViewDefinitions referenced in the Library's relatedArtifact entries. These are materialized as tables for the SQL to query against — they do not produce separate output entries."
-* parameter[1].part[0].name = #name
-* parameter[1].part[0].use = #in
-* parameter[1].part[0].min = 0
-* parameter[1].part[0].max = "1"
-* parameter[1].part[0].type = #string
-* parameter[1].part[0].documentation = "Optional friendly name for the ViewDefinition."
-* parameter[1].part[1].name = #viewReference
-* parameter[1].part[1].use = #in
-* parameter[1].part[1].min = 0
-* parameter[1].part[1].max = "1"
-* parameter[1].part[1].type = #Reference
-* parameter[1].part[1].targetProfile = Canonical(ViewDefinition)
-* parameter[1].part[1].documentation = "Reference to a ViewDefinition stored on the server."
-* parameter[1].part[2].name = #viewResource
-* parameter[1].part[2].use = #in
-* parameter[1].part[2].min = 0
-* parameter[1].part[2].max = "1"
-* parameter[1].part[2].type = #CanonicalResource
-* parameter[1].part[2].targetProfile = Canonical(ViewDefinition)
-* parameter[1].part[2].documentation = "Inline ViewDefinition resource."
+* parameter[1].scope[2] = #instance
+* parameter[1].type = #CanonicalResource
+* parameter[1].targetProfile[0] = Canonical(ViewDefinition)
+* parameter[1].targetProfile[1] = Canonical(SQLView)
+* parameter[1].documentation = "Inline ViewDefinition or SQLView Library supplying a table source the query depends on. Matched by its url (and version, when the depends-on canonical is versioned) to a relatedArtifact depends-on entry in the transitive dependency closure of the executed queries. See Table-Source Dependencies (operations-common.html)."
 
 // Input parameters — export control (from $viewdefinition-export)
 * parameter[2].name = #clientTrackingId
@@ -672,7 +668,7 @@ Description: "Export SQLQuery Library results asynchronously using the FHIR Asyn
 * parameter[19].use = #out
 * parameter[19].min = 0
 * parameter[19].max = "*"
-* parameter[19].documentation = "Output information for each exported SQL query result. One entry per query; ViewDefinitions supplied via the view parameter do not produce output entries."
+* parameter[19].documentation = "Output information for each exported SQL query result. One entry per query; resources supplied via the view parameter do not produce output entries."
 * parameter[19].part[0].name = #name
 * parameter[19].part[0].use = #out
 * parameter[19].part[0].min = 1

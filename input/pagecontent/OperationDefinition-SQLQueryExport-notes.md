@@ -140,19 +140,26 @@ At the instance level (`POST [base]/Library/[id]/$sqlquery-export`), the bound L
 
 ¹ Either queryReference or queryResource is required per `query` repetition.
 
-##### ViewDefinition Table Sources — `view` Parameter (0..\*, system+type scope)
+##### Table-Source Dependencies — `view` Parameter (0..\*, system, type and instance scope)
 
-Provides ViewDefinitions that serve as table sources for the SQL queries. These are the ViewDefinitions referenced in the Library's `relatedArtifact` entries. ViewDefinitions supplied here are materialized as tables for the SQL to query against — they do **not** produce separate output entries. Only the SQL query results appear in the export output.
+Supply table sources - ViewDefinitions or SQLView Libraries - inline through the
+repeating `view` parameter. Each repetition carries one resource identified by
+its `url`, matched against the `relatedArtifact` (`depends-on`) entries in the
+transitive dependency closure of the executed queries. A supplied resource takes
+precedence over a server-stored resource with the same canonical. Resources
+supplied here are materialized as tables for the SQL to query against; they do
+**not** produce separate `output` entries, so only the SQL query results appear
+in the export output.
 
-| Part Name     | Type      | Min | Max | Description                                        |
-| ------------- | --------- | --- | --- | -------------------------------------------------- |
-| name          | string    | 0   | 1   | Optional friendly name for the ViewDefinition      |
-| viewReference | Reference | 0²  | 1   | Reference to a ViewDefinition stored on the server |
-| viewResource  | Resource  | 0²  | 1   | Inline ViewDefinition resource                     |
+| Name | Type              | Min | Max | Description                                                               |
+| ---- | ----------------- | --- | --- | ------------------------------------------------------------------------- |
+| view | CanonicalResource | 0   | \*  | Inline ViewDefinition or SQLView table source, bound by `url` and version |
 
 {:.table-data}
 
-² Either viewReference or viewResource is required per `view` repetition.
+The full matching, precedence and error rules are defined once in
+[Table-Source Dependencies](operations-common.html#table-source-dependencies)
+and apply identically to `$sqlquery-run` and `$sqlquery-export`.
 
 ##### Export Control
 
@@ -277,7 +284,7 @@ the export is still in progress.
 
 | Name            | Type    | Min | Max | Description                                                                                                                                |
 | --------------- | ------- | --- | --- | ------------------------------------------------------------------------------------------------------------------------------------------ |
-| output          | complex | 0   | \*  | Output information for each exported SQL query result (one per `query`; ViewDefinitions supplied via `view` do not produce output entries) |
+| output          | complex | 0   | \*  | Output information for each exported SQL query result (one per `query`; resources supplied via `view` do not produce output entries)      |
 | output.name     | string  | 1   | 1   | The name of the exported output. [Details](#output-name-clarification)                                                                     |
 | output.location | uri     | 1   | \*  | URL(s) to download the exported file(s). [Details](#output-partitioning)                                                                   |
 
@@ -350,7 +357,8 @@ The $sqlquery-export operation uses standard HTTP status codes to indicate the o
 | 303 See Other             | Job Finished         | Export finished (successfully or not); `Location` header carries the result URL     |
 | 200 OK                    | Result Available     | Result URL returns the manifest `Parameters`; download URLs return the files        |
 | 400 Bad Request           | Client Error         | Invalid parameters, unsupported parameters, missing required headers                |
-| 404 Not Found             | Not Found            | SQLQuery Library not found, or cancelled export status URL                          |
+| 400 Bad Request           | Dependency Error     | A supplied `view` resource has no `url`, its `url` matches no entry in any executed query's transitive dependency closure, or two supplied resources match the same dependency entry |
+| 404 Not Found             | Not Found            | SQLQuery Library not found, cancelled export status URL, or a dependency neither supplied via `view` nor server-resolvable       |
 | 422 Unprocessable Entity  | Business Logic Error | Valid request but query is invalid or cannot be executed                            |
 | 429 Too Many Requests     | Excessive Polling    | Client is polling too frequently; back off exponentially, guided by `Retry-After`   |
 | 500 Internal Server Error | Server Error         | Unexpected server error; on the result URL, the failure outcome of the export       |
@@ -864,9 +872,14 @@ Prefer: respond-async
 }
 ```
 
-##### Multi-Query Export with ViewDefinition Table Sources
+##### Multi-Query Export with Mixed Stored and Inline Sources
 
-Export multiple queries in one operation, providing a ViewDefinition table source inline:
+Export multiple stored queries in one operation, supplying one table source
+inline via `view` while the remaining dependencies resolve on the server. The
+supplied ViewDefinition's `url` matches a `relatedArtifact` canonical of one of
+the queries and takes precedence over any server-stored resource with that
+canonical (see
+[Table-Source Dependencies](operations-common.html#table-source-dependencies)):
 
 ```http
 POST /Library/$sqlquery-export HTTP/1.1
@@ -921,14 +934,16 @@ Prefer: respond-async
     },
     {
       "name": "view",
-      "part": [
-        {
-          "name": "viewReference",
-          "valueReference": {
-            "reference": "ViewDefinition/UsCoreBloodPressures"
-          }
-        }
-      ]
+      "resource": {
+        "resourceType": "ViewDefinition",
+        "url": "https://example.org/ViewDefinition/UsCoreBloodPressures",
+        "status": "active",
+        "resource": "Observation",
+        "select": [{ "column": [
+          { "name": "id", "path": "getResourceKey()" },
+          { "name": "systolic", "path": "component.where(code.coding.code='8480-6').value.ofType(Quantity).value" }
+        ]}]
+      }
     },
     {
       "name": "_format",
