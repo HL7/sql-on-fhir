@@ -1,21 +1,22 @@
 #### HTTP Methods
 
 - **GET**: for invocations in which every supplied input parameter is primitive.
-- **POST**: required when `parameters` or `tableSource` is supplied, since both
-  carry a resource that cannot be expressed as a query string.
+- **POST**: required when `subjectResource`, `parameters`, `context` or
+  `resource` is supplied, since each carries a resource that cannot be expressed
+  as a query string.
 
-`$sqlquery-run` is a safe operation, so base FHIR permits `GET` whenever the
-supplied in-parameters are all primitive. This mirrors
-[`$viewdefinition-run`](OperationDefinition-ViewDefinitionRun.html), where
-`viewResource` and `resource` are the POST-only parameters.
+`$sql-run` is a safe operation, so base FHIR permits `GET` whenever the supplied
+in-parameters are all primitive. The subject is named by a parameter at every
+invocation, so a `GET` is available for a ViewDefinition subject and a SQL
+subject alike.
 
 ##### GET Method Limitations
 
 1. **Available parameters**: only those that can be passed as query parameters
    are supported over `GET`:
-   - `queryCanonical` - canonical URL of the SQLQuery or SQLView Library, with
-     any `|` percent-encoded as `%7C`
-   - `queryReference` - literal location of a Library on the server
+   - `subjectCanonical` - canonical URL of the ViewDefinition, SQLQuery or
+     SQLView, with any `|` percent-encoded as `%7C`
+   - `subjectReference` - literal location of the subject on the server
    - `_format` - output format specification
    - `header` - include CSV headers (for CSV format)
    - `patient` - filter by patient reference, repeated to name several patients
@@ -25,116 +26,170 @@ supplied in-parameters are all primitive. This mirrors
    - `source` - external data source
 
 2. **When POST is required**: use `POST` instead of `GET` when you need to:
-   - bind query parameters via `parameters`
-   - supply an inline table source via `tableSource`
-   - name the query inline via `queryResource`
+   - name the subject inline via `subjectResource`
+   - bind parameter values via `parameters`
+   - supply a supporting artefact inline via `context`
+   - supply FHIR resources to transform via `resource`
+
+   Each of those four carries a resource, which is the reason it cannot be
+   expressed as a query string. Supplying one over `GET` is rejected with
+   `400 Bad Request`.
+
+#### Data Sources
+
+The operation can process data from:
+
+1. **Direct resources** - Provided via the `resource` parameter in the request, where the subject is a ViewDefinition
+2. **Server resources** - From the server's data store (default)
+3. **External source** - Specified via the `source` parameter
 
 #### Input Parameters
 
 The following input parameters are passed as query parameters on a `GET`, or
 inside a `Parameters` resource in the request body on a `POST`.
 
-| Name           | Type                      | Scope                  | Required     | Max | Description                                                                                               |
-| -------------- | ------------------------- | ---------------------- | ------------ | --- | --------------------------------------------------------------------------------------------------------- |
-| \_format       | code                      | system, type, instance | No           | 1   | Output format: `json`, `ndjson`, `csv`, `parquet`, `fhir`. [Details](#format-parameter-clarification)     |
-| header         | boolean                   | system, type, instance | No           | 1   | Include CSV headers (default: true). Only applies to `csv` format                                         |
-| queryCanonical | canonical                 | system, type           | Conditional¹ | 1   | Canonical URL of the SQLQuery or SQLView Library. [Details](#queryreference-clarification)                |
-| queryReference | Reference                 | system, type           | Conditional¹ | 1   | Literal location of a SQLQuery or SQLView Library on the server. [Details](#queryreference-clarification) |
-| queryResource  | Library                   | system, type           | Conditional¹ | 1   | Inline SQLQuery or SQLView Library resource to execute. [Details](#queryreference-clarification)          |
-| tableSource    | ViewDefinition \| SQLView² | system, type, instance | No           | \*  | Inline table source, matched to a dependency by canonical URL. [Details](#table-sources)                 |
-| parameters     | Parameters                | system, type, instance | No           | 1   | Input parameters bound by name to parameters declared in the SQLQuery Library                             |
-| patient        | Reference                 | system, type, instance | No           | \*  | Filter by patient reference, repeated to name several patients. [Details](#filtering)                     |
-| group          | Reference                 | system, type, instance | No           | \*  | Filter by group membership. [Details](#filtering)                                                         |
-| \_since        | instant                   | system, type, instance | No           | 1   | Include only resources whose state changed after this instant. [Details](#filtering)                                    |
-| source         | string                    | system, type, instance | No           | 1   | External data source containing the ViewDefinition tables (e.g. URI, bucket name)                         |
-| \_limit        | integer                   | system, type, instance | No           | 1   | Maximum number of rows to return                                                                          |
+| Name             | Type                                   | Min | Max | Description                                                                                       |
+| ---------------- | -------------------------------------- | --- | --- | ----------------------------------------------------------------------------------------------- |
+| subjectCanonical | canonical                              | 0¹  | 1   | Canonical URL of the subject. [Details](#subject-clarification)                                   |
+| subjectReference | Reference                              | 0¹  | 1   | Literal location of the subject on the server. [Details](#subject-clarification)                  |
+| subjectResource  | ViewDefinition \| SQLQuery \| SQLView² | 0¹  | 1   | Inline subject resource. [Details](#subject-clarification)                                        |
+| parameters       | Parameters                             | 0   | 1   | Parameter values bound by name to those the Library declares; requires a SQL subject. [Details](#parameter-passing) |
+| context          | ViewDefinition \| SQLView²             | 0   | \*  | Inline supporting artefact, matched to a dependency by canonical URL. [Details](#supporting-artefacts) |
+| resource         | Resource                               | 0   | \*  | FHIR resources to transform; requires a ViewDefinition subject. [Details](#resource-parameter-clarification) |
+| \_format         | code                                   | 0   | 1   | Output format: `json`, `ndjson`, `csv`, `parquet`, `fhir`. [Details](#format-parameter-clarification) |
+| header           | boolean                                | 0   | 1   | Include CSV headers (default: true). Only applies to `csv` format                                 |
+| patient          | Reference                              | 0   | \*  | Filter by patient reference, repeated to name several patients. [Details](#filtering)             |
+| group            | Reference                              | 0   | \*  | Filter by group membership. [Details](#filtering)                                                 |
+| \_since          | instant                                | 0   | 1   | Include only resources whose state changed after this instant. [Details](#filtering)              |
+| source           | string                                 | 0   | 1   | External data source (e.g. URI, bucket name). If absent, uses server data                         |
+| \_limit          | integer                                | 0   | 1   | Maximum number of rows to return. [Details](#row-limit)                                           |
 
 {:.table-data}
 
-¹ Exactly one of `queryCanonical`, `queryReference` or `queryResource` is required
-at the system and type levels; none is allowed at the instance level, where the
-Library is identified by the request path. See
-[Identifying the query](#queryreference-clarification).
+¹ Exactly one of `subjectCanonical`, `subjectReference` or `subjectResource` is
+required. See [Naming the subject](#subject-clarification).
 
 ² Declared as `CanonicalResource` in the OperationDefinition; see
 [Why the declared type is `CanonicalResource`](operations-common.html#declared-type).
 
+`clientTrackingId` is not offered on this operation, and it accepts one subject
+rather than a repeating set; see
+[Parameters that do not apply to every operation](operations-common.html#parameter-asymmetries).
+
 ##### Output Parameter
 
-| Name   | Type   | Description                                                                                                                                                                                                                               |
-| ------ | ------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| return | Binary | Query results as a raw stream in the format's native media type, not a serialized `Binary` envelope (a `Parameters` resource when `_format=fhir` is requested). See [Return Representation](operations-common.html#return-representation) |
+| Name   | Type   | Description                                                                                                                                                                                                                              |
+| ------ | ------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| return | Binary | Result rows as a raw stream in the format's native media type, not a serialized `Binary` envelope (a `Parameters` resource when `_format=fhir` is requested). See [Return Representation](operations-common.html#return-representation) |
 
 {:.table-data}
 
-##### Identifying the query {#queryreference-clarification}
+##### Naming the subject {#subject-clarification}
 
-The SQLQuery or SQLView Library to execute is named in exactly one of three ways,
-each with its own parameter so that the intended meaning is carried by the
-parameter's type rather than inferred from the shape of a string:
+The artefact to execute is named in exactly one of three ways, each with its own
+parameter so that the intended meaning is carried by the parameter's type rather
+than inferred from the shape of a string. All three admit a
+[ViewDefinition](StructureDefinition-ViewDefinition.html), a
+[SQLQuery](StructureDefinition-SQLQuery.html) Library or a
+[SQLView](StructureDefinition-SQLView.html) Library, so the naming form is chosen
+independently of the subject's kind:
 
-| Parameter        | Type        | Names the query by                                                                                                                                                                                                                                                                       |
-| ---------------- | ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `queryCanonical` | `canonical` | Its canonical URL, optionally with a `\|version` suffix pinning a version (e.g. `http://example.org/Library/patient-bp-query\|1.0.0`). Absent a suffix, the server selects a version according to FHIR's [canonical resolution](https://hl7.org/fhir/R5/references.html#canonical) rules |
-| `queryReference` | `Reference` | A literal location: a relative URL on this server (e.g. `Library/patient-bp-query`) or an absolute URL (e.g. `http://example.org/fhir/Library/patient-bp-query`). This is not a canonical URL                                                                                            |
-| `queryResource`  | `Library`   | Carrying the Library itself in the request                                                                                                                                                                                                                                               |
+| Parameter          | Type                                   | Names the subject by                                                                                                                                                                                                                                                                        |
+| ------------------ | -------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `subjectCanonical` | `canonical`                            | Its canonical URL, optionally with a `\|version` suffix pinning a version (e.g. `http://example.org/ViewDefinition/patient_demographics\|2.0.0`). Absent a suffix, the server selects a version according to FHIR's [canonical resolution](https://hl7.org/fhir/R5/references.html#canonical) rules |
+| `subjectReference` | `Reference`                            | A literal location: a relative URL on this server (e.g. `ViewDefinition/123` or `Library/patient-bp-query`) or an absolute URL. This is not a canonical URL                                                                                                                                 |
+| `subjectResource`  | ViewDefinition \| SQLQuery \| SQLView² | Carrying the artefact itself in the request                                                                                                                                                                                                                                                  |
 
 {:.table-data}
 
-At the system and type levels, a request SHALL supply exactly one of the three.
-Supplying none, or more than one, is rejected with `400 Bad Request` and an
-`OperationOutcome` naming the problem.
+² `subjectResource` is declared as `CanonicalResource` in the
+OperationDefinition. ViewDefinition is a logical model in this guide rather than
+a FHIR resource, so `ViewDefinition` is not a value `parameter.type` accepts;
+`CanonicalResource` is the narrowest declared type admitting all three kinds, and
+the real constraint is carried by `targetProfile`. See
+[Why the declared type is `CanonicalResource`](operations-common.html#declared-type).
 
-At the instance level (`[base]/Library/[id]/$sqlquery-run`) the Library is
-identified by the request path, so none of the three applies; supplying any of
-them is rejected with `400 Bad Request`.
+A request SHALL supply exactly one of the three. Supplying none, or more than
+one, is rejected with `400 Bad Request` and an `OperationOutcome` naming the
+problem.
 
-A `queryCanonical` or `queryReference` the server cannot resolve is rejected with
-`404 Not Found` and an `OperationOutcome`. A resolved artifact that does not
-conform to the SQLQuery or SQLView profile is rejected with
-`422 Unprocessable Entity`.
+A `subjectCanonical` or `subjectReference` the server cannot resolve is rejected
+with `404 Not Found` and an `OperationOutcome`. A resolved artefact conforming to
+none of the three profiles is rejected with `422 Unprocessable Entity`.
+
+What the subject resolves to determines how it is processed, and which of the
+conditional parameters apply: a ViewDefinition is evaluated directly and may be
+fed inline resources through [`resource`](#resource-parameter-clarification); a
+SQLQuery or SQLView has its dependency graph resolved first and may have values
+bound through [`parameters`](#parameter-passing).
 
 How a server resolves a canonical URL or an absolute reference - from a local
-artifact registry, by dereferencing the URL, or not at all - is an implementation
+artefact registry, by dereferencing the URL, or not at all - is an implementation
 matter. A server that supports only some of these parameters declares the subset
 it supports as described in
 [Declaring partial operation support](operations-capability.html#partial-operation-support).
 
-##### ViewDefinition table sources {#table-sources}
+##### Supporting artefacts (`context`) {#supporting-artefacts}
 
-The query's table sources are named by its `relatedArtifact` entries and are
-normally resolved by the server. Where the server cannot resolve one - typically
-because the view exists only on the client - the client supplies it inline with
-the repeating `tableSource` parameter, which accepts a ViewDefinition or a
+Where the subject is a SQLQuery or SQLView, the tables it selects from are named
+by its `relatedArtifact` entries and are normally resolved by the server. Where
+the server cannot resolve one - typically because the artefact exists only on the
+client - the client supplies it inline with the repeating `context` parameter,
+which accepts a ViewDefinition or a
 [SQLView](StructureDefinition-SQLView.html).
 
 The matching, precedence and error rules are specified once in
-[ViewDefinition table sources](operations-common.html#table-sources) and apply
-identically here and on
-[`$sqlquery-export`](OperationDefinition-SQLQueryExport.html). That section
-governs; in outline, the supplied entries form one pool matched by canonical URL
-against every dependency in the query's transitive dependency graph, a supplied
-resource outranks one the server could itself resolve, an entry that cannot be
+[Supporting artefacts](operations-common.html#context) and apply identically here
+and on [`$sql-export`](OperationDefinition-SQLExport.html). That section governs;
+in outline, the supplied entries are matched by canonical URL against every
+dependency in the subject's transitive dependency graph, a supplied entry
+outranks an artefact the server could itself resolve, an entry that cannot be
 bound or matches nothing is rejected with `400 Bad Request`, and a dependency
 neither supplied nor resolvable is rejected with `404 Not Found`.
 
-Supplying every dependency inline alongside an inline `queryResource` makes a
-fully ad-hoc query possible, with nothing stored on the server. `tableSource`
-also applies at the instance level, so a client invoking a stored query can supply
-just the dependency the server cannot resolve.
+Supplying every dependency inline alongside an inline `subjectResource` makes a
+fully ad-hoc query possible, with nothing stored on the server.
 
-`tableSource` supplies the _views_ a query reads from, not the FHIR resources
-those views project. This operation has no `resource` parameter for the latter:
-unlike [`$viewdefinition-run`](OperationDefinition-ViewDefinitionRun.html), where
-inline resources feed one view directly, doing so here would need its own
-semantics for how supplied resources reach each dependency view. That is
-deliberately deferred; see
+`context` supplies the _views_ a query reads from, not the FHIR resources those
+views project. The [`resource`](#resource-parameter-clarification) parameter
+carries the latter, and requires a ViewDefinition subject: extending it to a SQL
+subject would need its own semantics for how supplied resources reach each
+dependency view, which is deliberately deferred. See
 [Parameters that do not apply to every operation](operations-common.html#parameter-asymmetries).
+
+A ViewDefinition subject contributes no dependencies at all, so a request naming
+one has nothing for `context` to match; a supplied entry would be unmatched and
+rejected with `400 Bad Request`.
+
+##### Resource parameter and Bundle inputs {#resource-parameter-clarification}
+
+The `resource` parameter is repeatable and carries the discrete FHIR resources
+to transform instead of using server data. It is permitted **only where the
+subject is a ViewDefinition**; supplying it with a SQLQuery or SQLView subject is
+rejected with `400 Bad Request` and an `OperationOutcome` naming `resource`,
+because how inline resources would reach each dependency view of a query is not
+specified.
+
+Because a `Bundle` is itself a `Resource`, a `Bundle` satisfies the parameter's
+`Resource` type. To avoid ambiguity, the following rule applies:
+
+When a `resource` value is a `Bundle`, the server SHALL **unwrap** it and run the
+ViewDefinition against each `Bundle.entry[*].resource`, exactly as if those
+entries had been supplied as individual repeated `resource` values. The `Bundle`
+itself is not treated as an input resource for the ViewDefinition.
+
+Unwrapping is applied one level deep. Resources within the bundle are evaluated
+against the ViewDefinition's `resource` type just like directly supplied
+resources: entries whose type does not match the ViewDefinition's `resource` are
+ignored. Mixing discrete `resource` values and `Bundle` values in the same
+request is permitted; the effective input is the union of the discrete resources
+and every unwrapped bundle entry.
 
 ##### Filtering {#filtering}
 
-`patient`, `group` and `_since` restrict the data the query sees. They carry the
-same meaning here as on the other three data operations, and are specified once in
+`patient`, `group` and `_since` restrict the data the subject sees. They carry
+the same meaning here as on
+[`$sql-export`](OperationDefinition-SQLExport.html), and are specified once in
 [Filtering](operations-common.html#filtering):
 
 | Parameter | Max | Restricts the data to                                                                                     |
@@ -145,29 +200,29 @@ same meaning here as on the other three data operations, and are specified once 
 
 {:.table-data}
 
-On this operation and on
-[`$sqlquery-export`](OperationDefinition-SQLQueryExport.html), the filter applies
-to the FHIR resources feeding the query's dependency views, before the SQL
-executes. The SQL therefore sees tables already narrowed to the requested scope,
-rather than being expected to express the filter itself.
+The filter applies to the FHIR resources feeding a view before projection. Where
+the subject is a SQLQuery or SQLView, that means it applies to the resources
+feeding the query's dependency views, before the SQL executes: the SQL sees
+tables already narrowed to the requested scope, rather than being expected to
+express the filter itself.
 
 A `patient` or `group` naming a resource the server cannot find is rejected with
 `400 Bad Request`; see
 [Status code for a value that cannot be resolved](operations-common.html#filter-resolution-errors).
 
-##### Row Limit
+##### Row Limit {#row-limit}
 
 `_limit` caps the rows the server returns to the client. Its semantics - the
-server's option to impose a smaller maximum, the application of the cap after
-the query has been evaluated, and that returning fewer rows is not an error -
-are specified once in
+server's option to impose a smaller maximum, the application of the cap after the
+subject has been evaluated, and that returning fewer rows is not an error - are
+specified once in
 [Row limit](operations-common.html#row-limit) and apply identically here.
 
-On this operation, "after the query has been evaluated" includes any in-query
-`LIMIT`: implementations are free to push the cap down into the SQL as an
-optimisation, but the observable behaviour is post-evaluation. A worked example
-is given under
-[Capping Result Rows with `_limit`](#capping-result-rows-with-_limit).
+Where the subject is a SQLQuery or SQLView, "after the subject has been
+evaluated" includes any in-query `LIMIT`: implementations are free to push the
+cap down into the SQL as an optimisation, but the observable behaviour is
+post-evaluation. A worked example is given under
+[Capping result rows with `_limit`](#limit-example).
 
 ##### Format Parameter Clarification
 
@@ -183,72 +238,44 @@ this operation:
 - If `_format` is omitted (and no format is derivable from `Accept`), the server
   SHALL return the result in `ndjson` format.
 - When `_format` is supplied, its value SHALL take precedence over `Accept`.
+- `_format=fhir` returns a `Parameters` resource with one repeating `row` per
+  result row, using the
+  [SQL to FHIR type mapping](#sql-to-fhir-type-mapping).
 - The response of any format MAY use `Transfer-Encoding: chunked`; chunked
   transfer is independent of the format. See
   [Streaming and Transfer Encoding](operations-common.html#streaming).
 
 #### Examples
 
-##### Instance-Level (Library on Server)
+##### Running a ViewDefinition over GET
 
-When the SQLQuery Library is stored on the server, invoke directly on the instance:
-
-```http
-POST /Library/patient-bp-query/$sqlquery-run HTTP/1.1
-Content-Type: application/fhir+json
-
-{
-  "resourceType": "Parameters",
-  "parameter": [
-    { "name": "_format", "valueCode": "csv" },
-    { "name": "parameters", "resource": {
-      "resourceType": "Parameters",
-      "parameter": [
-        { "name": "patient_id", "valueString": "Patient/123" },
-        { "name": "from_date", "valueDate": "2024-01-01" }
-      ]
-    }}
-  ]
-}
-```
-
-##### Type-Level with Canonical URL
-
-Name a stored Library by its canonical URL, pinning a version:
+Every parameter here is primitive, so the invocation fits in a query string. The
+`|` separating the canonical URL from its version is percent-encoded as `%7C`:
 
 ```http
-POST /Library/$sqlquery-run HTTP/1.1
-Content-Type: application/fhir+json
-
-{
-  "resourceType": "Parameters",
-  "parameter": [
-    { "name": "queryCanonical", "valueCanonical": "http://example.org/Library/patient-bp-query|1.0.0" },
-    { "name": "_format", "valueCode": "csv" }
-  ]
-}
+GET /$sql-run?subjectCanonical=http%3A%2F%2Fexample.org%2FViewDefinition%2Fpatient_demographics%7C2.0.0&patient=Patient/123&_limit=10&_format=csv HTTP/1.1
 ```
 
 ```http
 HTTP/1.1 200 OK
 Content-Type: text/csv
+Transfer-Encoding: chunked
 
-patient_id,systolic,effective_date
-Patient/123,120,2024-01-15
-Patient/123,118,2024-02-20
+id,birthDate,family,given
+pt-1,1990-01-15,Smith,John
+pt-2,1985-03-22,Johnson,Mary
 ```
 
-Omitting `|1.0.0` selects a version according to FHIR's canonical resolution
+Omitting `%7C2.0.0` selects a version according to FHIR's canonical resolution
 rules. A canonical URL the server cannot resolve returns `404 Not Found`.
 
-##### Type-Level over GET
+##### Running a SQLQuery over GET
 
-Every parameter in the request above is primitive, so the same invocation can be
-made with `GET`. The `|` separating the canonical URL from its version is
-percent-encoded as `%7C`:
+The same endpoint and the same parameter serve a SQL subject; only what the
+canonical URL resolves to differs:
 
 ```http
-GET /Library/$sqlquery-run?queryCanonical=http%3A%2F%2Fexample.org%2FLibrary%2Fpatient-bp-query%7C1.0.0&_format=csv HTTP/1.1
+GET /$sql-run?subjectCanonical=http%3A%2F%2Fexample.org%2FLibrary%2Fpatient-bp-query%7C1.0.0&_format=csv HTTP/1.1
 Accept: text/csv
 ```
 
@@ -261,28 +288,54 @@ Patient/123,120,2024-01-15
 Patient/123,118,2024-02-20
 ```
 
-Adding a filter keeps the request within the `GET`-available subset:
+Supplying `parameters`, `context`, `resource` or `subjectResource` takes the
+request outside the `GET`-available subset, because each carries a resource; use
+`POST` in that case.
+
+##### Running a SQLQuery with bound parameters over POST
 
 ```http
-GET /Library/$sqlquery-run?queryCanonical=http%3A%2F%2Fexample.org%2FLibrary%2Fpatient-bp-query%7C1.0.0&patient=Patient/123&_limit=100&_format=ndjson HTTP/1.1
+POST /$sql-run HTTP/1.1
+Content-Type: application/fhir+json
+
+{
+  "resourceType": "Parameters",
+  "parameter": [
+    { "name": "subjectCanonical", "valueCanonical": "http://example.org/Library/patient-bp-query|1.0.0" },
+    { "name": "parameters", "resource": {
+      "resourceType": "Parameters",
+      "parameter": [
+        { "name": "from_date", "valueDate": "2026-01-01" }
+      ]
+    }},
+    { "name": "_format", "valueCode": "ndjson" }
+  ]
+}
 ```
 
-Supplying `parameters` or `tableSource` takes the request outside that subset,
-because each carries a resource; use `POST` in that case.
+```http
+HTTP/1.1 200 OK
+Content-Type: application/x-ndjson
 
-##### Type-Level with Reference
+{"patient_id":"Patient/123","systolic":120,"effective_date":"2026-01-15"}
+{"patient_id":"Patient/123","systolic":118,"effective_date":"2026-02-20"}
+```
 
-Name a stored Library by its literal location on the server:
+The values are bound by name to the parameters the Library declares. Supplying
+`parameters` where the subject is a ViewDefinition is rejected with
+`400 Bad Request`.
+
+##### Naming the subject by literal reference
 
 ```http
-POST /Library/$sqlquery-run HTTP/1.1
+POST /$sql-run HTTP/1.1
 Content-Type: application/fhir+json
 
 {
   "resourceType": "Parameters",
   "parameter": [
     { "name": "_format", "valueCode": "json" },
-    { "name": "queryReference", "valueReference": {
+    { "name": "subjectReference", "valueReference": {
       "reference": "Library/patient-bp-query"
     }},
     { "name": "parameters", "resource": {
@@ -295,54 +348,171 @@ Content-Type: application/fhir+json
 }
 ```
 
-##### Type-Level with Inline Resource
+##### Running an inline ViewDefinition
 
-Pass the SQLQuery Library inline for ad-hoc queries:
+Pass the ViewDefinition itself in the request as `subjectResource`:
 
 ```http
-POST /Library/$sqlquery-run HTTP/1.1
+POST /$sql-run HTTP/1.1
+Accept: application/json
 Content-Type: application/fhir+json
 
 {
   "resourceType": "Parameters",
-  "parameter": [
-    { "name": "_format", "valueCode": "ndjson" },
-    { "name": "queryResource", "resource": {
-      "resourceType": "Library",
-      "meta": { "profile": ["http://hl7.org/fhir/uv/sql-on-fhir/StructureDefinition/SQLQuery"] },
-      "type": { "coding": [{ "system": "http://hl7.org/fhir/uv/sql-on-fhir/CodeSystem/LibraryTypesCodes", "code": "sql-query" }] },
-      "status": "active",
-      "relatedArtifact": [
-        { "type": "depends-on", "resource": "https://example.org/ViewDefinition/patient_view", "label": "p" }
-      ],
-      "content": [{
-        "contentType": "application/sql",
-        "data": "U0VMRUNUIHAuaWQsIHAubmFtZSBGUk9NIHAgV0hFUkUgcC5hY3RpdmUgPSB0cnVl",
-        "extension": [{
-          "url": "http://hl7.org/fhir/uv/sql-on-fhir/StructureDefinition/sql-text",
-          "valueString": "SELECT p.id, p.name FROM p WHERE p.active = true"
-        }]
+  "parameter": [{
+    "name": "subjectResource",
+    "resource": {
+      "resourceType": "ViewDefinition",
+      "resource": "Patient",
+      "select": [{
+        "column": [
+          {"name": "id", "type": "id", "path": "getResourceKey()"},
+          {"name": "birthDate", "type": "date", "path": "birthDate"},
+          {"name": "family", "type": "string", "path": "name.family"},
+          {"name": "given", "type": "string", "path": "name.given"}
+        ]
       }]
-    }}
-  ]
+    }
+  }]
 }
 ```
 
-##### Fully Ad-Hoc: Inline Query with an Inline Table Source
+```http
+HTTP/1.1 200 OK
+Content-Type: application/json
 
-Nothing is stored on the server. The query is supplied as `queryResource` and the
-ViewDefinition its `relatedArtifact` entry depends on is supplied as
-`tableSource`, matched to that entry by `url` and materialised as table `p`:
+[
+  {"id": "pt-1", "birthDate": "1990-01-15", "family": "Smith", "given": "John"},
+  {"id": "pt-2", "birthDate": "1985-03-22", "family": "Johnson", "given": "Mary"},
+  {"id": "pt-3", "birthDate": "1992-07-08", "family": "Williams", "given": "Robert"}
+]
+```
+
+##### Running a ViewDefinition over inline resources
+
+The subject is an inline ViewDefinition and the data is supplied in the same
+request, so nothing is stored on the server:
 
 ```http
-POST /$sqlquery-run HTTP/1.1
+POST /$sql-run HTTP/1.1
+Accept: text/csv
+Content-Type: application/fhir+json
+
+{
+  "resourceType": "Parameters",
+  "parameter": [{
+    "name": "subjectResource",
+    "resource": {
+      "resourceType": "ViewDefinition",
+      "resource": "Patient",
+      "select": [{
+        "column": [
+          {"name": "id", "type": "id", "path": "getResourceKey()"},
+          {"name": "birthDate", "type": "date", "path": "birthDate"},
+          {"name": "family", "type": "string", "path": "name.family"},
+          {"name": "given", "type": "string", "path": "name.given"}
+        ]
+      }]
+    }
+  },
+  {
+    "name": "resource",
+    "resource": {
+      "resourceType": "Patient",
+      "id": "pt-1",
+      "name": [{ "use": "official", "family": "Cole", "given": ["Joanie"] }],
+      "birthDate": "2012-03-30"
+    }
+  },
+  {
+    "name": "resource",
+    "resource": {
+      "resourceType": "Patient",
+      "id": "pt-2",
+      "name": [{ "use": "official", "family": "Doe", "given": ["John"] }],
+      "birthDate": "2012-03-30"
+    }
+  }]
+}
+```
+
+```http
+HTTP/1.1 200 OK
+Content-Type: text/csv
+
+id,birthDate,family,given
+pt-1,2012-03-30,Cole,Joanie
+pt-2,2012-03-30,Doe,John
+```
+
+##### Supplying inline resources as a Bundle
+
+A `Bundle` supplied as a `resource` value is unwrapped one level; the
+ViewDefinition runs against each entry. This request is equivalent to the one
+above, which passed the two Patients as discrete `resource` values:
+
+```http
+POST /$sql-run HTTP/1.1
+Accept: text/csv
+Content-Type: application/fhir+json
+
+{
+  "resourceType": "Parameters",
+  "parameter": [{
+    "name": "subjectResource",
+    "resource": {
+      "resourceType": "ViewDefinition",
+      "resource": "Patient",
+      "select": [{
+        "column": [
+          {"name": "id", "type": "id", "path": "getResourceKey()"},
+          {"name": "family", "type": "string", "path": "name.family"}
+        ]
+      }]
+    }
+  },
+  {
+    "name": "resource",
+    "resource": {
+      "resourceType": "Bundle",
+      "type": "collection",
+      "entry": [
+        { "resource": { "resourceType": "Patient", "id": "pt-1", "name": [{"family": "Cole"}] } },
+        { "resource": { "resourceType": "Patient", "id": "pt-2", "name": [{"family": "Doe"}] } }
+      ]
+    }
+  },
+  { "name": "_format", "valueCode": "csv" }]
+}
+```
+
+```http
+HTTP/1.1 200 OK
+Content-Type: text/csv
+
+id,family
+pt-1,Cole
+pt-2,Doe
+```
+
+Supplying `resource` alongside a SQLQuery or SQLView subject is rejected with
+`400 Bad Request`.
+
+##### Fully ad-hoc: an inline query with an inline supporting artefact
+
+Nothing is stored on the server. The query is supplied as `subjectResource` and
+the ViewDefinition its `relatedArtifact` entry depends on is supplied as
+`context`, matched to that entry by `url` and bound to table `p`:
+
+```http
+POST /$sql-run HTTP/1.1
 Content-Type: application/fhir+json
 
 {
   "resourceType": "Parameters",
   "parameter": [
     { "name": "_format", "valueCode": "csv" },
-    { "name": "queryResource", "resource": {
+    { "name": "subjectResource", "resource": {
       "resourceType": "Library",
       "meta": { "profile": ["http://hl7.org/fhir/uv/sql-on-fhir/StructureDefinition/SQLQuery"] },
       "type": { "coding": [{ "system": "http://hl7.org/fhir/uv/sql-on-fhir/CodeSystem/LibraryTypesCodes", "code": "sql-query" }] },
@@ -359,7 +529,7 @@ Content-Type: application/fhir+json
         }]
       }]
     }},
-    { "name": "tableSource", "resource": {
+    { "name": "context", "resource": {
       "resourceType": "ViewDefinition",
       "url": "https://example.org/ViewDefinition/patient_view",
       "status": "active",
@@ -383,35 +553,35 @@ pt-1,Smith
 pt-2,Johnson
 ```
 
-##### Inline SQLView with Its Own Inline Dependency
+##### Transitive resolution through a supplied SQLView
 
-A supplied SQLView brings dependencies of its own, so the pool is matched against
-the whole transitive graph. Here the first entry binds to table `ap`; traversing it
-reveals a dependency that the second entry satisfies as table `p`. Both entries
-were selected, so nothing is unmatched. The resources are abbreviated to the
-elements that drive matching:
+A supplied SQLView brings dependencies of its own, so the entries are matched
+against the whole transitive graph. Here the first entry binds to table `ap`;
+traversing it reveals a dependency that the second entry satisfies as table `p`.
+Both entries were selected, so neither is unmatched. The resources are
+abbreviated to the elements that drive matching:
 
 ```http
-POST /$sqlquery-run HTTP/1.1
+POST /$sql-run HTTP/1.1
 Content-Type: application/fhir+json
 
 {
   "resourceType": "Parameters",
   "parameter": [
-    { "name": "queryResource", "resource": {
+    { "name": "subjectResource", "resource": {
       "resourceType": "Library",
       "relatedArtifact": [
         { "type": "depends-on", "resource": "https://example.org/SQLView/active_patients", "label": "ap" }
       ]
     }},
-    { "name": "tableSource", "resource": {
+    { "name": "context", "resource": {
       "resourceType": "Library",
       "url": "https://example.org/SQLView/active_patients",
       "relatedArtifact": [
         { "type": "depends-on", "resource": "https://example.org/ViewDefinition/patient_view", "label": "p" }
       ]
     }},
-    { "name": "tableSource", "resource": {
+    { "name": "context", "resource": {
       "resourceType": "ViewDefinition",
       "url": "https://example.org/ViewDefinition/patient_view"
     }}
@@ -419,26 +589,26 @@ Content-Type: application/fhir+json
 }
 ```
 
-##### An Unmatched Table Source Is Rejected
+##### An unmatched context entry is rejected
 
 A typo in a supplied `url` binds to no dependency, and is reported where the
-mistake was made rather than resurfacing later as an SQL error naming table `p` as
-missing:
+mistake was made rather than resurfacing later as an SQL error naming table `p`
+as missing:
 
 ```http
-POST /$sqlquery-run HTTP/1.1
+POST /$sql-run HTTP/1.1
 Content-Type: application/fhir+json
 
 {
   "resourceType": "Parameters",
   "parameter": [
-    { "name": "queryResource", "resource": {
+    { "name": "subjectResource", "resource": {
       "resourceType": "Library",
       "relatedArtifact": [
         { "type": "depends-on", "resource": "https://example.org/ViewDefinition/patient_view", "label": "p" }
       ]
     }},
-    { "name": "tableSource", "resource": {
+    { "name": "context", "resource": {
       "resourceType": "ViewDefinition",
       "url": "https://example.org/ViewDefinition/patient_veiw"
     }}
@@ -455,72 +625,67 @@ Content-Type: application/fhir+json
   "issue": [{
     "severity": "error",
     "code": "invalid",
-    "diagnostics": "Supplied tableSource 'https://example.org/ViewDefinition/patient_veiw' does not match any relatedArtifact dependency of the query",
-    "expression": ["tableSource"]
+    "diagnostics": "Supplied context entry 'https://example.org/ViewDefinition/patient_veiw' does not match any relatedArtifact dependency of the subject",
+    "expression": ["context"]
   }]
 }
 ```
 
-##### Instance-Level with a Supplied Table Source
+##### Naming two patients over GET
 
-The query is identified by the request path. Its other dependencies resolve on the
-server; the supplied one covers the dependency that does not. Had the server also
-been able to resolve `local_cohort`, the supplied resource would still take
-precedence:
+`patient` repeats, so a cohort of a few known patients needs no `Group`:
 
 ```http
-POST /Library/patient-bp-query/$sqlquery-run HTTP/1.1
-Content-Type: application/fhir+json
-
-{
-  "resourceType": "Parameters",
-  "parameter": [
-    { "name": "tableSource", "resource": {
-      "resourceType": "ViewDefinition",
-      "url": "https://example.org/ViewDefinition/local_cohort"
-    }},
-    { "name": "_format", "valueCode": "json" }
-  ]
-}
+GET /$sql-run?subjectCanonical=http%3A%2F%2Fexample.org%2FViewDefinition%2Fencounters&patient=Patient/123&patient=Patient/456&_format=csv HTTP/1.1
 ```
 
-##### System-Level
+```http
+HTTP/1.1 200 OK
+Content-Type: text/csv
 
-Invoke at the server base without a resource type. This is useful when the server
-supports SQLQuery Libraries but does not expose them as FHIR Library resources:
+id,patient,status,period_start
+enc-1,Patient/123,finished,2023-01-15T10:00:00Z
+enc-4,Patient/456,finished,2023-04-02T09:00:00Z
+```
+
+The result is restricted to those two patients' compartments. Over `POST` the
+same filter is expressed by repeating the `patient` parameter in the
+`Parameters` body. The filters apply to the resources feeding the view before
+projection, and where the subject is a query, before the SQL executes.
+
+##### Capping result rows with `_limit` {#limit-example}
+
+Use `_limit` to ask the server to return at most a given number of rows. The
+server may return fewer rows if the subject yields fewer or if its configured
+maximum is smaller; see [Row Limit](#row-limit) for the full semantics.
 
 ```http
-POST /$sqlquery-run HTTP/1.1
+POST /$sql-run HTTP/1.1
 Content-Type: application/fhir+json
 
 {
   "resourceType": "Parameters",
   "parameter": [
+    { "name": "subjectReference", "valueReference": { "reference": "Library/patient-bp-query" } },
     { "name": "_format", "valueCode": "csv" },
-    { "name": "queryReference", "valueReference": {
-      "reference": "Library/patient-bp-query"
-    }},
-    { "name": "parameters", "resource": {
-      "resourceType": "Parameters",
-      "parameter": [
-        { "name": "patient_id", "valueString": "Patient/123" }
-      ]
-    }}
+    { "name": "_limit", "valueInteger": 100 }
   ]
 }
 ```
 
-##### Default Format (`_format` omitted)
+##### Default format (`_format` omitted)
 
-When `_format` is omitted, the server returns the result in `ndjson` format:
+When `_format` is omitted and no format is derivable from `Accept`, the server
+returns the result in `ndjson` format:
 
 ```http
-POST /Library/patient-bp-query/$sqlquery-run HTTP/1.1
+POST /$sql-run HTTP/1.1
 Content-Type: application/fhir+json
 
 {
   "resourceType": "Parameters",
   "parameter": [
+    { "name": "subjectReference", "valueReference": { "reference": "Library/patient-bp-query" } },
     { "name": "parameters", "resource": {
       "resourceType": "Parameters",
       "parameter": [
@@ -537,74 +702,6 @@ Content-Type: application/x-ndjson
 
 {"patient_id":"Patient/123","systolic":120,"effective_date":"2024-01-15"}
 {"patient_id":"Patient/123","systolic":118,"effective_date":"2024-02-20"}
-```
-
-##### Scoping a Query to Patients and a Time Window
-
-`patient`, `group` and `_since` apply here exactly as they do on
-[`$sqlquery-export`](OperationDefinition-SQLQueryExport.html), so a body
-supplying only these, `_format`, `header`, `source` and `tableSource` is
-accepted by both, with `Prefer: respond-async` added for the export. The body
-below is such a case.
-
-Three parameters do not carry across unchanged, so the two operations are not
-interchangeable in general:
-
-- `_limit` is offered on the run operations only, since an export delivers files
-  rather than rows in a response.
-- The subject is named by `queryCanonical`, `queryReference` or `queryResource`
-  here, but by the repeating `query` parameter and its parts on the export.
-- `parameters` is a top-level parameter at every level here; on the export it is
-  a part of `query` at system and type level, with a top-level form available at
-  instance level only.
-
-See
-[Parameters that do not apply to every operation](operations-common.html#parameter-asymmetries).
-
-```http
-POST /Library/patient-bp-query/$sqlquery-run HTTP/1.1
-Content-Type: application/fhir+json
-
-{
-  "resourceType": "Parameters",
-  "parameter": [
-    { "name": "patient", "valueReference": { "reference": "Patient/123" } },
-    { "name": "patient", "valueReference": { "reference": "Patient/456" } },
-    { "name": "_since", "valueInstant": "2026-01-01T00:00:00Z" },
-    { "name": "_format", "valueCode": "csv" }
-  ]
-}
-```
-
-```http
-HTTP/1.1 200 OK
-Content-Type: text/csv
-
-patient_id,systolic,effective_date
-Patient/123,120,2026-01-15
-Patient/456,135,2026-01-20
-```
-
-The filters apply to the resources feeding the query's dependency views, before
-the SQL executes.
-
-##### Capping Result Rows with `_limit`
-
-Use `_limit` to ask the server to return at most a given number of rows. The
-server may return fewer rows if the query yields fewer or if its configured
-maximum is smaller; see [Row Limit](#row-limit) for the full semantics.
-
-```http
-POST /Library/patient-bp-query/$sqlquery-run HTTP/1.1
-Content-Type: application/fhir+json
-
-{
-  "resourceType": "Parameters",
-  "parameter": [
-    { "name": "_format", "valueCode": "csv" },
-    { "name": "_limit", "valueInteger": 100 }
-  ]
-}
 ```
 
 ##### Response
@@ -631,12 +728,13 @@ When `_format=fhir`, the response is a FHIR Parameters resource with each row as
 repeating `row` parameter.
 
 ```http
-POST /Library/patient-bp-query/$sqlquery-run HTTP/1.1
+POST /$sql-run HTTP/1.1
 Content-Type: application/fhir+json
 
 {
   "resourceType": "Parameters",
   "parameter": [
+    { "name": "subjectReference", "valueReference": { "reference": "Library/patient-bp-query" } },
     { "name": "_format", "valueCode": "fhir" },
     { "name": "parameters", "resource": {
       "resourceType": "Parameters",
@@ -674,7 +772,7 @@ Response:
 }
 ```
 
-When a query returns zero rows, the response is a Parameters resource with no
+When a subject returns zero rows, the response is a Parameters resource with no
 `parameter` elements:
 
 ```json
@@ -732,17 +830,51 @@ type within the SQL query.
 
 #### Parameter Passing
 
-Query parameters are passed as a nested `Parameters` resource, following the
-same pattern as the
+Parameter values are passed as a nested `Parameters` resource, following the same
+pattern as the
 [CQL `$evaluate` operation](https://hl7.org/fhir/uv/cql/OperationDefinition-cql-library-evaluate.html).
 See [Parameter Types](StructureDefinition-SQLQuery.html#parameter-types) on the
 SQLQuery profile for the binding rules and the mapping from
 `Library.parameter.type` to the `value[x]` element to use.
 
+`parameters` binds by name to the parameters the subject declares in
+`Library.parameter`, so it requires a SQLQuery or SQLView subject. A
+ViewDefinition declares no `Library.parameter`, so there is nothing for a value
+to bind to, and supplying `parameters` alongside a ViewDefinition subject is
+rejected with `400 Bad Request` and an `OperationOutcome` naming `parameters`.
+
+Binding values to a ViewDefinition's `constant` elements is deliberately out of
+scope. A `ViewDefinition.constant` already carries a value, so supplying one
+here would be substitution of a set value rather than binding of an unbound
+placeholder - a different semantic that deserves its own proposal.
+
 #### Error Handling
 
-| Status                     | Condition                                                                                                                                                                                                                                                                                                                                     |
-| -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `400 Bad Request`          | Missing required parameter, unknown parameter name, or value type mismatch; no subject form supplied at system or type level, more than one supplied, or any supplied at instance level (see [Identifying the query](#queryreference-clarification)); a `tableSource` with no `url`, sharing a `url` with another, or matching no dependency; a `patient` or `group` naming a resource the server cannot find (see [Status code for a value that cannot be resolved](operations-common.html#filter-resolution-errors)) |
-| `404 Not Found`            | An unresolvable `queryCanonical` or `queryReference`; the Library named by the request path not found; a dependency view neither supplied nor resolvable                                                                                                                                                                                      |
-| `422 Unprocessable Entity` | SQL execution error, a resolved artifact not conforming to the SQLQuery or SQLView profile, or unsupported SQL column type when using `_format=fhir` (see [type mapping](#sql-to-fhir-type-mapping))                                                                                                                                          |
+| Status                      | `issue.code`    | `expression`  | Condition                                                                                                                                     |
+| --------------------------- | --------------- | ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| `400 Bad Request`           | `required`      | subject       | No subject supplied                                                                                                                           |
+| `400 Bad Request`           | `invalid`       | subject       | More than one of `subjectCanonical`, `subjectReference` and `subjectResource` supplied                                                        |
+| `400 Bad Request`           | `invalid`       | `parameters`  | Supplied where the subject is a ViewDefinition                                                                                                |
+| `400 Bad Request`           | `invalid`       | `parameters`  | A parameter name the subject does not declare, or a value whose type does not match the declared type                                         |
+| `400 Bad Request`           | `invalid`       | `resource`    | Supplied where the subject is a SQLQuery or SQLView                                                                                           |
+| `400 Bad Request`           | `invalid`       | `context`     | An entry with no `url`, two entries sharing a `url`, or an entry matching no dependency of the subject                                        |
+| `400 Bad Request`           | `invalid`       | the parameter | A resource-carrying parameter supplied over `GET`                                                                                             |
+| `400 Bad Request`           | `not-found`     | `patient`     | A `patient` naming a resource the server cannot find (see [Status code for a value that cannot be resolved](operations-common.html#filter-resolution-errors)) |
+| `400 Bad Request`           | `not-found`     | `group`       | A `group` naming a resource the server cannot find                                                                                            |
+| `400 Bad Request`           | `not-supported` | the parameter | A parameter the server does not support (see [Declaring partial operation support](operations-capability.html#partial-operation-support))     |
+| `400 Bad Request`           | `not-supported` | `_format`     | A format the server does not support                                                                                                          |
+| `404 Not Found`             | `not-found`     | subject       | An unresolvable `subjectCanonical` or `subjectReference`                                                                                      |
+| `404 Not Found`             | `not-found`     | -             | A dependency neither supplied as a `context` entry nor resolvable by the server                                                               |
+| `406 Not Acceptable`        | `not-supported` | -             | An envelope representation the server declines for the chosen format (see [Content Negotiation](operations-common.html#content-negotiation))  |
+| `422 Unprocessable Entity`  | `invalid`       | subject       | A resolved artefact conforming to none of ViewDefinition, SQLQuery or SQLView                                                                 |
+| `422 Unprocessable Entity`  | `invalid`       | subject       | A conformant subject that cannot be processed, such as an invalid FHIRPath expression or an SQL syntax error                                  |
+| `422 Unprocessable Entity`  | `invalid`       | -             | A result column of an SQL type with no `value[x]` mapping, where `_format=fhir` (see [type mapping](#sql-to-fhir-type-mapping))               |
+| `500 Internal Server Error` | `exception`     | -             | Unexpected server error                                                                                                                       |
+
+{:.table-data}
+
+All error responses (4xx and 5xx) SHOULD include an `OperationOutcome` resource
+providing details about the error. Where a request carries both an unresolvable
+subject and an unresolvable filter value, the subject failure is the more
+fundamental: the response is `404 Not Found` and the `OperationOutcome` reports
+both issues.
