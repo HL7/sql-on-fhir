@@ -1,19 +1,22 @@
-Export SQLQuery Library results asynchronously using the FHIR Asynchronous Interaction Request Pattern.
+Export one or more subjects - ViewDefinitions, SQLQuery Libraries and SQLView
+Libraries, in any mixture - as a single asynchronous job, using the FHIR
+Asynchronous Interaction Request Pattern.
 
 **Use Cases:**
 
+- Exporting a mixed analytics bundle, the views and the queries over them, as one job whose outputs can be joined
 - Large-scale SQL query execution against ViewDefinition tables
 - Long-running analytical queries that would time out synchronously
-- Batch export of multiple query results in a single operation
-- Exporting queries with inline ViewDefinition table sources
+- Exporting subjects that depend on artefacts the server cannot itself resolve
 
-**Endpoints:**
+**Endpoint:**
 
-| Level    | Endpoint                                    | Query Source                                                                                              |
-| -------- | ------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
-| System   | `POST [base]/$sqlquery-export`              | `query` parameter (1..\*), each naming a Library by `queryCanonical`, `queryReference` or `queryResource` |
-| Type     | `POST [base]/Library/$sqlquery-export`      | `query` parameter (1..\*), each naming a Library by `queryCanonical`, `queryReference` or `queryResource` |
-| Instance | `POST [base]/Library/[id]/$sqlquery-export` | The bound Library named by the path                                                                       |
+The operation is invoked at the system level only. Subjects are named by the
+repeating `subject` parameter rather than by the request path.
+
+| Endpoint                  | Subjects named by                                                                                                                                                     |
+| ------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `POST [base]/$sql-export` | `subject` parameter (1..\*), each repetition naming a ViewDefinition, SQLQuery or SQLView by `subjectCanonical`, `subjectReference` or `subjectResource` |
 
 **Execution Flow:**
 
@@ -23,12 +26,11 @@ Export SQLQuery Library results asynchronously using the FHIR Asynchronous Inter
 4. Client fetches the result URL, which returns the manifest with `200 OK`
 5. Client downloads exported files from the `output.location` URLs in the manifest
 
-This operation combines the query source and parameter binding from
-[`$sqlquery-run`](OperationDefinition-SQLQueryRun.html) with the asynchronous
-export pattern from [`$viewdefinition-export`](OperationDefinition-ViewDefinitionExport.html).
-
 **Key Features:**
 
-- **Multiple queries** per export via the repeating `query` parameter, each with its own parameters
-- **ViewDefinition table sources** via the repeating `tableSource` parameter - supply a ViewDefinition or SQLView inline where the server cannot resolve a dependency named in the Library's `relatedArtifact` entries (materialised as tables for the SQL to query; only query results appear in the export output)
-- **Per-query parameters** - each `query` repetition can have its own `parameters` resource
+- **Mixed-subject batching** - one job exports any mixture of ViewDefinitions, SQLQuery Libraries and SQLView Libraries, each named by a `subject` repetition and each producing one manifest entry
+- **One snapshot** - every subject in the job is computed against a single consistent view of the data, so two outputs of one job can be joined without a skew window
+- **One set of filters** - `patient`, `group` and `_since` are stated once and apply to every subject
+- **Job-wide supporting artefacts** - the repeating `context` parameter supplies artefacts the server cannot itself resolve, once for the whole job however many subjects depend on them
+- **Per-subject parameters** - each `subject` repetition carries its own `parameters` resource
+- **Client tracking** - `clientTrackingId` is echoed in the manifest, correlating the job with the client's own records

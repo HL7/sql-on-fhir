@@ -1,12 +1,14 @@
 #### HTTP Methods
 
-- **POST**: Required for providing export parameters and SQLQuery Libraries
+- **POST**: required. The operation creates a job, so it cannot be expressed as a
+  safe `GET`; a `GET` on the operation endpoint is rejected with
+  `400 Bad Request`.
 
 #### Asynchronous Pattern
 
 This operation follows the [FHIR Asynchronous Interaction Request Pattern](https://build.fhir.org/ig/HL7/api-incubator-ig/branches/simplified-async-interaction/async-interaction.html); the asynchronous flow is specified once in [Common Operation Behavior - Asynchronous Delivery](operations-common.html#asynchronous-delivery):
 
-1. Client sends request with `Prefer: respond-async` header and query source parameters
+1. Client sends request with `Prefer: respond-async` header and one or more `subject` parameters
 2. Server returns `202 Accepted` with `Content-Location` header pointing to status URL
 3. Client polls the status URL for export progress
 4. Server responds with `202 Accepted` while export is in progress (MAY include interim results)
@@ -25,7 +27,7 @@ sequenceDiagram
 
     rect rgb(240, 248, 255)
     Note over C,S: Step 1: Kick-off
-    C->>S: POST /Library/$sqlquery-export<br/>Prefer: respond-async<br/>Body: Parameters{query, _format, ...}
+    C->>S: POST /$sql-export<br/>Prefer: respond-async<br/>Body: Parameters{subject, subject, _format, ...}
     S-->>C: 202 Accepted<br/>Content-Location: /status/abc123<br/>Body: Parameters{exportId, status: accepted}
     end
 
@@ -49,7 +51,7 @@ sequenceDiagram
 
     rect rgb(255, 248, 240)
     Note over C,S: Step 5: Download
-    C->>S: GET /export/abc123/bp-results.csv
+    C->>S: GET /export/abc123/bp_summary.csv
     S-->>C: 200 OK<br/>Content-Type: text/csv<br/>Body: patient_id,systolic,...
     end
 ```
@@ -80,6 +82,34 @@ sequenceDiagram
     S-->>C: 500 Internal Server Error<br/>Body: OperationOutcome{severity: error, diagnostics: ...}
 ```
 
+#### One Job, One Snapshot {#one-snapshot}
+
+One invocation is one job: one set of subjects, one set of filters, one supplied
+`context`, one manifest. Four guarantees hold across it.
+
+**One snapshot.** The server SHALL compute every subject in the job against a
+single consistent view of the data. Two outputs of one job can therefore be
+joined on a shared key without a skew window, whatever changes to the data occur
+while the job runs. This is what makes one job different from two jobs submitted
+together.
+
+**No ordering.** Neither the order of the `output` entries in the manifest nor
+the order in which subjects are computed is guaranteed, and servers MAY compute
+subjects in parallel. The shared snapshot is the only consistency guarantee
+offered. Clients correlate manifest entries with the subjects they requested by
+[`output.name`](#output-name-clarification), never by position.
+
+**One resolution per canonical URL.** A canonical URL appearing as a dependency
+of more than one subject is resolved once for the job, and every subject
+depending on it sees the same resolved artefact; see
+[Supporting artefacts](operations-common.html#context). Whether that artefact is
+then materialised once or several times is not constrained, consistent with what
+this specification already leaves to implementations.
+
+**One `output` per subject.** The manifest carries exactly one `output` entry per
+`subject` repetition and none for any other supplied artefact. A `context` entry
+is a supporting artefact rather than a subject, so it never produces one.
+
 #### Data Sources
 
 The operation can export data from:
@@ -89,19 +119,21 @@ The operation can export data from:
 
 #### Filtering
 
-`patient`, `group` and `_since` restrict the data the queries see. They carry the
-same meaning here as on the other three data operations, and are specified once in
+`patient`, `group` and `_since` restrict the data every subject in the job sees.
+They are stated once for the whole job - there is no way to scope one subject
+differently from another - and carry the same meaning here as on
+[`$sql-run`](OperationDefinition-SQLRun.html), specified once in
 [Filtering](operations-common.html#filtering):
 
 - `patient` - restrict to the patient compartments of the supplied patients ([details](operations-common.html#patient-filter))
 - `group` - restrict to members of the supplied Groups ([details](operations-common.html#group-filter))
 - `_since` - restrict to resources whose state changed after the supplied instant ([details](operations-common.html#since-filter))
 
-On this operation and on
-[`$sqlquery-run`](OperationDefinition-SQLQueryRun.html), the filter applies to the
-FHIR resources feeding the queries' dependency views, before the SQL executes. The
-SQL therefore sees tables already narrowed to the requested scope, rather than
-being expected to express the filter itself.
+The filter applies to the FHIR resources feeding a view before projection. Where
+a subject is a SQLQuery or SQLView, that means it applies to the resources
+feeding that subject's dependency views, before the SQL executes: the SQL sees
+tables already narrowed to the requested scope, rather than being expected to
+express the filter itself.
 
 #### Required Headers
 
@@ -131,162 +163,69 @@ client to negotiate a different representation for interim status responses
 
 ##### Input Parameters
 
-###### Query Source - `query` Parameter (1..\*, system+type scope)
+###### Subjects - `subject` Parameter (1..\*)
 
-Each repetition identifies a single SQLQuery Library to export. At least one `query` is required at system/type level.
+Each repetition names a single artefact to export - a ViewDefinition, a SQLQuery
+Library or a SQLView Library - and produces exactly one `output` entry in the
+manifest. One job may name any mixture of the three. At least one `subject` is
+required; a request supplying none is rejected with `400 Bad Request`.
 
-| Part Name      | Type       | Min | Max | Description                                                                                               |
-| -------------- | ---------- | --- | --- | --------------------------------------------------------------------------------------------------------- |
-| name           | string     | 0   | 1   | Optional friendly name for the exported query output                                                      |
-| queryCanonical | canonical  | 0¹  | 1   | Canonical URL of the SQLQuery or SQLView Library. [Details](#queryreference-clarification)                |
-| queryReference | Reference  | 0¹  | 1   | Literal location of a SQLQuery or SQLView Library on the server. [Details](#queryreference-clarification) |
-| queryResource  | Library    | 0¹  | 1   | Inline SQLQuery or SQLView Library resource. [Details](#queryreference-clarification)                     |
-| parameters     | Parameters | 0   | 1   | Input parameters for this query. [Details](#parameter-passing)                                            |
-
-{:.table-data}
-
-¹ Exactly one of `queryCanonical`, `queryReference` or `queryResource` is required
-per `query` repetition. See [Identifying each query](#queryreference-clarification).
-
-###### Instance-level invocation {#instance-level}
-
-At the instance level (`POST [base]/Library/[id]/$sqlquery-export`), the bound
-Library identified by the request URL serves as the single query source and the
-`query` parameter does not apply: the subject is already named by the path, so
-supplying `query` as well would be ambiguous. Exporting several queries in one
-operation therefore requires the system or type level.
-
-Every other input parameter does apply at the instance level, in addition to
-system and type: `clientTrackingId`, `_format`, `header`, `patient`, `group`,
-`_since` and `source`, along with `tableSource`.
-
-A parameterised query is bound through the top-level `parameters` parameter,
-which is available **at the instance level only**:
-
-| Name         | Type         | Min | Max | Scope        | Description                                                              |
-| ------------ | ------------ | --- | --- | ------------ | ------------------------------------------------------------------------ |
-| `parameters` | `Parameters` | 0   | 1   | instance     | Values bound by name to the parameters the bound Library declares in `Library.parameter.name` |
+| Part Name        | Type                                   | Min | Max | Description                                                                      |
+| ---------------- | -------------------------------------- | --- | --- | ---------------------------------------------------------------------------------- |
+| name             | string                                 | 0   | 1   | Name for this subject's output entry. [Details](#output-name-clarification)      |
+| subjectCanonical | canonical                              | 0¹  | 1   | Canonical URL of the subject. [Details](#subject-clarification)                  |
+| subjectReference | Reference                              | 0¹  | 1   | Literal location of the subject on the server. [Details](#subject-clarification) |
+| subjectResource  | ViewDefinition \| SQLQuery \| SQLView² | 0¹  | 1   | Inline subject resource. [Details](#subject-clarification)                       |
+| parameters       | Parameters                             | 0   | 1   | Input parameter values for this subject. [Details](#parameter-passing)           |
 
 {:.table-data}
 
-Binding follows the same rules as
-[`$sqlquery-run`](OperationDefinition-SQLQueryRun.html#parameter-passing): each
-supplied value is matched by name to a `Library.parameter` entry, using the
-`value[x]` type that corresponds to the declared `Library.parameter.type`. A
-name the bound Library does not declare, or a value whose type does not match
-the declared type, is rejected with `400 Bad Request` and an `OperationOutcome`
-naming the parameter.
-
-The restriction to the instance level is deliberate rather than an oversight. At
-system and type level a request may carry several `query` repetitions, each
-declaring its own parameters, so a single top-level set would be ambiguous: it
-would need rules for whether it applies to every query or only to those
-supplying none, for how it combines with a per-query set, and for what happens
-when two queries declare the same name with different
-`Library.parameter.type` - a case in which one binding would be simultaneously
-valid against one query and a type mismatch against another. At the instance
-level there is exactly one query and no `query` parameter, so none of these
-questions arises. Supplying a top-level `parameters` at system or type level is
-therefore rejected with `400 Bad Request`; use `query.parameters` there instead.
-
-For example, exporting a stored query for two patients as CSV, under a client
-tracking identifier:
-
-```http
-POST /Library/patient-bp-query/$sqlquery-export HTTP/1.1
-Content-Type: application/fhir+json
-Prefer: respond-async
-
-{
-  "resourceType": "Parameters",
-  "parameter": [
-    { "name": "clientTrackingId", "valueString": "bp-report-2026-07" },
-    { "name": "patient", "valueReference": { "reference": "Patient/123" } },
-    { "name": "patient", "valueReference": { "reference": "Patient/456" } },
-    { "name": "_format", "valueCode": "csv" }
-  ]
-}
-```
-
-The response is `202 Accepted` with a `Content-Location` polling URL, the export
-scoped to those two patients and delivered as CSV, and `clientTrackingId` echoed
-in the manifest. Supplying `query` here is out of scope and is rejected with
-`400 Bad Request` and an `OperationOutcome`.
-
-Where the bound Library declares parameters, their values are supplied in the
-same request. Given a Library declaring `min_systolic` as an `integer` and
-`observation_status` as a `code`:
-
-```http
-POST /Library/bp-threshold-query/$sqlquery-export HTTP/1.1
-Content-Type: application/fhir+json
-Prefer: respond-async
-
-{
-  "resourceType": "Parameters",
-  "parameter": [
-    {
-      "name": "parameters",
-      "resource": {
-        "resourceType": "Parameters",
-        "parameter": [
-          { "name": "min_systolic", "valueInteger": 140 },
-          { "name": "observation_status", "valueCode": "final" }
-        ]
-      }
-    },
-    { "name": "patient", "valueReference": { "reference": "Patient/123" } },
-    { "name": "_format", "valueCode": "ndjson" }
-  ]
-}
-```
-
-The query executes with `min_systolic` bound to `140` and
-`observation_status` to `final`, over the resources in `Patient/123`'s
-compartment, and the result is exported as NDJSON. The equivalent request at
-type level would carry a `query` repetition whose `parameters` part holds the
-same inner `Parameters` resource.
-
-###### ViewDefinition table sources
-
-A query's table sources are named by its `relatedArtifact` entries and are
-normally resolved by the server. Where the server cannot resolve one - typically
-because the view exists only on the client - the client supplies it inline with
-`tableSource`.
-
-| Name         | Type                      | Min | Max | Description                                                                                                    |
-| ------------ | ------------------------- | --- | --- | -------------------------------------------------------------------------------------------------------------- |
-| tableSource | ViewDefinition \| SQLView² | 0   | \*  | Inline table source, matched to a dependency by canonical URL. [Details](operations-common.html#table-sources) |
-
-{:.table-data}
-
+¹ Exactly one of `subjectCanonical`, `subjectReference` or `subjectResource` is
+required per `subject` repetition. See
+[Naming each subject](#subject-clarification).
 
 ² Declared as `CanonicalResource` in the OperationDefinition; see
 [Why the declared type is `CanonicalResource`](operations-common.html#declared-type).
 
-The matching, precedence and error rules are specified once in
-[ViewDefinition table sources](operations-common.html#table-sources) and apply
-identically here and on
-[`$sqlquery-run`](OperationDefinition-SQLQueryRun.html). That section governs; in
-outline, the supplied entries form one pool matched by canonical URL against every
-dependency of every query in the request, a supplied resource outranks one the
-server could itself resolve, an entry that cannot be bound or matches nothing is
-rejected with `400 Bad Request`, and a dependency neither supplied nor resolvable
-is rejected with `404 Not Found`.
+`parameters` binds to the parameters the subject's Library declares, so it is
+permitted only where that repetition's subject is a SQLQuery or SQLView.
+Supplying it where the subject is a ViewDefinition is rejected with
+`400 Bad Request`, because a ViewDefinition declares no parameters.
 
-Supplied resources are table sources, not export subjects: they produce no
-`output` entries in the manifest, which carries one entry per query and nothing
+###### Supporting artefacts - `context` Parameter
+
+A subject's dependencies are named by its `relatedArtifact` entries and are
+normally resolved by the server. Where the server cannot resolve one - typically
+because the artefact exists only on the client - the client supplies it inline
+with `context`.
+
+| Name    | Type                       | Min | Max | Description                                                                                                     |
+| ------- | -------------------------- | --- | --- | ----------------------------------------------------------------------------------------------------------------- |
+| context | ViewDefinition \| SQLView² | 0   | \*  | Inline supporting artefact, matched to a dependency by canonical URL. [Details](operations-common.html#context) |
+
+{:.table-data}
+
+`context` applies to the job as a whole rather than to one subject, so an
+artefact several subjects depend on is supplied once and
+[resolved once](#one-snapshot). The matching, precedence and error rules are
+specified once in
+[Supporting artefacts](operations-common.html#context) and apply identically here
+and on [`$sql-run`](OperationDefinition-SQLRun.html). That section governs; in
+outline, the supplied entries are matched by canonical URL against every
+dependency of every subject in the request, a supplied entry outranks an artefact
+the server could itself resolve, an entry that cannot be bound or matches nothing
+is rejected with `400 Bad Request`, and a dependency neither supplied nor
+resolvable is rejected with `404 Not Found`.
+
+A `context` entry is a supporting artefact, not an export subject: it produces no
+`output` entry in the manifest, which carries one entry per `subject` and nothing
 else.
-
-Unlike the `query` parameter, `tableSource` applies at the instance level as
-well as at system and type level, because a stored query can depend on a view the
-server cannot resolve.
 
 ###### Export Control
 
 | Name             | Type    | Min | Max | Description                                                                                   |
 | ---------------- | ------- | --- | --- | --------------------------------------------------------------------------------------------- |
-| clientTrackingId | string  | 0   | 1   | Client-provided tracking ID for the export operation                                          |
+| clientTrackingId | string  | 0   | 1   | Client-provided tracking ID for the export job, echoed in the manifest                        |
 | \_format         | code    | 0   | 1   | Output format: `csv`, `ndjson`, `parquet`, `json`. [Details](#format-parameter-clarification) |
 | header           | boolean | 0   | 1   | Include CSV headers (default true). Applies only when csv output is requested                 |
 
@@ -310,36 +249,51 @@ server cannot resolve.
 
 {:.table-data}
 
+`resource` and `_limit` are not offered on this operation, and `fhir` is not an
+available output format; see
+[Parameters that do not apply to every operation](operations-common.html#parameter-asymmetries).
+
 A server that does not support a parameter declares that through the mechanism
 described in
 [Declaring partial operation support](operations-capability.html#partial-operation-support),
 and rejects a request supplying it as specified there.
 
-###### Identifying each query {#queryreference-clarification}
+###### Naming each subject {#subject-clarification}
 
-Each `query` repetition names the SQLQuery or SQLView Library to export in exactly
-one of three ways, each with its own part so that the intended meaning is carried
-by the part's type rather than inferred from the shape of a string:
+Each `subject` repetition names the artefact to export in exactly one of three
+ways, each with its own part so that the intended meaning is carried by the
+part's type rather than inferred from the shape of a string. All three admit a
+[ViewDefinition](StructureDefinition-ViewDefinition.html), a
+[SQLQuery](StructureDefinition-SQLQuery.html) Library or a
+[SQLView](StructureDefinition-SQLView.html) Library, so the naming form is chosen
+independently of the subject's kind:
 
-| Part                   | Type        | Names the query by                                                                                                                                                                                                                                                                 |
-| ---------------------- | ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `query.queryCanonical` | `canonical` | Its canonical URL, optionally with a `\|version` suffix pinning a version (e.g. `http://example.org/Library/bp-summary\|2.1.0`). Absent a suffix, the server selects a version according to FHIR's [canonical resolution](https://hl7.org/fhir/R5/references.html#canonical) rules |
-| `query.queryReference` | `Reference` | A literal location: a relative URL on this server (e.g. `Library/patient-bp-query`) or an absolute URL (e.g. `http://example.org/fhir/Library/patient-bp-query`). This is not a canonical URL                                                                                      |
-| `query.queryResource`  | `Library`   | Carrying the Library itself in the request                                                                                                                                                                                                                                         |
+| Part                       | Type                                   | Names the subject by                                                                                                                                                                                                                                                              |
+| -------------------------- | -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `subject.subjectCanonical` | `canonical`                            | Its canonical URL, optionally with a `\|version` suffix pinning a version (e.g. `http://example.org/Library/bp-summary\|2.1.0`). Absent a suffix, the server selects a version according to FHIR's [canonical resolution](https://hl7.org/fhir/R5/references.html#canonical) rules |
+| `subject.subjectReference` | `Reference`                            | A literal location: a relative URL on this server (e.g. `Library/patient-bp-query`) or an absolute URL (e.g. `http://example.org/fhir/Library/patient-bp-query`). This is not a canonical URL                                                                                      |
+| `subject.subjectResource`  | ViewDefinition \| SQLQuery \| SQLView² | Carrying the artefact itself in the request                                                                                                                                                                                                                                        |
 
 {:.table-data}
 
-Each `query` repetition SHALL supply exactly one of the three. Supplying none, or
-more than one, in a single repetition is rejected with `400 Bad Request` and an
-`OperationOutcome` naming the problem.
+² `subjectResource` is declared as `CanonicalResource` in the
+OperationDefinition. ViewDefinition is a logical model in this guide rather than
+a FHIR resource, so `ViewDefinition` is not a value `parameter.type` accepts;
+`CanonicalResource` is the narrowest declared type admitting all three kinds, and
+the real constraint is carried by `targetProfile`. See
+[Why the declared type is `CanonicalResource`](operations-common.html#declared-type).
 
-A `query.queryCanonical` or `query.queryReference` the server cannot resolve is
-rejected with `404 Not Found` and an `OperationOutcome`. A resolved artifact that
-does not conform to the SQLQuery or SQLView profile is rejected with
+Each `subject` repetition SHALL supply exactly one of the three. Supplying none,
+or more than one, in a single repetition is rejected with `400 Bad Request` and
+an `OperationOutcome` naming the problem.
+
+A `subject.subjectCanonical` or `subject.subjectReference` the server cannot
+resolve is rejected with `404 Not Found` and an `OperationOutcome`. A resolved
+artefact conforming to none of the three profiles is rejected with
 `422 Unprocessable Entity`.
 
 How a server resolves a canonical URL or an absolute reference - from a local
-artifact registry, by dereferencing the URL, or not at all - is an implementation
+artefact registry, by dereferencing the URL, or not at all - is an implementation
 matter. A server that supports only some of these parts declares the subset it
 supports as described in
 [Declaring partial operation support](operations-capability.html#partial-operation-support).
@@ -349,7 +303,9 @@ supports as described in
 The supported formats (`json`, `ndjson`, `csv`, `parquet`) and the default are
 defined in
 [Common Operation Behavior](operations-common.html#output-formats) and apply to
-this operation. The `fhir` format is available on the run operations only:
+this operation. The `fhir` format is available on the run operation only, because
+an export produces flat files; requesting it here is rejected with
+`400 Bad Request`.
 
 - It is RECOMMENDED to support `json`, `ndjson` and `csv` by default; servers MAY
   support `parquet`, and SHALL document supported formats in the
@@ -362,24 +318,29 @@ this operation. The `fhir` format is available on the run operations only:
 
 ###### Filtering Parameter Clarification
 
-`patient`, `group` and `_since` carry the same meaning on all four data
-operations, and are specified once in
+`patient`, `group` and `_since` carry the same meaning on both data operations,
+and are specified once in
 [Filtering](operations-common.html#filtering):
 [`patient`](operations-common.html#patient-filter),
 [`group`](operations-common.html#group-filter) and
-[`_since`](operations-common.html#since-filter). On this operation the filter
-applies to the resources feeding the queries' dependency views, before the SQL
-executes.
+[`_since`](operations-common.html#since-filter). On this operation they are
+stated once and apply to every subject in the job.
 
-#### Parameter Passing
+#### Parameter Passing {#parameter-passing}
 
-Query parameters are passed as a nested `Parameters` resource within each
-`query` repetition (per-query binding via the `parameters` part), following the
-same pattern as [`$sqlquery-run`](OperationDefinition-SQLQueryRun.html) and the
+Parameter values are passed as a nested `Parameters` resource within each
+`subject` repetition, following the same pattern as
+[`$sql-run`](OperationDefinition-SQLRun.html#parameter-passing) and the
 [CQL `$evaluate` operation](https://hl7.org/fhir/uv/cql/OperationDefinition-cql-library-evaluate.html).
+Binding is per subject because one job may carry several subjects, each declaring
+its own parameters, so a single top-level set would be ambiguous across them.
+
 See [Parameter Types](StructureDefinition-SQLQuery.html#parameter-types) on the
 SQLQuery profile for the binding rules and the mapping from
-`Library.parameter.type` to the `value[x]` element to use.
+`Library.parameter.type` to the `value[x]` element to use. A parameter name the
+subject does not declare, or a value whose type does not match the declared type,
+is rejected with `400 Bad Request` and an `OperationOutcome` naming the
+parameter.
 
 #### Output Parameters
 
@@ -402,19 +363,19 @@ the export is still in progress.
 | Name            | Type    | Min | Max | Description                                                      |
 | --------------- | ------- | --- | --- | ---------------------------------------------------------------- |
 | \_format        | code    | 0   | 1   | The format of the exported files (echoed from input if provided) |
-| exportStartTime | instant | 0   | 1   | When the export operation began                                  |
-| exportEndTime   | instant | 0   | 1   | When the export operation completed                              |
+| exportStartTime | instant | 0   | 1   | When the export job began                                        |
+| exportEndTime   | instant | 0   | 1   | When the export job completed                                    |
 | exportDuration  | integer | 0   | 1   | The actual duration of the export in seconds                     |
 
 {:.table-data}
 
 ##### Export Results
 
-| Name            | Type    | Min | Max | Description                                                                                                                                  |
-| --------------- | ------- | --- | --- | -------------------------------------------------------------------------------------------------------------------------------------------- |
-| output          | complex | 0   | \*  | Output information for each exported SQL query result (one per `query`; resources supplied via `tableSource` do not produce output entries) |
-| output.name     | string  | 1   | 1   | The name of the exported output. [Details](#output-name-clarification)                                                                       |
-| output.location | uri     | 1   | \*  | URL(s) to download the exported file(s). [Details](#output-partitioning)                                                                     |
+| Name            | Type    | Min | Max | Description                                                                                                   |
+| --------------- | ------- | --- | --- | ----------------------------------------------------------------------------------------------------------------- |
+| output          | complex | 0   | \*  | Output information for each exported subject: exactly one entry per `subject`, and none for a `context` entry |
+| output.name     | string  | 1   | 1   | The name of the exported output. [Details](#output-name-clarification)                                        |
+| output.location | uri     | 1   | \*  | URL(s) to download the exported file(s). [Details](#output-partitioning)                                      |
 
 {:.table-data}
 
@@ -431,23 +392,31 @@ During status polling (`202 Accepted` responses), servers MAY include the follow
 
 Servers MAY also include partial/interim results during polling. The format of interim responses is implementation-defined.
 
-##### Output Name Clarification
+##### Output Name Clarification {#output-name-clarification}
 
-The `output.name` parameter identifies the exported query result. The value is determined as follows:
+`output.name` identifies which subject an entry belongs to. Because the manifest
+states no ordering, it is the only way a client correlates an entry with the
+subject it requested. The value is determined in three steps:
 
-1. If a `name` was provided in the `query` part, the server SHOULD use it
-2. Otherwise, the server MAY use the SQLQuery Library's `name` element
+1. If a `name` was supplied in that `subject` repetition, the server SHOULD use it
+2. Otherwise, the server MAY use the subject's own `name` element
 3. If neither is available, the server SHALL generate a unique identifier for the output
 
-When multiple queries are exported, each produces a separate `output` entry with a distinct `name`.
+Output names SHALL be unique across the job. A request in which two `subject`
+repetitions would produce the same `output.name` is rejected with
+`400 Bad Request` and an `OperationOutcome` whose `expression` names `subject`,
+because manifest entries a client cannot tell apart are of no use to it. Where
+the client names its subjects explicitly the collision is visible in the request;
+where it does not, the collision is between two subjects whose own `name`
+elements agree, and supplying an explicit `name` on either resolves it.
 
-##### Output Partitioning
+##### Output Partitioning {#output-partitioning}
 
 For large exports, servers MAY partition the output into multiple files. When partitioning occurs:
 
 1. **Multiple Locations**: The `output.location` parameter can repeat within a single output entry
 2. **File Naming**: Partitioned files SHOULD use a consistent naming convention (e.g., `filename.part1.parquet`, `filename.part2.parquet`)
-3. **Complete Set**: All parts together represent the complete export for that query
+3. **Complete Set**: All parts together represent the complete export for that subject
 
 **Example of partitioned output:**
 
@@ -457,15 +426,15 @@ For large exports, servers MAY partition the output into multiple files. When pa
   "part": [
     {
       "name": "name",
-      "valueString": "patient_bp_results"
+      "valueString": "bp_summary"
     },
     {
       "name": "location",
-      "valueUri": "https://example.com/export/123/patient_bp_results.part1.csv"
+      "valueUri": "https://example.com/export/123/bp_summary.part1.csv"
     },
     {
       "name": "location",
-      "valueUri": "https://example.com/export/123/patient_bp_results.part2.csv"
+      "valueUri": "https://example.com/export/123/bp_summary.part2.csv"
     }
   ]
 }
@@ -475,24 +444,57 @@ Clients MUST download all parts to obtain the complete dataset.
 
 #### Error Handling
 
-##### HTTP Status Codes
+##### Flow Status Codes
 
-The $sqlquery-export operation uses standard HTTP status codes to indicate the outcome:
+| Status Code   | Meaning                                                                              |
+| ------------- | -------------------------------------------------------------------------------------- |
+| 202 Accepted  | Kick-off accepted, export still in progress during polling, or cancellation accepted |
+| 303 See Other | Export finished, successfully or not; `Location` header carries the result URL       |
+| 200 OK        | Result URL returns the manifest `Parameters`; download URLs return the files         |
 
-| Status Code               | Description          | When to Use                                                                                                                                                                                                                                                     |
-| ------------------------- | -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 202 Accepted              | In Progress          | Export request accepted, still in progress during polling, or cancellation accepted                                                                                                                                                                             |
-| 303 See Other             | Job Finished         | Export finished (successfully or not); `Location` header carries the result URL                                                                                                                                                                                 |
-| 200 OK                    | Result Available     | Result URL returns the manifest `Parameters`; download URLs return the files                                                                                                                                                                                    |
-| 400 Bad Request           | Client Error         | Invalid parameters, unsupported parameters, missing required headers; a `query` repetition naming no subject form or more than one; `query` supplied at instance level; a top-level `parameters` supplied at system or type level; a parameter name the bound Library does not declare, or a value whose type does not match the declared type; a `tableSource` with no `url`, sharing a `url` with another, or matching no dependency; a `patient` or `group` naming a resource the server cannot find (see [Status code for a value that cannot be resolved](operations-common.html#filter-resolution-errors)) |
-| 404 Not Found             | Not Found            | SQLQuery Library not found, a dependency neither supplied nor resolvable, or a cancelled export status URL                                                                                                                                                      |
-| 422 Unprocessable Entity  | Business Logic Error | Valid request but query is invalid or cannot be executed                                                                                                                                                                                                        |
-| 429 Too Many Requests     | Excessive Polling    | Client is polling too frequently; back off exponentially, guided by `Retry-After`                                                                                                                                                                               |
-| 500 Internal Server Error | Server Error         | Unexpected server error; on the result URL, the failure outcome of the export                                                                                                                                                                                   |
+{:.table-data}
+
+##### Rejected Requests
+
+| Status                      | `issue.code`    | `expression`  | Condition                                                                                                                                                    |
+| --------------------------- | --------------- | ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `400 Bad Request`           | `required`      | -             | `Prefer: respond-async` absent, or the operation invoked with `GET`                                                                                          |
+| `400 Bad Request`           | `required`      | `subject`     | No `subject` supplied                                                                                                                                        |
+| `400 Bad Request`           | `invalid`       | `subject`     | A repetition supplying none of the three naming forms, or more than one                                                                                      |
+| `400 Bad Request`           | `invalid`       | `subject`     | Two repetitions that would produce the same `output.name`                                                                                                    |
+| `400 Bad Request`           | `invalid`       | `parameters`  | Supplied where that repetition's subject is a ViewDefinition                                                                                                 |
+| `400 Bad Request`           | `invalid`       | `parameters`  | A parameter name the subject does not declare, or a value whose type does not match the declared type                                                        |
+| `400 Bad Request`           | `invalid`       | `context`     | An entry with no `url`, two entries sharing a `url`, or an entry matching no dependency of any subject                                                       |
+| `400 Bad Request`           | `not-found`     | `patient`     | A `patient` naming a resource the server cannot find (see [Status code for a value that cannot be resolved](operations-common.html#filter-resolution-errors)) |
+| `400 Bad Request`           | `not-found`     | `group`       | A `group` naming a resource the server cannot find                                                                                                           |
+| `400 Bad Request`           | `not-supported` | the parameter | A parameter the server does not support (see [Declaring partial operation support](operations-capability.html#partial-operation-support))                    |
+| `400 Bad Request`           | `not-supported` | `_format`     | A format the server does not support                                                                                                                         |
+| `400 Bad Request`           | `invalid`       | `_format`     | `fhir` requested, which this operation does not offer                                                                                                        |
+| `400 Bad Request`           | `invalid`       | `_limit`      | Supplied, which this operation does not offer                                                                                                                |
+| `404 Not Found`             | `not-found`     | `subject`     | An unresolvable `subjectCanonical` or `subjectReference`                                                                                                     |
+| `404 Not Found`             | `not-found`     | -             | A dependency neither supplied as a `context` entry nor resolvable by the server                                                                              |
+| `404 Not Found`             | `not-found`     | -             | A status URL for a cancelled job                                                                                                                             |
+| `422 Unprocessable Entity`  | `invalid`       | `subject`     | A resolved artefact conforming to none of ViewDefinition, SQLQuery or SQLView                                                                                |
+| `422 Unprocessable Entity`  | `invalid`       | `subject`     | A conformant subject that cannot be processed, such as an SQL syntax error or an invalid FHIRPath expression                                                 |
+| `429 Too Many Requests`     | `throttled`     | -             | Excessive polling; back off exponentially, guided by `Retry-After`                                                                                           |
+| `500 Internal Server Error` | `exception`     | -             | Unexpected server error; on the result URL, the failure outcome of the job                                                                                   |
 
 {:.table-data}
 
 All error responses (4xx and 5xx) SHOULD include an `OperationOutcome` resource providing details about the error.
+
+Where a request carries both an unresolvable subject and an unresolvable filter
+value, the subject failure is the more fundamental: the response is
+`404 Not Found` and the `OperationOutcome` reports both issues.
+
+##### Timing of Rejection
+
+Invalid requests are rejected **synchronously at kick-off** - bad or unsupported
+parameters, authorisation failures, unresolvable subjects, unresolvable
+dependencies and unmatched `context` entries alike. Rejection is never deferred
+to the status URL. The status endpoint reflects polling machinery only; it never
+communicates the job's outcome, which is why a finished job returns
+`303 See Other` whether it succeeded or failed.
 
 ##### Common Error Scenarios
 
@@ -516,49 +518,10 @@ Content-Type: application/fhir+json
 }
 ```
 
-###### 2. Invalid SQLQuery Library
+###### 2. Colliding Output Names
 
-When a provided SQLQuery Library is invalid:
-
-```http
-HTTP/1.1 422 Unprocessable Entity
-Content-Type: application/fhir+json
-
-{
-  "resourceType": "OperationOutcome",
-  "issue": [
-    {
-      "severity": "error",
-      "code": "invalid",
-      "diagnostics": "The SQLQuery Library contains invalid SQL: syntax error near 'SELCT'"
-    }
-  ]
-}
-```
-
-###### 3. SQLQuery Library Not Found
-
-When a referenced SQLQuery Library does not exist:
-
-```http
-HTTP/1.1 404 Not Found
-Content-Type: application/fhir+json
-
-{
-  "resourceType": "OperationOutcome",
-  "issue": [
-    {
-      "severity": "error",
-      "code": "not-found",
-      "diagnostics": "SQLQuery Library with reference 'Library/non-existent' not found"
-    }
-  ]
-}
-```
-
-###### 4. Parameter Type Mismatch
-
-When a query parameter value type does not match the declared Library.parameter.type:
+Two `subject` repetitions naming the same output leave the client unable to tell
+the manifest entries apart:
 
 ```http
 HTTP/1.1 400 Bad Request
@@ -570,7 +533,50 @@ Content-Type: application/fhir+json
     {
       "severity": "error",
       "code": "invalid",
-      "diagnostics": "Parameter 'from_date' expects type 'date' but received 'valueString'"
+      "diagnostics": "Two subject repetitions would produce the output name 'demographics'",
+      "expression": ["subject"]
+    }
+  ]
+}
+```
+
+###### 3. Subject Not Found
+
+When a named subject does not exist:
+
+```http
+HTTP/1.1 404 Not Found
+Content-Type: application/fhir+json
+
+{
+  "resourceType": "OperationOutcome",
+  "issue": [
+    {
+      "severity": "error",
+      "code": "not-found",
+      "diagnostics": "Subject with reference 'Library/non-existent' not found",
+      "expression": ["subject.subjectReference"]
+    }
+  ]
+}
+```
+
+###### 4. Parameter Type Mismatch
+
+When a supplied parameter value type does not match the declared `Library.parameter.type`:
+
+```http
+HTTP/1.1 400 Bad Request
+Content-Type: application/fhir+json
+
+{
+  "resourceType": "OperationOutcome",
+  "issue": [
+    {
+      "severity": "error",
+      "code": "invalid",
+      "diagnostics": "Parameter 'from_date' expects type 'date' but received 'valueString'",
+      "expression": ["subject.parameters"]
     }
   ]
 }
@@ -602,12 +608,12 @@ Content-Type: application/fhir+json
 
 #### Operation Flow
 
-1. **Kick-off Request**: Client sends `POST Library/$sqlquery-export` with `Prefer: respond-async` header and one or more `query` parameters.
+1. **Kick-off Request**: Client sends `POST [base]/$sql-export` with `Prefer: respond-async` header and one or more `subject` parameters.
 2. **Kick-off Response**: Server responds with:
    - `202 Accepted` status code
    - `Content-Location` header with the absolute URL for subsequent status requests (polling location)
    - Parameters resource with `status` parameter set to `accepted` and `location` parameter
-   - If request is not valid or cannot be processed, server responds with `400 Bad Request` and `OperationOutcome` resource in the body.
+   - If the request is not valid or cannot be processed, the server responds with the relevant `4xx` status code and an `OperationOutcome` resource in the body.
 3. **Status Polling**: Client polls the polling location to get status of the export:
    - **In Progress**: `202 Accepted` with optional Parameters resource for interim status
    - **Progress Updates**: Server MAY include `X-Progress` header to indicate completion percentage
@@ -624,8 +630,8 @@ Content-Type: application/fhir+json
      values.
 5. **Result Retrieval**: Client fetches the result URL with `GET`:
    - **Success**: `200 OK` with the manifest `Parameters` resource in the body
-     containing `status` = `completed`, the export metadata, and the `output`
-     entries with their download `location`s
+     containing `status` = `completed`, the export metadata, and one `output`
+     entry per subject with its download `location`s
    - **Failure**: the relevant error status code (e.g.
      `500 Internal Server Error`) with an `OperationOutcome` body explaining
      the failure; repeated fetches return the same outcome within the validity
@@ -645,24 +651,26 @@ Content-Type: application/fhir+json
    - Clients should retrieve results promptly but can retry within the validity window
 8. **Access Control**:
    Servers SHALL protect status, result, and download URLs with appropriate access controls:
-   - Same authorization context as the original request (servers SHOULD limit
+   - Same authorisation context as the original request (servers SHOULD limit
      access to the client that initiated the export), OR
    - Non-guessable URLs (e.g., cryptographically random tokens)
-   - Unauthorized access attempts return `401 Unauthorized` or `403 Forbidden`
+   - Unauthorised access attempts return `401 Unauthorized` or `403 Forbidden`
 9. **File Download**: Client downloads the output from URLs in the `output.location` parameters.
 
 #### Examples
 
-##### Complete Export Flow Example
+##### Mixed Batch Export
 
-This example demonstrates the full lifecycle of a SQL query export from initiation through completion.
+The motivating case: two ViewDefinitions and one SQLQuery exported as one job,
+filtered to two patients, as CSV. The three subjects are named by canonical URL,
+by literal reference, and by canonical URL with bound parameters respectively,
+showing that the naming form is chosen per subject and independently of the
+subject's kind.
 
 **Step 1: Kick-off Request**
 
-Client initiates export of a SQLQuery Library with parameters and patient filtering:
-
 ```http
-POST /Library/$sqlquery-export HTTP/1.1
+POST /$sql-export HTTP/1.1
 Host: example.com
 Content-Type: application/fhir+json
 Prefer: respond-async
@@ -674,56 +682,61 @@ Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGc...
   "parameter": [
     {
       "name": "clientTrackingId",
-      "valueString": "bp-report-2026-03"
+      "valueString": "bundle-2026-08"
     },
     {
-      "name": "query",
+      "name": "subject",
       "part": [
+        { "name": "name", "valueString": "demographics" },
         {
-          "name": "name",
-          "valueString": "patient-bp-results"
-        },
+          "name": "subjectCanonical",
+          "valueCanonical": "http://example.org/ViewDefinition/patient_demographics|2.1.0"
+        }
+      ]
+    },
+    {
+      "name": "subject",
+      "part": [
+        { "name": "name", "valueString": "encounters" },
         {
-          "name": "queryReference",
-          "valueReference": {
-            "reference": "Library/patient-bp-query"
-          }
+          "name": "subjectReference",
+          "valueReference": { "reference": "ViewDefinition/encounters" }
+        }
+      ]
+    },
+    {
+      "name": "subject",
+      "part": [
+        { "name": "name", "valueString": "bp_summary" },
+        {
+          "name": "subjectCanonical",
+          "valueCanonical": "http://example.org/Library/bp-summary|1.0.0"
         },
         {
           "name": "parameters",
           "resource": {
             "resourceType": "Parameters",
             "parameter": [
-              {
-                "name": "from_date",
-                "valueDate": "2024-01-01"
-              }
+              { "name": "min_systolic", "valueInteger": 140 }
             ]
           }
         }
       ]
     },
-    {
-      "name": "patient",
-      "valueReference": {
-        "reference": "Patient/123"
-      }
-    },
-    {
-      "name": "_since",
-      "valueInstant": "2026-01-01T00:00:00Z"
-    },
-    {
-      "name": "_format",
-      "valueCode": "csv"
-    }
+    { "name": "patient", "valueReference": { "reference": "Patient/123" } },
+    { "name": "patient", "valueReference": { "reference": "Patient/456" } },
+    { "name": "_format", "valueCode": "csv" }
   ]
 }
 ```
 
+The two `patient` filters apply to all three subjects; there is no way to scope
+one subject differently from another.
+
 **Step 2: Kick-off Response**
 
-Server accepts the request and provides polling location:
+The server accepts the request and provides one polling location for the whole
+job:
 
 ```http
 HTTP/1.1 202 Accepted
@@ -739,7 +752,7 @@ Content-Type: application/fhir+json
     },
     {
       "name": "clientTrackingId",
-      "valueString": "bp-report-2026-03"
+      "valueString": "bundle-2026-08"
     },
     {
       "name": "status",
@@ -753,9 +766,7 @@ Content-Type: application/fhir+json
 }
 ```
 
-**Step 3: First Status Poll (Starting)**
-
-Client polls immediately:
+**Step 3: Status Poll (In Progress)**
 
 ```http
 GET /fhir/export/550e8400-e29b-41d4-a716-446655440000/status HTTP/1.1
@@ -763,54 +774,6 @@ Host: example.com
 Accept: application/fhir+json
 Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGc...
 ```
-
-Response shows export is starting:
-
-```http
-HTTP/1.1 202 Accepted
-Content-Type: application/fhir+json
-Retry-After: 5
-X-Progress: 0%
-
-{
-  "resourceType": "Parameters",
-  "parameter": [
-    {
-      "name": "exportId",
-      "valueString": "550e8400-e29b-41d4-a716-446655440000"
-    },
-    {
-      "name": "clientTrackingId",
-      "valueString": "bp-report-2026-03"
-    },
-    {
-      "name": "status",
-      "valueCode": "in-progress"
-    },
-    {
-      "name": "location",
-      "valueUri": "https://example.com/fhir/export/550e8400-e29b-41d4-a716-446655440000/status"
-    },
-    {
-      "name": "exportStartTime",
-      "valueInstant": "2026-03-03T14:30:00Z"
-    }
-  ]
-}
-```
-
-**Step 4: Second Status Poll (In Progress)**
-
-After 5 seconds, client polls again:
-
-```http
-GET /fhir/export/550e8400-e29b-41d4-a716-446655440000/status HTTP/1.1
-Host: example.com
-Accept: application/fhir+json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGc...
-```
-
-Response shows progress:
 
 ```http
 HTTP/1.1 202 Accepted
@@ -827,7 +790,7 @@ X-Progress: 65%
     },
     {
       "name": "clientTrackingId",
-      "valueString": "bp-report-2026-03"
+      "valueString": "bundle-2026-08"
     },
     {
       "name": "status",
@@ -839,7 +802,7 @@ X-Progress: 65%
     },
     {
       "name": "exportStartTime",
-      "valueInstant": "2026-03-03T14:30:00Z"
+      "valueInstant": "2026-08-03T14:30:00Z"
     },
     {
       "name": "estimatedTimeRemaining",
@@ -849,9 +812,10 @@ X-Progress: 65%
 }
 ```
 
-**Step 5: Final Status Poll (Completed)**
+**Step 4: Final Status Poll (Completed)**
 
-After another 10 seconds:
+The export has finished, so the status poll returns `303 See Other` with the
+result URL in the `Location` header and no body:
 
 ```http
 GET /fhir/export/550e8400-e29b-41d4-a716-446655440000/status HTTP/1.1
@@ -860,16 +824,15 @@ Accept: application/fhir+json
 Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGc...
 ```
 
-The export has finished, so the status poll returns `303 See Other` with the result URL in the `Location` header and no body:
-
 ```http
 HTTP/1.1 303 See Other
 Location: https://example.com/fhir/export/550e8400-e29b-41d4-a716-446655440000/result
 ```
 
-**Step 6: Fetch the Result**
+**Step 5: Fetch the Result**
 
-Client fetches the result URL; the manifest `Parameters` resource is returned:
+The client fetches the result URL; the manifest `Parameters` resource is
+returned:
 
 ```http
 GET /fhir/export/550e8400-e29b-41d4-a716-446655440000/result HTTP/1.1
@@ -881,7 +844,7 @@ Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGc...
 ```http
 HTTP/1.1 200 OK
 Content-Type: application/fhir+json
-Expires: Wed, 04 Mar 2026 14:30:42 GMT
+Expires: Tue, 04 Aug 2026 14:31:15 GMT
 
 {
   "resourceType": "Parameters",
@@ -892,7 +855,7 @@ Expires: Wed, 04 Mar 2026 14:30:42 GMT
     },
     {
       "name": "clientTrackingId",
-      "valueString": "bp-report-2026-03"
+      "valueString": "bundle-2026-08"
     },
     {
       "name": "status",
@@ -904,11 +867,11 @@ Expires: Wed, 04 Mar 2026 14:30:42 GMT
     },
     {
       "name": "exportStartTime",
-      "valueInstant": "2026-03-03T14:30:00Z"
+      "valueInstant": "2026-08-03T14:30:00Z"
     },
     {
       "name": "exportEndTime",
-      "valueInstant": "2026-03-03T14:31:15Z"
+      "valueInstant": "2026-08-03T14:31:15Z"
     },
     {
       "name": "exportDuration",
@@ -917,13 +880,30 @@ Expires: Wed, 04 Mar 2026 14:30:42 GMT
     {
       "name": "output",
       "part": [
-        {
-          "name": "name",
-          "valueString": "patient-bp-results"
-        },
+        { "name": "name", "valueString": "demographics" },
         {
           "name": "location",
-          "valueUri": "https://example.com/fhir/export/550e8400-e29b-41d4-a716-446655440000/patient-bp-results.csv"
+          "valueUri": "https://example.com/fhir/export/550e8400-e29b-41d4-a716-446655440000/demographics.csv"
+        }
+      ]
+    },
+    {
+      "name": "output",
+      "part": [
+        { "name": "name", "valueString": "encounters" },
+        {
+          "name": "location",
+          "valueUri": "https://example.com/fhir/export/550e8400-e29b-41d4-a716-446655440000/encounters.csv"
+        }
+      ]
+    },
+    {
+      "name": "output",
+      "part": [
+        { "name": "name", "valueString": "bp_summary" },
+        {
+          "name": "location",
+          "valueUri": "https://example.com/fhir/export/550e8400-e29b-41d4-a716-446655440000/bp_summary.csv"
         }
       ]
     }
@@ -931,12 +911,17 @@ Expires: Wed, 04 Mar 2026 14:30:42 GMT
 }
 ```
 
-**Step 7: Download Files**
+One `exportId`, one echoed `clientTrackingId`, and exactly three `output`
+entries - one per subject. The manifest states no order, so the client finds each
+entry by `name`. All three were computed against one snapshot, so `bp_summary`
+joins to `demographics` on the patient key without a skew window.
 
-Client downloads each file:
+**Step 6: Download Files**
+
+The client downloads each file:
 
 ```http
-GET /fhir/export/550e8400-e29b-41d4-a716-446655440000/patient-bp-results.csv HTTP/1.1
+GET /fhir/export/550e8400-e29b-41d4-a716-446655440000/bp_summary.csv HTTP/1.1
 Host: example.com
 Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGc...
 ```
@@ -944,20 +929,19 @@ Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGc...
 ```http
 HTTP/1.1 200 OK
 Content-Type: text/csv
-Content-Disposition: attachment; filename="patient-bp-results.csv"
+Content-Disposition: attachment; filename="bp_summary.csv"
 
 patient_id,systolic,effective_date
-Patient/123,120,2024-01-15
-Patient/123,118,2024-02-20
-Patient/456,135,2024-01-20
+Patient/123,145,2026-01-15
+Patient/456,152,2026-01-20
 ```
 
-##### Type-Level with Inline SQLQuery Library
+##### Inline Subject Resource
 
-Pass the SQLQuery Library inline for ad-hoc queries:
+Pass the artefact inline for an ad-hoc export, with nothing stored on the server:
 
 ```http
-POST /Library/$sqlquery-export HTTP/1.1
+POST /$sql-export HTTP/1.1
 Host: example.com
 Content-Type: application/fhir+json
 Prefer: respond-async
@@ -965,19 +949,13 @@ Prefer: respond-async
 {
   "resourceType": "Parameters",
   "parameter": [
+    { "name": "_format", "valueCode": "ndjson" },
     {
-      "name": "_format",
-      "valueCode": "ndjson"
-    },
-    {
-      "name": "query",
+      "name": "subject",
       "part": [
+        { "name": "name", "valueString": "active-patients" },
         {
-          "name": "name",
-          "valueString": "active-patients"
-        },
-        {
-          "name": "queryResource",
+          "name": "subjectResource",
           "resource": {
             "resourceType": "Library",
             "meta": { "profile": ["http://hl7.org/fhir/uv/sql-on-fhir/StructureDefinition/SQLQuery"] },
@@ -998,27 +976,19 @@ Prefer: respond-async
         }
       ]
     },
-    {
-      "name": "_since",
-      "valueInstant": "2026-01-01T00:00:00Z"
-    }
+    { "name": "_since", "valueInstant": "2026-01-01T00:00:00Z" }
   ]
 }
 ```
 
-##### Multi-Query Export with ViewDefinition Table Sources
+##### A Shared Supporting Artefact, Supplied Once
 
-Export multiple queries in one operation, providing a ViewDefinition table source
-inline. One pool of `tableSource` entries serves every query in the request: the
-pool is matched against the transitive dependency graph of both queries, so an
-entry matching either one's dependencies is bound, and an entry matching neither
-is rejected with `400 Bad Request`.
-
-The first query is named by canonical URL with a pinned version, the second by its
-literal location on the server.
+Two SQLQuery subjects both depend on a ViewDefinition that exists only on the
+client. It is supplied once as a `context` entry, resolved once for the job, and
+satisfies both subjects' dependencies:
 
 ```http
-POST /Library/$sqlquery-export HTTP/1.1
+POST /$sql-export HTTP/1.1
 Host: example.com
 Content-Type: application/fhir+json
 Prefer: respond-async
@@ -1027,47 +997,21 @@ Prefer: respond-async
   "resourceType": "Parameters",
   "parameter": [
     {
-      "name": "query",
+      "name": "subject",
       "part": [
-        {
-          "name": "name",
-          "valueString": "bp-summary"
-        },
-        {
-          "name": "queryCanonical",
-          "valueCanonical": "http://example.org/Library/bp-summary|2.1.0"
-        }
+        { "name": "name", "valueString": "cohort_bp" },
+        { "name": "subjectCanonical", "valueCanonical": "http://example.org/Library/cohort-bp" }
       ]
     },
     {
-      "name": "query",
+      "name": "subject",
       "part": [
-        {
-          "name": "name",
-          "valueString": "lab-summary"
-        },
-        {
-          "name": "queryReference",
-          "valueReference": {
-            "reference": "Library/lab-summary-query"
-          }
-        },
-        {
-          "name": "parameters",
-          "resource": {
-            "resourceType": "Parameters",
-            "parameter": [
-              {
-                "name": "loinc_code",
-                "valueString": "2093-3"
-              }
-            ]
-          }
-        }
+        { "name": "name", "valueString": "cohort_labs" },
+        { "name": "subjectCanonical", "valueCanonical": "http://example.org/Library/cohort-labs" }
       ]
     },
     {
-      "name": "tableSource",
+      "name": "context",
       "resource": {
         "resourceType": "ViewDefinition",
         "url": "https://example.org/ViewDefinition/local_cohort",
@@ -1082,13 +1026,12 @@ Prefer: respond-async
         ]
       }
     },
-    {
-      "name": "_format",
-      "valueCode": "csv"
-    }
+    { "name": "_format", "valueCode": "csv" }
   ]
 }
 ```
 
-The completed manifest carries exactly two `output` entries, `bp-summary` and
-`lab-summary`. The supplied `tableSource` produces none.
+The completed manifest carries exactly two `output` entries, `cohort_bp` and
+`cohort_labs`. The supplied `context` entry produces none. Had the server been
+able to resolve `local_cohort` itself, the supplied entry would still take
+precedence.
