@@ -1,7 +1,7 @@
 {
   "name": "sql-on-fhir-v2",
-  "version": "2.0.0",
-  "description": "SQL on FHIR v2.0 Implementation Guide",
+  "version": "3.0.0-ballot",
+  "description": "SQL on FHIR Implementation Guide",
   "scripts": {
     "build:ig": "./scripts/_genonce.sh",
     "build:ig:continuous": "./scripts/_gencontinuous.sh",
