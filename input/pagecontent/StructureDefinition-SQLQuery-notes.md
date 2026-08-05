@@ -102,8 +102,7 @@ is bound by name to the matching `Library.parameter`, and the appropriate
 ### SQL Annotations
 
 SQL files MAY include annotations to generate SQLQuery Libraries automatically.
-Library elements are authoritative. Based on
-[Brian Kaney's sql-fhir-library-builder](https://github.com/reason-healthcare/sql-fhir-library-builder).
+Library elements are authoritative.
 
 Syntax: `@key: value` in SQL comments.
 
