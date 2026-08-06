@@ -9,8 +9,9 @@ URL so that other SQLQueries and SQLViews can build upon it.
 The key differences from SQLQuery are:
 
 - The Library `type` is fixed to `LibraryTypesCodes#sql-view`.
-- An SQLView SHALL NOT declare parameters. Dependent views cannot be
-  parameterised in this iteration of the specification.
+- <span class="fhir-conformance" id="sqlview-1">An SQLView SHALL NOT declare parameters.</span>
+  Dependent views cannot be parameterised in this iteration of the
+  specification.
 
 ### Boundaries and Relationships
 
@@ -42,9 +43,10 @@ that cannot be resolved the constraint is advisory.
 
 #### No Parameters
 
-Unlike SQLQuery, an SQLView SHALL NOT declare `Library.parameter` entries
-(`parameter` is constrained to `0..0`). A view is a fixed, reusable building
-block; callers compose with it by referencing it from a parameterised SQLQuery.
+<span class="fhir-conformance" id="sqlview-2">Unlike SQLQuery, an SQLView SHALL NOT declare
+`Library.parameter` entries (`parameter` is constrained to `0..0`).</span> A view
+is a fixed, reusable building block; callers compose with it by referencing it
+from a parameterised SQLQuery.
 
 #### SQL Attachments
 
@@ -58,11 +60,15 @@ SQLQuery.
 
 **Constraints:**
 
-- Library type SHALL be `LibraryTypesCodes#sql-view`
-- `Library.parameter` SHALL be absent
-- Every `content.contentType` SHALL start with `application/sql`
-- `content.data` SHALL be present; the `sql-text` extension MAY carry a plain-text copy
-- Dependencies SHALL use `relatedArtifact` with `type = "depends-on"`, a `label`,
-  and a `resource` referencing a ViewDefinition or SQLView
+- <span class="fhir-conformance" id="sqlview-3">Library type SHALL be
+  `LibraryTypesCodes#sql-view`</span>
+- <span class="fhir-conformance" id="sqlview-4">`Library.parameter` SHALL be absent</span>
+- <span class="fhir-conformance" id="sqlview-5">Every `content.contentType` SHALL start with
+  `application/sql`</span>
+- <span class="fhir-conformance" id="sqlview-6">`content.data` SHALL be present; the `sql-text`
+  extension MAY carry a plain-text copy</span>
+- <span class="fhir-conformance" id="sqlview-7">Dependencies SHALL use `relatedArtifact` with
+  `type = "depends-on"`, a `label`, and a `resource` referencing a
+  ViewDefinition or SQLView</span>
 
 For notes on query composition, see the Notes tab below.

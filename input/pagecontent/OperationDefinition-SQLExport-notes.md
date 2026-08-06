@@ -11,7 +11,7 @@ This operation follows the [FHIR Asynchronous Interaction Request Pattern](https
 1. Client sends request with `Prefer: respond-async` header and one or more `subject` parameters
 2. Server returns `202 Accepted` with `Content-Location` header pointing to status URL
 3. Client polls the status URL for export progress
-4. Server responds with `202 Accepted` while export is in progress (MAY include interim results)
+4. <span class="fhir-conformance" id="exp-1">Server responds with `202 Accepted` while export is in progress (MAY include interim results)</span>
 5. Once the export has finished (successfully or not), the status poll returns `303 See Other` with a `Location` header carrying the result URL and an empty body
 6. Client fetches the result URL; a successful export returns `200 OK` with the manifest `Parameters` resource (`exportId`, `status`, `output`, …), and a failed export returns the error status code with an `OperationOutcome`
 7. Client downloads the exported files from the `output.location` URLs in the manifest
@@ -87,16 +87,17 @@ sequenceDiagram
 One invocation is one job: one set of subjects, one set of filters, one supplied
 `context`, one manifest. Four guarantees hold across it.
 
-**One snapshot.** The server SHALL compute every subject in the job against a
-single consistent view of the data. Two outputs of one job can therefore be
-joined on a shared key without a skew window, whatever changes to the data occur
-while the job runs. This is what makes one job different from two jobs submitted
-together.
+**One snapshot.** <span class="fhir-conformance" id="exp-2">The server SHALL compute every
+subject in the job against a single consistent view of the data.</span> Two
+outputs of one job can therefore be joined on a shared key without a skew window,
+whatever changes to the data occur while the job runs. This is what makes one job
+different from two jobs submitted together.
 
-**No ordering.** Neither the order of the `output` entries in the manifest nor
-the order in which subjects are computed is guaranteed, and servers MAY compute
-subjects in parallel. The shared snapshot is the only consistency guarantee
-offered. Clients correlate manifest entries with the subjects they requested by
+**No ordering.** <span class="fhir-conformance" id="exp-3">Neither the order of the `output`
+entries in the manifest nor the order in which subjects are computed is
+guaranteed, and servers MAY compute subjects in parallel.</span> The shared
+snapshot is the only consistency guarantee offered. Clients correlate manifest
+entries with the subjects they requested by
 [`output.name`](#output-name-clarification), never by position.
 
 **One resolution per canonical URL.** A canonical URL appearing as a dependency
@@ -283,9 +284,9 @@ a FHIR resource, so `ViewDefinition` is not a value `parameter.type` accepts;
 the real constraint is carried by `targetProfile`. See
 [Why the declared type is `CanonicalResource`](operations-common.html#declared-type).
 
-Each `subject` repetition SHALL supply exactly one of the three. Supplying none,
-or more than one, in a single repetition is rejected with `400 Bad Request` and
-an `OperationOutcome` naming the problem.
+<span class="fhir-conformance" id="exp-4">Each `subject` repetition SHALL supply exactly
+one of the three.</span> Supplying none, or more than one, in a single repetition
+is rejected with `400 Bad Request` and an `OperationOutcome` naming the problem.
 
 A `subject.subjectCanonical` or `subject.subjectReference` the server cannot
 resolve is rejected with `404 Not Found` and an `OperationOutcome`. A resolved
@@ -307,14 +308,14 @@ this operation. The `fhir` format is available on the run operation only, becaus
 an export produces flat files; requesting it here is rejected with
 `400 Bad Request`.
 
-- It is RECOMMENDED to support `json`, `ndjson` and `csv` by default; servers MAY
-  support `parquet`, and SHALL document supported formats in the
-  CapabilityStatement.
-- If `_format` is omitted, the server SHALL produce the export output in `ndjson`
-  format, irrespective of `Accept`.
-- When `_format` is supplied, its value SHALL take precedence over `Accept`
-  (which here negotiates the format of the _status and result_ responses, not
-  the exported files).
+- <span class="fhir-conformance" id="exp-5">It is RECOMMENDED to support `json`, `ndjson` and
+  `csv` by default; servers MAY support `parquet`, and SHALL document supported
+  formats in the CapabilityStatement.</span>
+- <span class="fhir-conformance" id="exp-6">If `_format` is omitted, the server SHALL produce
+  the export output in `ndjson` format, irrespective of `Accept`.</span>
+- <span class="fhir-conformance" id="exp-7">When `_format` is supplied, its value SHALL take
+  precedence over `Accept`</span> (which here negotiates the format of the
+  _status and result_ responses, not the exported files).
 
 ###### Filtering Parameter Clarification
 
@@ -381,7 +382,7 @@ the export is still in progress.
 
 ##### Status Polling Parameters (interim)
 
-During status polling (`202 Accepted` responses), servers MAY include the following in the response body:
+<span class="fhir-conformance" id="exp-8">During status polling (`202 Accepted` responses), servers MAY include the following in the response body:</span>
 
 | Name                   | Type    | Min | Max | Description                        |
 | ---------------------- | ------- | --- | --- | ---------------------------------- |
@@ -390,7 +391,7 @@ During status polling (`202 Accepted` responses), servers MAY include the follow
 
 {:.table-data}
 
-Servers MAY also include partial/interim results during polling. The format of interim responses is implementation-defined.
+<span class="fhir-conformance" id="exp-9">Servers MAY also include partial/interim results during polling.</span> The format of interim responses is implementation-defined.
 
 ##### Output Name Clarification {#output-name-clarification}
 
@@ -398,24 +399,25 @@ Servers MAY also include partial/interim results during polling. The format of i
 states no ordering, it is the only way a client correlates an entry with the
 subject it requested. The value is determined in three steps:
 
-1. If a `name` was supplied in that `subject` repetition, the server SHOULD use it
-2. Otherwise, the server MAY use the subject's own `name` element
-3. If neither is available, the server SHALL generate a unique identifier for the output
+1. <span class="fhir-conformance" id="exp-10">If a `name` was supplied in that `subject` repetition, the server SHOULD use it</span>
+2. <span class="fhir-conformance" id="exp-11">Otherwise, the server MAY use the subject's own `name` element</span>
+3. <span class="fhir-conformance" id="exp-12">If neither is available, the server SHALL generate a unique identifier for the output</span>
 
-Output names SHALL be unique across the job. A request in which two `subject`
-repetitions would produce the same `output.name` is rejected with
-`400 Bad Request` and an `OperationOutcome` whose `expression` names `subject`,
-because manifest entries a client cannot tell apart are of no use to it. Where
-the client names its subjects explicitly the collision is visible in the request;
-where it does not, the collision is between two subjects whose own `name`
-elements agree, and supplying an explicit `name` on either resolves it.
+<span class="fhir-conformance" id="exp-13">Output names SHALL be unique across the job.</span>
+A request in which two `subject` repetitions would produce the same
+`output.name` is rejected with `400 Bad Request` and an `OperationOutcome` whose
+`expression` names `subject`, because manifest entries a client cannot tell apart
+are of no use to it. Where the client names its subjects explicitly the collision
+is visible in the request; where it does not, the collision is between two
+subjects whose own `name` elements agree, and supplying an explicit `name` on
+either resolves it.
 
 ##### Output Partitioning {#output-partitioning}
 
-For large exports, servers MAY partition the output into multiple files. When partitioning occurs:
+<span class="fhir-conformance" id="exp-14">For large exports, servers MAY partition the output into multiple files.</span> When partitioning occurs:
 
 1. **Multiple Locations**: The `output.location` parameter can repeat within a single output entry
-2. **File Naming**: Partitioned files SHOULD use a consistent naming convention (e.g., `filename.part1.parquet`, `filename.part2.parquet`)
+2. **File Naming**: <span class="fhir-conformance" id="exp-15">Partitioned files SHOULD use a consistent naming convention (e.g., `filename.part1.parquet`, `filename.part2.parquet`)</span>
 3. **Complete Set**: All parts together represent the complete export for that subject
 
 **Example of partitioned output:**
@@ -481,7 +483,7 @@ Clients MUST download all parts to obtain the complete dataset.
 
 {:.table-data}
 
-All error responses (4xx and 5xx) SHOULD include an `OperationOutcome` resource providing details about the error.
+<span class="fhir-conformance" id="exp-16">All error responses (4xx and 5xx) SHOULD include an `OperationOutcome` resource providing details about the error.</span>
 
 Where a request carries both an unresolvable subject and an unresolvable filter
 value, the subject failure is the more fundamental: the response is
@@ -584,9 +586,9 @@ Content-Type: application/fhir+json
 
 ###### 5. Several Subjects with Errors
 
-A job carries several subjects, so servers SHOULD validate all of them before
-starting the export and report every problem in one `OperationOutcome`, rather
-than failing on the first:
+<span class="fhir-conformance" id="exp-17">A job carries several subjects, so servers
+SHOULD validate all of them before starting the export and report every problem
+in one `OperationOutcome`, rather than failing on the first:</span>
 
 ```http
 HTTP/1.1 400 Bad Request
@@ -645,10 +647,10 @@ Content-Type: application/fhir+json
    - If the request is not valid or cannot be processed, the server responds with the relevant `4xx` status code and an `OperationOutcome` resource in the body.
 3. **Status Polling**: Client polls the polling location to get status of the export:
    - **In Progress**: `202 Accepted` with optional Parameters resource for interim status
-   - **Progress Updates**: Server MAY include `X-Progress` header to indicate completion percentage
-   - **Retry-After**: Server SHOULD include `Retry-After` header to indicate when to retry
-   - **Interim Results**: Server MAY include partial/interim results in response body (implementation-defined)
-   - **Excessive Polling**: Server MAY respond with `429 Too Many Requests`; clients SHOULD apply exponential backoff
+   - **Progress Updates**: <span class="fhir-conformance" id="exp-18">Server MAY include `X-Progress` header to indicate completion percentage</span>
+   - **Retry-After**: <span class="fhir-conformance" id="exp-19">Server SHOULD include `Retry-After` header to indicate when to retry</span>
+   - **Interim Results**: <span class="fhir-conformance" id="exp-20">Server MAY include partial/interim results in response body (implementation-defined)</span>
+   - **Excessive Polling**: <span class="fhir-conformance" id="exp-21">Server MAY respond with `429 Too Many Requests`; clients SHOULD apply exponential backoff</span>
 4. **Completion**: When the export has finished - whether it succeeded or
    failed - the status poll returns:
    - `303 See Other` status code
@@ -666,22 +668,22 @@ Content-Type: application/fhir+json
      the failure; repeated fetches return the same outcome within the validity
      window
 6. **Cancellation** (Recommended):
-   Servers SHOULD support export cancellation via DELETE request to the status URL:
+   <span class="fhir-conformance" id="exp-22">Servers SHOULD support export cancellation via DELETE request to the status URL:</span>
    - Client sends `DELETE` request to the status polling URL
    - Server responds with `202 Accepted`
    - Subsequent status requests return `404 Not Found`
-   - Server SHOULD clean up any partial results
+   - <span class="fhir-conformance" id="exp-23">Server SHOULD clean up any partial results</span>
 7. **Result Lifetime**:
-   The result URL (which returns the manifest) and the
+   <span class="fhir-conformance" id="exp-24">The result URL (which returns the manifest) and the
    `output.location` download URLs SHALL remain valid for at least 24 hours after
-   export completion:
-   - Servers SHOULD support multiple retrievals of the result
-   - Servers MAY include an `Expires` header to indicate when the URLs expire
+   export completion:</span>
+   - <span class="fhir-conformance" id="exp-25">Servers SHOULD support multiple retrievals of the result</span>
+   - <span class="fhir-conformance" id="exp-26">Servers MAY include an `Expires` header to indicate when the URLs expire</span>
    - Clients should retrieve results promptly but can retry within the validity window
 8. **Access Control**:
-   Servers SHALL protect status, result, and download URLs with appropriate access controls:
-   - Same authorisation context as the original request (servers SHOULD limit
-     access to the client that initiated the export), OR
+   <span class="fhir-conformance" id="exp-27">Servers SHALL protect status, result, and download URLs with appropriate access controls:</span>
+   - <span class="fhir-conformance" id="exp-28">Same authorisation context as the original request (servers SHOULD limit
+     access to the client that initiated the export), OR</span>
    - Non-guessable URLs (e.g., cryptographically random tokens)
    - Unauthorised access attempts return `401 Unauthorized` or `403 Forbidden`
 9. **File Download**: Client downloads the output from URLs in the `output.location` parameters.

@@ -11,7 +11,7 @@
   <kind value="resource"/>
   <abstract value="false"/>
   <type value="ViewDefinition"/>
-  <baseDefinition value="http://hl7.org/fhir/uv/sql-on-fhir/StructureDefinition/ViewDefinition"/>
+  <baseDefinition value="http://hl7.org/fhir/StructureDefinition/ViewDefinition"/>
   <derivation value="constraint"/>
   <differential>
     <element id="ViewDefinition">

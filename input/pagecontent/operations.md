@@ -72,7 +72,7 @@ And use standard tools like Apache Spark, AWS Athena or other tools to analyze d
    a list of subjects to the server with `Prefer: respond-async` header.
 2. The server returns `202 Accepted` with `Content-Location` header pointing to status URL.
 3. The client polls the status URL:
-   - Server returns `202 Accepted` while processing (MAY include interim results)
+   - <span class="fhir-conformance" id="ops-1">Server returns `202 Accepted` while processing (MAY include interim results)</span>
    - Server returns `303 See Other` with a `Location` header carrying the result URL when the export has finished
 4. The client fetches the result URL, which returns the manifest (output URLs) with `200 OK`.
 5. The client reads the output URLs from the manifest.

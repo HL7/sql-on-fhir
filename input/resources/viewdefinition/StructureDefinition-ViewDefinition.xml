@@ -10,7 +10,7 @@
   <extension url="http://hl7.org/fhir/StructureDefinition/structuredefinition-implements">
     <valueUri value="http://hl7.org/fhir/StructureDefinition/MetadataResource"/>
   </extension>
-  <url value="http://hl7.org/fhir/uv/sql-on-fhir/StructureDefinition/ViewDefinition"/>
+  <url value="http://hl7.org/fhir/StructureDefinition/ViewDefinition"/>
   <name value="ViewDefinition"/>
   <title value="View Definition"/>
   <status value="draft"/>
@@ -109,7 +109,7 @@
         <severity value="error"/>
         <human value="Name is limited to letters, numbers, or underscores and cannot start with an&#xA;underscore -- i.e. with a regular expression of: ^[A-Za-z][A-Za-z0-9_]*$ &#xA;&#xA;&#xA;This makes it usable as table names in a wide variety of databases."/>
         <expression value="empty() or matches('^[A-Za-z][A-Za-z0-9_]*$')"/>
-        <source value="http://hl7.org/fhir/uv/sql-on-fhir/StructureDefinition/ViewDefinition"/>
+        <source value="http://hl7.org/fhir/StructureDefinition/ViewDefinition"/>
       </constraint>
       <isSummary value="true"/>
     </element>
@@ -471,7 +471,7 @@
         <severity value="error"/>
         <human value="Name is limited to letters, numbers, or underscores and cannot start with an&#xA;underscore -- i.e. with a regular expression of: ^[A-Za-z][A-Za-z0-9_]*$ &#xA;&#xA;&#xA;This makes it usable as table names in a wide variety of databases."/>
         <expression value="empty() or matches('^[A-Za-z][A-Za-z0-9_]*$')"/>
-        <source value="http://hl7.org/fhir/uv/sql-on-fhir/StructureDefinition/ViewDefinition"/>
+        <source value="http://hl7.org/fhir/StructureDefinition/ViewDefinition"/>
       </constraint>
     </element>
     <element id="ViewDefinition.constant.value[x]">
@@ -552,7 +552,7 @@
         <severity value="error"/>
         <human value="Can only have at most one of `forEach`, `forEachOrNull`, or `repeat`."/>
         <expression value="(forEach.exists().toInteger() + forEachOrNull.exists().toInteger() + repeat.exists().toInteger()) &lt;= 1"/>
-        <source value="http://hl7.org/fhir/uv/sql-on-fhir/StructureDefinition/ViewDefinition"/>
+        <source value="http://hl7.org/fhir/StructureDefinition/ViewDefinition"/>
       </constraint>
     </element>
     <element id="ViewDefinition.select.column">
@@ -589,7 +589,7 @@
         <severity value="error"/>
         <human value="Name is limited to letters, numbers, or underscores and cannot start with an&#xA;underscore -- i.e. with a regular expression of: ^[A-Za-z][A-Za-z0-9_]*$ &#xA;&#xA;&#xA;This makes it usable as table names in a wide variety of databases."/>
         <expression value="empty() or matches('^[A-Za-z][A-Za-z0-9_]*$')"/>
-        <source value="http://hl7.org/fhir/uv/sql-on-fhir/StructureDefinition/ViewDefinition"/>
+        <source value="http://hl7.org/fhir/StructureDefinition/ViewDefinition"/>
       </constraint>
     </element>
     <element id="ViewDefinition.select.column.description">
@@ -658,7 +658,7 @@
       <definition value="Nested select relative to a parent expression. If the parent `select` has a `forEach` or `forEachOrNull`, this child select will apply for each item in that expression. "/>
       <min value="0"/>
       <max value="*"/>
-      <contentReference value="http://hl7.org/fhir/uv/sql-on-fhir/StructureDefinition/ViewDefinition#ViewDefinition.select"/>
+      <contentReference value="http://hl7.org/fhir/StructureDefinition/ViewDefinition#ViewDefinition.select"/>
     </element>
     <element id="ViewDefinition.select.forEach">
       <path value="ViewDefinition.select.forEach"/>
@@ -696,7 +696,7 @@
       <definition value="A `unionAll` combines the results of multiple selection structures. Each structure under the `unionAll` must produce the same column names&#xA;and types. The results from each nested selection will then have their own row."/>
       <min value="0"/>
       <max value="*"/>
-      <contentReference value="http://hl7.org/fhir/uv/sql-on-fhir/StructureDefinition/ViewDefinition#ViewDefinition.select"/>
+      <contentReference value="http://hl7.org/fhir/StructureDefinition/ViewDefinition#ViewDefinition.select"/>
     </element>
     <element id="ViewDefinition.where">
       <path value="ViewDefinition.where"/>

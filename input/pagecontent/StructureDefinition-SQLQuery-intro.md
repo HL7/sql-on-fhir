@@ -64,9 +64,10 @@ implement parameter binding.
 #### SQL Attachments
 
 Store the query in `content` with `contentType = "application/sql"`. The
-`data` element (base64-encoded SQL) is required. The
+`data` element (base64-encoded SQL) is required.
+<span class="fhir-conformance" id="sqlquery-1">The
 [`sql-text`](StructureDefinition-sql-text.html) extension MAY carry a
-plain-text copy for human readability.
+plain-text copy for human readability.</span>
 
 ```json
 "content": [{
@@ -90,10 +91,11 @@ parameter names consistent across variants.
 
 A `contentType` of `application/sql` (with no `dialect` parameter) represents a
 default variant. It carries no dialect commitment and is intended to be broadly
-portable, so authors SHOULD restrict it to standard ANSI SQL constructs that
-work across the engines they expect to target. Implementations MAY treat the
+portable, so <span class="fhir-conformance" id="sqlquery-2">authors SHOULD restrict it to
+standard ANSI SQL constructs that work across the engines they expect to
+target.</span> <span class="fhir-conformance" id="sqlquery-3">Implementations MAY treat the
 default variant as roughly equivalent to ANSI SQL when no dialect-specific
-variant matches.
+variant matches.</span>
 
 When a Library contains multiple `content` attachments, implementations choose
 which attachment to execute as follows:
@@ -103,31 +105,38 @@ which attachment to execute as follows:
    selects `application/sql;dialect=postgresql`).
 2. If no matching dialect-specific attachment is present, fall back to the
    default attachment with `contentType = "application/sql"`.
-3. If neither a matching dialect nor a default attachment is available,
-   implementations SHOULD return an error rather than guess at a translation
-   between dialects.
+3. <span class="fhir-conformance" id="sqlquery-4">If neither a matching dialect nor a default
+   attachment is available, implementations SHOULD return an error rather than
+   guess at a translation between dialects.</span>
 
-Authors SHOULD include a default `application/sql` attachment whenever possible
-so that engines without a dedicated variant still have a portable fallback. All
-variants within a single Library SHALL be functionally equivalent: they SHALL
-expose the same parameters, reference the same table aliases, and produce the
-same logical result set.
+<span class="fhir-conformance" id="sqlquery-5">Authors SHOULD include a default `application/sql`
+attachment whenever possible so that engines without a dedicated variant still
+have a portable fallback.</span> <span class="fhir-conformance" id="sqlquery-6">All variants
+within a single Library SHALL be functionally equivalent: they SHALL expose the
+same parameters, reference the same table aliases, and produce the same logical
+result set.</span>
 
 ### Conformance
 
-**Terminology:** `contentType` SHOULD come from
-[All SQL Content Type Codes](ValueSet-AllSQLContentTypeCodes.html). The binding
-is extensible: when one of these codes covers the dialect, that code SHALL be
-used; otherwise, an alternative code MAY be supplied (subject to the constraint
-that every `contentType` starts with `application/sql`).
+**Terminology:** <span class="fhir-conformance" id="sqlquery-7">`contentType` SHOULD come from
+[All SQL Content Type Codes](ValueSet-AllSQLContentTypeCodes.html).</span> The
+binding is extensible: <span class="fhir-conformance" id="sqlquery-8">when one of these codes
+covers the dialect, that code SHALL be used; otherwise, an alternative code MAY
+be supplied (subject to the constraint that every `contentType` starts with
+`application/sql`).</span>
 
 **Constraints:**
 
-- Library type SHALL be `LibraryTypesCodes#sql-query`
-- Every `content.contentType` SHALL start with `application/sql`
-- `content.data` SHALL be present; the `sql-text` extension MAY carry a plain-text copy
-- Dependencies SHALL use `relatedArtifact` with `type = "depends-on"` and `label`,
-  each `resource` referencing a ViewDefinition or an SQLView
-- Parameters SHALL use `Library.parameter` with `use = "in"`
+- <span class="fhir-conformance" id="sqlquery-9">Library type SHALL be
+  `LibraryTypesCodes#sql-query`</span>
+- <span class="fhir-conformance" id="sqlquery-10">Every `content.contentType` SHALL start with
+  `application/sql`</span>
+- <span class="fhir-conformance" id="sqlquery-11">`content.data` SHALL be present; the `sql-text`
+  extension MAY carry a plain-text copy</span>
+- <span class="fhir-conformance" id="sqlquery-12">Dependencies SHALL use `relatedArtifact` with
+  `type = "depends-on"` and `label`, each `resource` referencing a
+  ViewDefinition or an SQLView</span>
+- <span class="fhir-conformance" id="sqlquery-13">Parameters SHALL use `Library.parameter` with
+  `use = "in"`</span>
 
 For examples and tooling guidance, see the Notes tab below.

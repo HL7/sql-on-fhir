@@ -4,16 +4,4 @@
   <id value="ViewDefinition-operations"/>
   <status value="current"/>
   <mode value="working"/>
-  <entry>
-    <item>
-      <reference value="OperationDefinition/ViewDefinitionRun"/>
-      <display value="$viewdefinition-run"/>
-    </item>
-  </entry>
-  <entry>
-    <item>
-      <reference value="OperationDefinition/ViewDefinitionExport"/>
-      <display value="$viewdefinition-export"/>
-    </item>
-  </entry>
 </List>

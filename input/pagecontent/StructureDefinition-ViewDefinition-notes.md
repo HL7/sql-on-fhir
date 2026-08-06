@@ -3,9 +3,9 @@
 Columns within a view are defined using the [FHIRPath](https://hl7.org/fhirpath/) language. FHIRPath contains a large number of functions and syntax constructs - not all of these are required to be implemented within a SQL on FHIR view runner.
 
 View runner implementations MUST support the following required additional FHIRPath functions. In
-addition to this, runners SHOULD implement the FHIRPath subset defined in the
+addition to this, <span class="fhir-conformance" id="viewdef-1">runners SHOULD implement the FHIRPath subset defined in the
 [Shareable View Definition](StructureDefinition-ShareableViewDefinition.html) profile if the intent is for the runner to be able to
-execute shared view definitions.
+execute shared view definitions.</span>
 
 ### Required Additional Functions
 
@@ -58,12 +58,14 @@ storage. Integers, strings, UUIDs, and other primitive types may be appropriate.
 The getReferenceKey function has both required and optional functionality:
 
 - Implementations MUST support the relative literal form of reference (
-  e.g., `Patient/123`), and MAY support other types of references. If the
-  implementation does not support the reference type, or is unable to resolve
-  the reference, it MUST return the empty collection (i.e., `{}`).
-- Implementations MAY generate a list of unprocessable references through query
-  responses, logging or reporting. The details of how this information would be
-  provided to the user is implementation specific.
+  e.g., `Patient/123`), and <span class="fhir-conformance" id="viewdef-2">MAY support other
+  types of references.</span> If the implementation does not support the
+  reference type, or is unable to resolve the reference, it MUST return the
+  empty collection (i.e., `{}`).
+- <span class="fhir-conformance" id="viewdef-3">Implementations MAY generate a list of
+  unprocessable references through query responses, logging or
+  reporting.</span> The details of how this information would be provided to the
+  user is implementation specific.
 
 See the [Joins with Resource and Reference Keys](#joins-with-resource-and-reference-keys) section below for details.
 
@@ -862,11 +864,12 @@ This specification requires implementers to extract contained resources that
 need to be included in views into independent resources that can then be
 accessed via [getReferenceKey](#getreferencekeyresource-type-specifier--keytype)
 like any
-other resource. Implementations SHOULD normalize these resources appropriately
-whenever possible, such as eliminating duplicate resources contained in many
-parent resources. Note that this may change in a later version of this
-specification, allowing users to explicitly create separate views for contained
-resources that could be distinct from top-level resource views.
+other resource. <span class="fhir-conformance" id="viewdef-4">Implementations SHOULD normalize
+these resources appropriately whenever possible, such as eliminating duplicate
+resources contained in many parent resources.</span> Note that this may change in
+a later version of this specification, allowing users to explicitly create
+separate views for contained resources that could be distinct from top-level
+resource views.
 
 Contained resources have different semantics than other resources since they
 don't have an independent identity, and the same logical record may be
@@ -885,9 +888,9 @@ inside the Patient resources.
 ## Generating Schemas
 
 The output format produced by a View Runner will be technology-specific, such as
-a SQL database query or a structured file like Parquet. View Runner
-implementations SHOULD offer a way to compute the output schema from a
-ViewDefinition when applicable.
+a SQL database query or a structured file like Parquet.
+<span class="fhir-conformance" id="viewdef-5">View Runner implementations SHOULD offer a way to
+compute the output schema from a ViewDefinition when applicable.</span>
 
 For example, a runner that produces a table in a database system could return
 a "CREATE TABLE" or "CREATE VIEW" statement based on the ViewDefinition,
@@ -905,11 +908,13 @@ created. This is done by tagging fields with database-specific type information.
 
 ### Default Type Mappings
 
-To maximize consistency across different view runners, implementations SHOULD
-align their output types to the following default type mappings from FHIR and
-FHIRPath types to [ISO/IEC 9075](https://www.iso.org/standard/76583.html) SQL
-types. If implementations do not natively support SQL types, they SHOULD map
-each of these types to the closest equivalent in their output format.
+<span class="fhir-conformance" id="viewdef-6">To maximize consistency across different view
+runners, implementations SHOULD align their output types to the following
+default type mappings from FHIR and FHIRPath types to
+[ISO/IEC 9075](https://www.iso.org/standard/76583.html) SQL types.</span>
+<span class="fhir-conformance" id="viewdef-7">If implementations do not natively support SQL
+types, they SHOULD map each of these types to the closest equivalent in their
+output format.</span>
 
 #### FHIR Type to SQL Type Mapping
 

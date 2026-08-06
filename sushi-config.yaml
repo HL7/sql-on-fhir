@@ -10,7 +10,7 @@ title: SQL on FHIR
 description: A specification for defining portable views of FHIR data that can be easily queried using tools such as SQL.
 status: draft # draft | active | retired | unknown
 version: 3.0.0-ballot
-fhirVersion: 6.0.0-ballot4 # https://www.hl7.org/fhir/valueset-FHIR-version.html
+fhirVersion: 6.0.0-ballot3 # https://www.hl7.org/fhir/valueset-FHIR-version.html
 copyrightYear: 2023+
 releaseLabel: STU 3 Ballot # free text shown in the publish box, e.g. "CI Build", "STU 3 Ballot", "STU 3"
 license: CC0-1.0 # https://www.hl7.org/fhir/valueset-spdx-license.html
@@ -73,6 +73,13 @@ parameters:
     - input/resources/viewdefinition
   additional-resource:
     - input/resources/viewdefinition/StructureDefinition-ViewDefinition.xml
+  # Additional resources are published under the core FHIR URL base, following the
+  # convention used by the other HL7 resource incubator guides (see fhir-testing-ig
+  # and api-incubator-ig). This is also required in practice: the IG Publisher
+  # resolves the base of a profiled resource by prefixing the root of
+  # ElementDefinition.base.path with http://hl7.org/fhir/StructureDefinition/, so
+  # profiles of ViewDefinition cannot be rendered unless it lives in that namespace.
+  special-url-base: http://hl7.org/fhir
 
 #   validation: [allow-any-extensions, no-broken-links]
 #
