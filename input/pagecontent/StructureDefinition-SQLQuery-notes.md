@@ -6,7 +6,9 @@ A minimal SQLQuery Library:
 {
   "resourceType": "Library",
   "meta": {
-    "profile": ["http://hl7.org/fhir/uv/sql-on-fhir/StructureDefinition/SQLQuery"]
+    "profile": [
+      "http://hl7.org/fhir/uv/sql-on-fhir/StructureDefinition/SQLQuery"
+    ]
   },
   "type": {
     "coding": [
@@ -79,12 +81,17 @@ The [Active Patient Addresses](Library-ActivePatientAddressesQuery.html) example
 shows an SQLQuery that references the
 [Active Patients](Library-ActivePatientsView.html) SQLView.
 
+How these dependencies are resolved when a query is invoked, including how a
+client may supply one inline that the server cannot itself resolve, is specified
+in
+[Supporting artefacts](operations-common.html#context).
+
 ### Parameter Types
 
 Each `Library.parameter` declares a `type` that callers must honour when
 supplying values. When parameters are passed at invocation time via a
-`Parameters` resource (for example to [`$sqlquery-run`](OperationDefinition-SQLQueryRun.html)
-or [`$sqlquery-export`](OperationDefinition-SQLQueryExport.html)), each entry
+`Parameters` resource (for example to [`$sql-run`](OperationDefinition-SQLRun.html)
+or [`$sql-export`](OperationDefinition-SQLExport.html)), each entry
 is bound by name to the matching `Library.parameter`, and the appropriate
 `value[x]` element must be used for the declared type:
 

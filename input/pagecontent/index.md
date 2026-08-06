@@ -80,15 +80,12 @@ ViewDefinition outputs. See the
 The specification defines a standard [HTTP API](operations.html) as FHIR
 OperationDefinitions for interacting with SQL on FHIR systems:
 
-* [`$viewdefinition-run`](OperationDefinition-ViewDefinitionRun.html) —
-  Synchronous evaluation of a ViewDefinition with streamed results.
-* [`$viewdefinition-export`](OperationDefinition-ViewDefinitionExport.html) —
-  Asynchronous bulk export of ViewDefinition results into formats like CSV,
-  NDJSON, or Parquet.
-* [`$sqlquery-run`](OperationDefinition-SQLQueryRun.html) — Execute a
-  SQLQuery Library against materialized ViewDefinition tables synchronously.
-* `$sqlquery-export` — Asynchronous counterpart to `$sqlquery-run` for
-  large-scale query execution with results delivered to file storage.
+* [`$sql-run`](OperationDefinition-SQLRun.html) — Synchronous evaluation of a
+  single subject, whether a ViewDefinition, a SQLQuery Library or a SQLView
+  Library, with streamed results.
+* [`$sql-export`](OperationDefinition-SQLExport.html) — Asynchronous bulk export
+  of one or more subjects, in any mixture, into formats like CSV, NDJSON or
+  Parquet, as a single job against a single snapshot.
 
 Servers advertise their supported operations via the standard FHIR
 [CapabilityStatement](operations-capability.html).
@@ -245,7 +242,7 @@ Example output:
 {:.table-data}
 
 This query can be executed via the
-[`$sqlquery-run`](OperationDefinition-SQLQueryRun.html) operation, or used
+[`$sql-run`](OperationDefinition-SQLRun.html) operation, or used
 directly in any database where the views have been materialized.
 
 
@@ -322,10 +319,8 @@ The View Layer has two key components:
   annotations to optimize performance.
 
 The [HTTP API](operations.html) formalizes the View Runner concept as standard
-FHIR operations:
-[`$viewdefinition-run`](OperationDefinition-ViewDefinitionRun.html) for
-synchronous evaluation and
-[`$viewdefinition-export`](OperationDefinition-ViewDefinitionExport.html) for
+FHIR operations: [`$sql-run`](OperationDefinition-SQLRun.html) for synchronous
+evaluation and [`$sql-export`](OperationDefinition-SQLExport.html) for
 asynchronous bulk export.
 
 See [View Definition](StructureDefinition-ViewDefinition.html) for more
@@ -358,7 +353,7 @@ business intelligence tools.
 The [SQLQuery](StructureDefinition-SQLQuery.html) profile serves as a bridge
 between the View Layer and the Analytics Layer, capturing reusable SQL queries
 over ViewDefinition outputs as shareable FHIR Library resources. The
-[`$sqlquery-run`](OperationDefinition-SQLQueryRun.html) operation executes
+[`$sql-run`](OperationDefinition-SQLRun.html) operation executes
 these queries against materialized views.
 
 ### Glossary
