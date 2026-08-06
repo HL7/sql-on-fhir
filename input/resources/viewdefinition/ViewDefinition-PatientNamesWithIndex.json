@@ -1,0 +1,40 @@
+{
+  "resourceType": "ViewDefinition",
+  "id": "PatientNamesWithIndex",
+  "name": "patient_names_with_index",
+  "status": "draft",
+  "resource": "Patient",
+  "select": [
+    {
+      "column": [
+        {
+          "path": "getResourceKey()",
+          "name": "patient_id"
+        }
+      ]
+    },
+    {
+      "column": [
+        {
+          "path": "%rowIndex",
+          "name": "name_index",
+          "description": "The 0-based position of this name in the patient's name array.",
+          "type": "integer"
+        },
+        {
+          "path": "use",
+          "name": "use"
+        },
+        {
+          "path": "family",
+          "name": "family"
+        },
+        {
+          "path": "given.join(' ')",
+          "name": "given"
+        }
+      ],
+      "forEach": "name"
+    }
+  ]
+}

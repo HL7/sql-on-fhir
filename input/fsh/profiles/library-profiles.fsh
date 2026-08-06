@@ -11,6 +11,19 @@ Description: "The content of the Library must be SQL expressions."
 Severity: #error
 Expression: "content.all(contentType.startsWith('application/sql'))"
 
+// Mirrors the sql-name constraint on ViewDefinition, whose definition lives in
+// input/resources/viewdefinition/StructureDefinition-ViewDefinition.xml.
+Invariant: sql-name
+Description: """
+Name is limited to letters, numbers, or underscores and cannot start with an
+underscore -- i.e. with a regular expression of: ^[A-Za-z][A-Za-z0-9_]*$ 
+
+
+This makes it usable as table names in a wide variety of databases.
+"""
+Severity: #error
+Expression: "empty() or matches('^[A-Za-z][A-Za-z0-9_]*$')"
+
 Profile: SQLQuery
 Title: "SQL Query Library"
 Parent: Library

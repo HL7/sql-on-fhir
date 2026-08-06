@@ -89,7 +89,7 @@ For instance, each Patient resource can have multiple addresses, which users can
 expand into a separate `patient_addresses` table with one row per address. Each
 row would still have a `patient_id` field to know which patient that address row
 is associated with. You can see this in
-the [PatientAddresses example](Binary-PatientAddresses.html), which unrolls
+the [PatientAddresses example](ViewDefinition-PatientAddresses.html), which unrolls
 addresses as described above.
 
 [forEach](StructureDefinition-ViewDefinition-definitions.html#diff_ViewDefinition.select.forEach)
@@ -319,7 +319,7 @@ produce the same columns including their specified names and FHIR types.
 The above example uses `forEach` to select different data elements from the
 resources to be included in the union. For other use cases, it is possible to
 define the columns directly in the `select`. See
-the [PatientAndContactAddressUnion example](Binary-PatientAndContactAddressUnion.html)
+the [PatientAndContactAddressUnion example](ViewDefinition-PatientAndContactAddressUnion.html)
 for a complete version of the above.
 
 The columns produced from the `unionAll` list are effectively added to the

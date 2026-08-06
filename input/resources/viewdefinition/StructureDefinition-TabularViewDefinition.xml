@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<StructureDefinition xmlns="http://hl7.org/fhir">
+  <id value="TabularViewDefinition"/>
+  <url value="http://hl7.org/fhir/uv/sql-on-fhir/StructureDefinition/TabularViewDefinition"/>
+  <name value="TabularViewDefinition"/>
+  <title value="Tabular View Definition"/>
+  <status value="draft"/>
+  <description value="A profile for View Definitions where each resulting field must contain only a simple scalar value.&#xA;This is sometimes referred to as 'CSV Mode', but applies to any system that explicitly constrains &#xA;its views or tables to tabular data."/>
+  <fhirVersion value="5.0.0"/>
+  <kind value="resource"/>
+  <abstract value="false"/>
+  <type value="ViewDefinition"/>
+  <baseDefinition value="http://hl7.org/fhir/uv/sql-on-fhir/StructureDefinition/ViewDefinition"/>
+  <derivation value="constraint"/>
+  <differential>
+    <element id="ViewDefinition">
+      <path value="ViewDefinition"/>
+    </element>
+    <element id="ViewDefinition.select.column">
+      <path value="ViewDefinition.select.column"/>
+      <constraint>
+        <key value="no-collections"/>
+        <severity value="error"/>
+        <human value="Tabular view columns must not be collections."/>
+        <expression value="collection.empty() or collection = false"/>
+        <source value="http://hl7.org/fhir/uv/sql-on-fhir/StructureDefinition/TabularViewDefinition"/>
+      </constraint>
+      <constraint>
+        <key value="primitives-only"/>
+        <severity value="error"/>
+        <human value="Tabular view columns only contain primitive values."/>
+        <expression value="type in ('base64Binary' | 'boolean' | 'canonical' | 'code' | 'dateTime' | 'decimal' | 'id' | 'instant' | 'integer' | 'integer64' | 'markdown' | 'oid' | 'string' | 'positiveInt' | 'time' | 'unsignedInt' | 'url' | 'uuid')"/>
+        <source value="http://hl7.org/fhir/uv/sql-on-fhir/StructureDefinition/TabularViewDefinition"/>
+      </constraint>
+    </element>
+  </differential>
+</StructureDefinition>

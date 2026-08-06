@@ -1,0 +1,732 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<StructureDefinition xmlns="http://hl7.org/fhir">
+  <id value="ViewDefinition"/>
+  <extension url="http://hl7.org/fhir/StructureDefinition/structuredefinition-standards-status">
+    <valueCode value="draft"/>
+  </extension>
+  <extension url="http://hl7.org/fhir/StructureDefinition/structuredefinition-wg">
+    <valueCode value="fhir"/>
+  </extension>
+  <extension url="http://hl7.org/fhir/StructureDefinition/structuredefinition-implements">
+    <valueUri value="http://hl7.org/fhir/StructureDefinition/MetadataResource"/>
+  </extension>
+  <url value="http://hl7.org/fhir/uv/sql-on-fhir/StructureDefinition/ViewDefinition"/>
+  <name value="ViewDefinition"/>
+  <title value="View Definition"/>
+  <status value="draft"/>
+  <description value="A ViewDefinition represents a tabular projection of a FHIR resource, where the columns and inclusion &#xA;criteria are defined by FHIRPath expressions. "/>
+  <fhirVersion value="5.0.0"/>
+  <kind value="resource"/>
+  <abstract value="false"/>
+  <type value="ViewDefinition"/>
+  <baseDefinition value="http://hl7.org/fhir/StructureDefinition/DomainResource"/>
+  <derivation value="specialization"/>
+  <differential>
+    <element id="ViewDefinition">
+      <path value="ViewDefinition"/>
+      <short value="View Definition"/>
+      <definition value="A ViewDefinition represents a tabular projection of a FHIR resource, where the columns and inclusion &#xA;criteria are defined by FHIRPath expressions. "/>
+      <min value="0"/>
+      <max value="*"/>
+    </element>
+    <element id="ViewDefinition.url">
+      <path value="ViewDefinition.url"/>
+      <short value="Canonical identifier for this view definition, represented as an absolute URI (globally unique)"/>
+      <definition value="An absolute URI that is used to identify this view definition when it is referenced in a specification, model, design or an instance; also called its canonical identifier. This SHOULD be globally unique and SHOULD be a literal address at which an authoritative instance of this view definition is (or will be) published. This URL can be the target of a canonical reference. It SHALL remain the same when the view definition is stored on different servers."/>
+      <comment value="Can be a urn:uuid: or a urn:oid: but real http: addresses are preferred.  Multiple instances may share the same URL if they have a distinct version.&#xA;&#xA;The determination of when to create a new version of a resource (same url, new version) vs. defining a new artifact is up to the author.  Considerations for making this decision are found in [Technical and Business Versions](resource.html#versions).&#xA;&#xA;In some cases, the resource can no longer be found at the stated url, but the url itself cannot change. Implementations can use the [meta.source](resource.html#meta) element to indicate where the current master source of the resource can be found."/>
+      <requirements value="Allows the view definition to be referenced by a single globally unique identifier."/>
+      <min value="0"/>
+      <max value="1"/>
+      <type>
+        <code value="uri"/>
+      </type>
+      <constraint>
+        <key value="cnl-1"/>
+        <severity value="warning"/>
+        <human value="URL should not contain | or # - these characters make processing canonical references problematic"/>
+        <expression value="exists() implies matches('^[^|# ]+$')"/>
+        <source value="http://hl7.org/fhir/StructureDefinition/MetadataResource"/>
+      </constraint>
+      <isSummary value="true"/>
+    </element>
+    <element id="ViewDefinition.identifier">
+      <path value="ViewDefinition.identifier"/>
+      <short value="Additional identifier for the view definition"/>
+      <definition value="A formal identifier that is used to identify this view definition when it is represented in other formats, or referenced in a specification, model, design or an instance."/>
+      <comment value="Typically, this is used for identifiers that can go in an HL7 V3 II (instance identifier) data type, and can then identify this view definition outside of FHIR, where it is not possible to use the logical URI."/>
+      <requirements value="Allows externally provided and/or usable business identifiers to be easily associated with the view definition."/>
+      <min value="0"/>
+      <max value="*"/>
+      <type>
+        <code value="Identifier"/>
+      </type>
+      <isSummary value="true"/>
+    </element>
+    <element id="ViewDefinition.version">
+      <path value="ViewDefinition.version"/>
+      <short value="Business version of the view definition"/>
+      <definition value="The identifier that is used to identify this version of the view definition when it is referenced in a specification, model, design or instance. This is an arbitrary value managed by the view definition author and is not expected to be globally unique. For example, it might be a timestamp (e.g. yyyymmdd) if a managed version is not available. There is also no expectation that versions can be placed in a lexicographical sequence without additional knowledge.  (See the versionAlgorithm element.)"/>
+      <comment value="There may be different view definitions that have the same url but different versions.  The version can be appended to the url in a reference to allow a reference to a particular business version of the view definition with the format [url]|[version]. The version SHOULD NOT contain a '#' - see [Business Version](resource.html#bv-format)."/>
+      <min value="0"/>
+      <max value="1"/>
+      <type>
+        <code value="string"/>
+      </type>
+      <isSummary value="true"/>
+    </element>
+    <element id="ViewDefinition.versionAlgorithm[x]">
+      <path value="ViewDefinition.versionAlgorithm[x]"/>
+      <short value="How to compare versions"/>
+      <definition value="Indicates the mechanism used to compare versions to determine which is more current."/>
+      <comment value="If set as a string, this is a FHIRPath expression that has two additional context variables passed in - %version1 and %version2 and will return a negative number if version1 is newer, a positive number if version2 and a 0 if the version ordering can't be successfully be determined."/>
+      <min value="0"/>
+      <max value="1"/>
+      <type>
+        <code value="string"/>
+      </type>
+      <type>
+        <code value="Coding"/>
+      </type>
+      <isSummary value="true"/>
+      <binding>
+        <strength value="extensible"/>
+        <valueSet value="http://hl7.org/fhir/ValueSet/version-algorithm"/>
+      </binding>
+    </element>
+    <element id="ViewDefinition.name">
+      <path value="ViewDefinition.name"/>
+      <short value="Name for this view definition (computer friendly)"/>
+      <definition value="A natural language name identifying the view definition. This name should be usable as an identifier for the resource by machine processing applications such as code generation."/>
+      <comment value="The name is not expected to be globally unique. The name should be a simple alphanumeric type no-whitespace name to ensure that it is machine-processing friendly."/>
+      <requirements value="Supports code generation."/>
+      <min value="0"/>
+      <max value="1"/>
+      <type>
+        <code value="string"/>
+      </type>
+      <constraint>
+        <key value="sql-name"/>
+        <severity value="error"/>
+        <human value="Name is limited to letters, numbers, or underscores and cannot start with an&#xA;underscore -- i.e. with a regular expression of: ^[A-Za-z][A-Za-z0-9_]*$ &#xA;&#xA;&#xA;This makes it usable as table names in a wide variety of databases."/>
+        <expression value="empty() or matches('^[A-Za-z][A-Za-z0-9_]*$')"/>
+        <source value="http://hl7.org/fhir/uv/sql-on-fhir/StructureDefinition/ViewDefinition"/>
+      </constraint>
+      <isSummary value="true"/>
+    </element>
+    <element id="ViewDefinition.title">
+      <path value="ViewDefinition.title"/>
+      <short value="Name for this view definition (human friendly)"/>
+      <definition value="A short, descriptive, user-friendly title for the view definition."/>
+      <comment value="This name does not need to be machine-processing friendly and may contain punctuation, white-space, etc."/>
+      <min value="0"/>
+      <max value="1"/>
+      <type>
+        <code value="string"/>
+      </type>
+      <isSummary value="true"/>
+    </element>
+    <element id="ViewDefinition.status">
+      <path value="ViewDefinition.status"/>
+      <short value="draft | active | retired | unknown"/>
+      <definition value="The current state of this view definition. "/>
+      <comment value="A nominal state-transition diagram can be found in the [Definition pattern](definition.html#statemachine) documentation.&#xA;&#xA;Unknown does not represent 'other' - one of the defined statuses must apply.  Unknown is used when the authoring system is not sure what the current status is.&#xA;&#xA;See guidance around (not) making local changes to elements [here](canonicalresource.html#localization)."/>
+      <requirements value="Enables tracking the life-cycle of the content and filtering of view definitions that are appropriate for use versus not."/>
+      <min value="1"/>
+      <max value="1"/>
+      <type>
+        <code value="code"/>
+      </type>
+      <isModifier value="true"/>
+      <isModifierReason value="This is labeled as &quot;Is Modifier&quot; because applications should not use a retired view definition without due consideration"/>
+      <isSummary value="true"/>
+      <binding>
+        <extension url="http://hl7.org/fhir/StructureDefinition/elementdefinition-bindingName">
+          <valueString value="PublicationStatus"/>
+        </extension>
+        <extension url="http://hl7.org/fhir/StructureDefinition/elementdefinition-isCommonBinding">
+          <valueBoolean value="true"/>
+        </extension>
+        <strength value="required"/>
+        <description value="The lifecycle status of an artifact."/>
+        <valueSet value="http://hl7.org/fhir/ValueSet/publication-status"/>
+      </binding>
+    </element>
+    <element id="ViewDefinition.experimental">
+      <path value="ViewDefinition.experimental"/>
+      <short value="For testing purposes, not real usage"/>
+      <definition value="A Boolean value to indicate that this view definition is authored for testing purposes (or education/evaluation/marketing) and is not intended for genuine usage."/>
+      <comment value="Allows filtering of view definitions that are appropriate for use versus not."/>
+      <requirements value="Enables experimental content to be developed following the same lifecycle that would be used for a production-level view definition."/>
+      <min value="0"/>
+      <max value="1"/>
+      <type>
+        <code value="boolean"/>
+      </type>
+      <meaningWhenMissing value="If absent, this resource is treated as though it is not experimental."/>
+      <isSummary value="true"/>
+    </element>
+    <element id="ViewDefinition.date">
+      <path value="ViewDefinition.date"/>
+      <short value="Date last changed"/>
+      <definition value="The date (and optionally time) when the view definition was last significantly changed. The date must change when the business version changes and it must change if the status code changes. In addition, it should change when the substantive content of the view definition changes."/>
+      <comment value="The date is often not tracked until the resource is published, but may be present on draft content. Note that this is not the same as the resource last-modified-date, since the resource may be a secondary representation of the view definition. Additional specific dates may be added as extensions or be found by consulting Provenances associated with past versions of the resource.&#xA;&#xA;See guidance around (not) making local changes to elements [here](canonicalresource.html#localization)."/>
+      <alias value="Revision Date"/>
+      <min value="0"/>
+      <max value="1"/>
+      <type>
+        <code value="dateTime"/>
+      </type>
+      <isSummary value="true"/>
+    </element>
+    <element id="ViewDefinition.publisher">
+      <path value="ViewDefinition.publisher"/>
+      <short value="Name of the publisher/steward (organization or individual)"/>
+      <definition value="The name of the organization or individual responsible for the release and ongoing maintenance of the view definition."/>
+      <comment value="Usually an organization but may be an individual. The publisher (or steward) of the view definition is the organization or individual primarily responsible for the maintenance and upkeep of the view definition. This is not necessarily the same individual or organization that developed and initially authored the content. The publisher is the primary point of contact for questions or issues with the view definition. This item SHOULD be populated unless the information is available from context."/>
+      <requirements value="Helps establish the &quot;authority/credibility&quot; of the view definition.  May also allow for contact."/>
+      <min value="0"/>
+      <max value="1"/>
+      <type>
+        <code value="string"/>
+      </type>
+      <isSummary value="true"/>
+    </element>
+    <element id="ViewDefinition.contact">
+      <path value="ViewDefinition.contact"/>
+      <short value="Contact details for the publisher"/>
+      <definition value="Contact details to assist a user in finding and communicating with the publisher."/>
+      <comment value="May be a web site, an email address, a telephone number, etc.&#xA;&#xA;See guidance around (not) making local changes to elements [here](canonicalresource.html#localization)."/>
+      <min value="0"/>
+      <max value="*"/>
+      <type>
+        <code value="ContactDetail"/>
+      </type>
+      <isSummary value="true"/>
+    </element>
+    <element id="ViewDefinition.description">
+      <path value="ViewDefinition.description"/>
+      <short value="Natural language description of the view definition"/>
+      <definition value="A free text natural language description of the view definition from a consumer's perspective."/>
+      <comment value="This description can be used to capture details such as comments about misuse, instructions for clinical use and interpretation, literature references, examples from the paper world, etc. It is not a rendering of the view definition as conveyed in the 'text' field of the resource itself. This item SHOULD be populated unless the information is available from context."/>
+      <min value="0"/>
+      <max value="1"/>
+      <type>
+        <code value="markdown"/>
+      </type>
+    </element>
+    <element id="ViewDefinition.useContext">
+      <path value="ViewDefinition.useContext"/>
+      <short value="The context that the content is intended to support"/>
+      <definition value="The content was developed with a focus and intent of supporting the contexts that are listed. These contexts may be general categories (gender, age, ...) or may be references to specific programs (insurance plans, studies, ...) and may be used to assist with indexing and searching for appropriate view definitions."/>
+      <comment value="When multiple useContexts are specified, there is no expectation that all or even any of the contexts apply."/>
+      <requirements value="Assist in searching for appropriate content."/>
+      <min value="0"/>
+      <max value="*"/>
+      <type>
+        <code value="UsageContext"/>
+      </type>
+      <isSummary value="true"/>
+    </element>
+    <element id="ViewDefinition.jurisdiction">
+      <extension url="http://hl7.org/fhir/StructureDefinition/structuredefinition-standards-status">
+        <valueCode value="deprecated"/>
+      </extension>
+      <path value="ViewDefinition.jurisdiction"/>
+      <short value="Intended jurisdiction for view definition (if applicable)"/>
+      <definition value="A legal or geographic region in which the view definition is intended to be used."/>
+      <comment value="It may be possible for the view definition to be used in jurisdictions other than those for which it was originally designed or intended.&#xA;&#xA;DEPRECATION NOTE: For consistency, implementations are encouraged to migrate to using the new 'jurisdiction' code in the useContext element.  (I.e. useContext.code indicating http://terminology.hl7.org/CodeSystem/usage-context-type#jurisdiction and useContext.valueCodeableConcept indicating the jurisdiction.)"/>
+      <min value="0"/>
+      <max value="*"/>
+      <type>
+        <code value="CodeableConcept"/>
+      </type>
+      <isSummary value="true"/>
+      <binding>
+        <extension url="http://hl7.org/fhir/StructureDefinition/elementdefinition-bindingName">
+          <valueString value="Jurisdiction"/>
+        </extension>
+        <extension url="http://hl7.org/fhir/StructureDefinition/elementdefinition-isCommonBinding">
+          <valueBoolean value="true"/>
+        </extension>
+        <strength value="extensible"/>
+        <description value="Countries and regions within which this artifact is targeted for use."/>
+        <valueSet value="http://hl7.org/fhir/ValueSet/jurisdiction"/>
+      </binding>
+    </element>
+    <element id="ViewDefinition.purpose">
+      <path value="ViewDefinition.purpose"/>
+      <short value="Why this view definition is defined"/>
+      <definition value="Explanation of why this view definition is needed and why it has been designed as it has."/>
+      <comment value="This element does not describe the usage of the view definition. Instead, it provides traceability of &quot;why&quot; the resource is either needed or &quot;why&quot; it is defined as it is.  This may be used to point to source materials or specifications that drove the structure of this view definition."/>
+      <min value="0"/>
+      <max value="1"/>
+      <type>
+        <code value="markdown"/>
+      </type>
+    </element>
+    <element id="ViewDefinition.copyright">
+      <path value="ViewDefinition.copyright"/>
+      <short value="Use and/or publishing restrictions"/>
+      <definition value="A copyright statement relating to the view definition and/or its contents. Copyright statements are generally legal restrictions on the use and publishing of the view definition."/>
+      <comment value="The short copyright declaration (e.g. (c) '2015+ xyz organization' should be sent in the copyrightLabel element."/>
+      <requirements value="Consumers must be able to determine any legal restrictions on the use of the view definition and/or its content."/>
+      <alias value="License"/>
+      <alias value="Restrictions"/>
+      <min value="0"/>
+      <max value="1"/>
+      <type>
+        <code value="markdown"/>
+      </type>
+    </element>
+    <element id="ViewDefinition.copyrightLabel">
+      <extension url="http://hl7.org/fhir/StructureDefinition/elementdefinition-translatable">
+        <valueBoolean value="true"/>
+      </extension>
+      <extension url="http://hl7.org/fhir/StructureDefinition/elementdefinition-translatable">
+        <valueBoolean value="true"/>
+      </extension>
+      <path value="ViewDefinition.copyrightLabel"/>
+      <short value="Copyright holder and year(s)"/>
+      <definition value="A short string (&lt;50 characters), suitable for inclusion in a page footer that identifies the copyright holder, effective period, and optionally whether rights are resctricted. (e.g. 'All rights reserved', 'Some rights reserved')."/>
+      <comment value="The (c) symbol should NOT be included in this string. It will be added by software when rendering the notation. Full details about licensing, restrictions, warrantees, etc. goes in the more general 'copyright' element."/>
+      <requirements value="Defines the content expected to be rendered in all representations of the artifact."/>
+      <min value="0"/>
+      <max value="1"/>
+      <type>
+        <code value="string"/>
+      </type>
+    </element>
+    <element id="ViewDefinition.approvalDate">
+      <path value="ViewDefinition.approvalDate"/>
+      <short value="When the view definition was approved by publisher"/>
+      <definition value="The date on which the resource content was approved by the publisher. Approval happens once when the content is officially approved for usage."/>
+      <comment value="The 'date' element may be more recent than the approval date because of minor changes or editorial corrections.&#xA;&#xA;See guidance around (not) making local changes to elements [here](canonicalresource.html#localization)."/>
+      <min value="0"/>
+      <max value="1"/>
+      <type>
+        <code value="date"/>
+      </type>
+    </element>
+    <element id="ViewDefinition.lastReviewDate">
+      <path value="ViewDefinition.lastReviewDate"/>
+      <short value="When the view definition was last reviewed by the publisher"/>
+      <definition value="The date on which the resource content was last reviewed. Review happens periodically after approval but does not change the original approval date."/>
+      <comment value="If specified, this date follows the original approval date."/>
+      <requirements value="Gives a sense of how &quot;current&quot; the content is.  Resources that have not been reviewed in a long time may have a risk of being less appropriate/relevant.&#xA;&#xA;See guidance around (not) making local changes to elements [here](canonicalresource.html#localization)."/>
+      <min value="0"/>
+      <max value="1"/>
+      <type>
+        <code value="date"/>
+      </type>
+    </element>
+    <element id="ViewDefinition.effectivePeriod">
+      <path value="ViewDefinition.effectivePeriod"/>
+      <short value="When the view definition is expected to be used"/>
+      <definition value="The period during which the view definition content was or is planned to be in active use."/>
+      <comment value="The effective period for a view definition  determines when the content is applicable for usage and is independent of publication and review dates. For example, a measure intended to be used for the year 2016 might be published in 2015.&#xA;&#xA;See guidance around (not) making local changes to elements [here](canonicalresource.html#localization)."/>
+      <requirements value="Allows establishing a transition before a resource comes into effect and also allows for a sunsetting  process when new versions of the view definition are or are expected to be used instead."/>
+      <min value="0"/>
+      <max value="1"/>
+      <type>
+        <code value="Period"/>
+      </type>
+      <isSummary value="true"/>
+    </element>
+    <element id="ViewDefinition.topic">
+      <extension url="http://hl7.org/fhir/StructureDefinition/structuredefinition-standards-status">
+        <valueCode value="deprecated"/>
+      </extension>
+      <path value="ViewDefinition.topic"/>
+      <short value="E.g. Education, Treatment, Assessment, etc"/>
+      <definition value="Descriptive topics related to the content of the view definition. Topics provide a high-level categorization as well as keywords for the view definition that can be useful for filtering and searching."/>
+      <comment value="This element provides topical categorization and keywords for the view definition, as opposed to the more structured context-of-use information provided in the useContext element.&#xA;&#xA;DEPRECATION NOTE: For consistency, implementations are encouraged to migrate to using the new 'topic' code in the useContext element.  (I.e. useContext.code indicating http://terminology.hl7.org/CodeSystem/usage-context-type#topic and useContext.valueCodeableConcept indicating the topic)"/>
+      <requirements value="Repositories must be able to determine how to categorize the view definition so that it can be found by topical and keyword searches."/>
+      <min value="0"/>
+      <max value="*"/>
+      <type>
+        <code value="CodeableConcept"/>
+      </type>
+      <binding>
+        <extension url="http://hl7.org/fhir/StructureDefinition/elementdefinition-bindingName">
+          <valueString value="DefinitionTopic"/>
+        </extension>
+        <strength value="example"/>
+        <valueSet value="http://hl7.org/fhir/ValueSet/definition-topic"/>
+      </binding>
+    </element>
+    <element id="ViewDefinition.author">
+      <path value="ViewDefinition.author"/>
+      <short value="Who authored the view definition"/>
+      <definition value="An individiual or organization primarily involved in the creation and maintenance of the view definition."/>
+      <min value="0"/>
+      <max value="*"/>
+      <type>
+        <code value="ContactDetail"/>
+      </type>
+    </element>
+    <element id="ViewDefinition.editor">
+      <path value="ViewDefinition.editor"/>
+      <short value="Who edited the view definition"/>
+      <definition value="An individual or organization primarily responsible for internal coherence of the view definition."/>
+      <min value="0"/>
+      <max value="*"/>
+      <type>
+        <code value="ContactDetail"/>
+      </type>
+    </element>
+    <element id="ViewDefinition.reviewer">
+      <path value="ViewDefinition.reviewer"/>
+      <short value="Who reviewed the view definition"/>
+      <definition value="An individual or organization asserted by the publisher to be primarily responsible for review of some aspect of the view definition."/>
+      <comment value="See guidance around (not) making local changes to elements [here](canonicalresource.html#localization)."/>
+      <min value="0"/>
+      <max value="*"/>
+      <type>
+        <code value="ContactDetail"/>
+      </type>
+    </element>
+    <element id="ViewDefinition.endorser">
+      <path value="ViewDefinition.endorser"/>
+      <short value="Who endorsed the view definition"/>
+      <definition value="An individual or organization asserted by the publisher to be responsible for officially endorsing the view definition for use in some setting."/>
+      <comment value="See guidance around (not) making local changes to elements [here](canonicalresource.html#localization)."/>
+      <min value="0"/>
+      <max value="*"/>
+      <type>
+        <code value="ContactDetail"/>
+      </type>
+    </element>
+    <element id="ViewDefinition.relatedArtifact">
+      <path value="ViewDefinition.relatedArtifact"/>
+      <short value="Additional documentation, citations, etc"/>
+      <definition value="Related artifacts such as additional documentation, justification, dependencies, bibliographic references, and predecessor and successor artifacts."/>
+      <comment value="Each related artifact is either an attachment, or a reference to another resource, but not both."/>
+      <requirements value="A view definition must be able to provide enough information for consumers of the content (and/or interventions or results produced by the content) to be able to determine and understand the justification for and evidence in support of the content."/>
+      <min value="0"/>
+      <max value="*"/>
+      <type>
+        <code value="RelatedArtifact"/>
+      </type>
+    </element>
+    <element id="ViewDefinition.resource">
+      <path value="ViewDefinition.resource"/>
+      <short value="FHIR resource for the ViewDefinition"/>
+      <definition value="The FHIR resource that the view is based upon, e.g. 'Patient' or 'Observation'."/>
+      <min value="1"/>
+      <max value="1"/>
+      <type>
+        <code value="code"/>
+      </type>
+      <binding>
+        <strength value="required"/>
+        <valueSet value="http://hl7.org/fhir/ValueSet/resource-types"/>
+      </binding>
+    </element>
+    <element id="ViewDefinition.profile">
+      <path value="ViewDefinition.profile"/>
+      <short value="FHIR profiles that this view definition was intended to be executed against"/>
+      <definition value="Indicates that this definition was intended to create a view over a set of resources conforming to the specified FHIR profiles. Each of these profiles SHALL be based upon the resource type specified in `resource`."/>
+      <min value="0"/>
+      <max value="*"/>
+      <type>
+        <code value="canonical"/>
+        <targetProfile value="http://hl7.org/fhir/StructureDefinition/StructureDefinition"/>
+      </type>
+    </element>
+    <element id="ViewDefinition.fhirVersion">
+      <path value="ViewDefinition.fhirVersion"/>
+      <short value="FHIR version(s) of the resource for the ViewDefinition"/>
+      <definition value="The FHIR version(s) for the FHIR resource. The value of this element is the&#xA;formal version of the specification, without the revision number, e.g.&#xA;[publication].[major].[minor]."/>
+      <min value="0"/>
+      <max value="*"/>
+      <type>
+        <code value="code"/>
+      </type>
+      <binding>
+        <strength value="required"/>
+        <valueSet value="http://hl7.org/fhir/ValueSet/FHIR-version"/>
+      </binding>
+    </element>
+    <element id="ViewDefinition.constant">
+      <path value="ViewDefinition.constant"/>
+      <short value="Constant that can be used in FHIRPath expressions"/>
+      <definition value="A constant is a value that is injected into a FHIRPath expression through the use of a FHIRPath&#xA;external constant with the same name."/>
+      <min value="0"/>
+      <max value="*"/>
+      <type>
+        <code value="BackboneElement"/>
+      </type>
+    </element>
+    <element id="ViewDefinition.constant.name">
+      <path value="ViewDefinition.constant.name"/>
+      <short value="Name of constant (referred to in FHIRPath as %[name])"/>
+      <definition value="Name of constant (referred to in FHIRPath as %[name])"/>
+      <min value="1"/>
+      <max value="1"/>
+      <type>
+        <code value="string"/>
+      </type>
+      <constraint>
+        <key value="sql-name"/>
+        <severity value="error"/>
+        <human value="Name is limited to letters, numbers, or underscores and cannot start with an&#xA;underscore -- i.e. with a regular expression of: ^[A-Za-z][A-Za-z0-9_]*$ &#xA;&#xA;&#xA;This makes it usable as table names in a wide variety of databases."/>
+        <expression value="empty() or matches('^[A-Za-z][A-Za-z0-9_]*$')"/>
+        <source value="http://hl7.org/fhir/uv/sql-on-fhir/StructureDefinition/ViewDefinition"/>
+      </constraint>
+    </element>
+    <element id="ViewDefinition.constant.value[x]">
+      <path value="ViewDefinition.constant.value[x]"/>
+      <short value="Value of constant"/>
+      <definition value="The value that will be substituted in place of the constant reference. This&#xA;is done by including `%your_constant_name` in a FHIRPath expression, which effectively converts&#xA;the FHIR literal defined here to a FHIRPath literal used in the path expression.&#xA;&#xA;Support for additional types may be added in the future."/>
+      <min value="1"/>
+      <max value="1"/>
+      <type>
+        <code value="base64Binary"/>
+      </type>
+      <type>
+        <code value="boolean"/>
+      </type>
+      <type>
+        <code value="canonical"/>
+      </type>
+      <type>
+        <code value="code"/>
+      </type>
+      <type>
+        <code value="date"/>
+      </type>
+      <type>
+        <code value="dateTime"/>
+      </type>
+      <type>
+        <code value="decimal"/>
+      </type>
+      <type>
+        <code value="id"/>
+      </type>
+      <type>
+        <code value="instant"/>
+      </type>
+      <type>
+        <code value="integer"/>
+      </type>
+      <type>
+        <code value="integer64"/>
+      </type>
+      <type>
+        <code value="oid"/>
+      </type>
+      <type>
+        <code value="string"/>
+      </type>
+      <type>
+        <code value="positiveInt"/>
+      </type>
+      <type>
+        <code value="time"/>
+      </type>
+      <type>
+        <code value="unsignedInt"/>
+      </type>
+      <type>
+        <code value="uri"/>
+      </type>
+      <type>
+        <code value="url"/>
+      </type>
+      <type>
+        <code value="uuid"/>
+      </type>
+    </element>
+    <element id="ViewDefinition.select">
+      <path value="ViewDefinition.select"/>
+      <short value="A collection of columns and nested selects to include in the view."/>
+      <definition value="The select structure defines the columns to be used in the resulting view. These are expressed&#xA;in the `column` structure below, or in nested `select`s for nested resources."/>
+      <min value="1"/>
+      <max value="*"/>
+      <type>
+        <code value="BackboneElement"/>
+      </type>
+      <constraint>
+        <key value="sql-expressions"/>
+        <severity value="error"/>
+        <human value="Can only have at most one of `forEach`, `forEachOrNull`, or `repeat`."/>
+        <expression value="(forEach.exists().toInteger() + forEachOrNull.exists().toInteger() + repeat.exists().toInteger()) &lt;= 1"/>
+        <source value="http://hl7.org/fhir/uv/sql-on-fhir/StructureDefinition/ViewDefinition"/>
+      </constraint>
+    </element>
+    <element id="ViewDefinition.select.column">
+      <path value="ViewDefinition.select.column"/>
+      <short value="A column to be produced in the resulting table."/>
+      <definition value="A column to be produced in the resulting table. The column is relative to the select structure&#xA;that contains it."/>
+      <min value="0"/>
+      <max value="*"/>
+      <type>
+        <code value="BackboneElement"/>
+      </type>
+    </element>
+    <element id="ViewDefinition.select.column.path">
+      <path value="ViewDefinition.select.column.path"/>
+      <short value="FHIRPath expression that creates a column and defines its content"/>
+      <definition value="A FHIRPath expression that evaluates to the value that will be output in the column for each &#xA;resource. The input context is the collection of resources of the type specified in the resource &#xA;element. Constants defined in Reference({constant}) can be referenced as %[name]."/>
+      <min value="1"/>
+      <max value="1"/>
+      <type>
+        <code value="string"/>
+      </type>
+    </element>
+    <element id="ViewDefinition.select.column.name">
+      <path value="ViewDefinition.select.column.name"/>
+      <short value="Column name produced in the output"/>
+      <definition value="Name of the column produced in the output, must be in a database-friendly format. The column &#xA;names in the output must not have any duplicates."/>
+      <min value="1"/>
+      <max value="1"/>
+      <type>
+        <code value="string"/>
+      </type>
+      <constraint>
+        <key value="sql-name"/>
+        <severity value="error"/>
+        <human value="Name is limited to letters, numbers, or underscores and cannot start with an&#xA;underscore -- i.e. with a regular expression of: ^[A-Za-z][A-Za-z0-9_]*$ &#xA;&#xA;&#xA;This makes it usable as table names in a wide variety of databases."/>
+        <expression value="empty() or matches('^[A-Za-z][A-Za-z0-9_]*$')"/>
+        <source value="http://hl7.org/fhir/uv/sql-on-fhir/StructureDefinition/ViewDefinition"/>
+      </constraint>
+    </element>
+    <element id="ViewDefinition.select.column.description">
+      <path value="ViewDefinition.select.column.description"/>
+      <short value="Description of the column"/>
+      <definition value="A human-readable description of the column."/>
+      <min value="0"/>
+      <max value="1"/>
+      <type>
+        <code value="markdown"/>
+      </type>
+    </element>
+    <element id="ViewDefinition.select.column.collection">
+      <path value="ViewDefinition.select.column.collection"/>
+      <short value="Indicates whether the column may have multiple values."/>
+      <definition value="Indicates whether the column may have multiple values. Defaults to `false` if unset.&#xA;&#xA;ViewDefinitions must have this set to `true` if multiple values may be returned. Implementations SHALL&#xA;report an error if multiple values are produced when that is not the case."/>
+      <min value="0"/>
+      <max value="1"/>
+      <type>
+        <code value="boolean"/>
+      </type>
+    </element>
+    <element id="ViewDefinition.select.column.type">
+      <path value="ViewDefinition.select.column.type"/>
+      <short value="A FHIR StructureDefinition URI for the column's type."/>
+      <definition value="A FHIR StructureDefinition URI for the column's type. Relative URIs are implicitly given&#xA;the 'http://hl7.org/fhir/StructureDefinition/' prefix. The URI may also use FHIR element ID notation to indicate&#xA;a backbone element within a structure. For instance, `Observation.referenceRange` may be specified to indicate&#xA;the returned type is that backbone element.&#xA;&#xA;This field *must* be provided if a ViewDefinition returns a non-primitive type. Implementations should report an error&#xA;if the returned type does not match the type set here, or if a non-primitive type is returned but this field is unset."/>
+      <min value="0"/>
+      <max value="1"/>
+      <type>
+        <code value="uri"/>
+      </type>
+    </element>
+    <element id="ViewDefinition.select.column.tag">
+      <path value="ViewDefinition.select.column.tag"/>
+      <short value="Additional metadata describing the column"/>
+      <definition value="Tags can be used to attach additional metadata to columns, such as implementation-specific &#xA;directives or database-specific type hints."/>
+      <min value="0"/>
+      <max value="*"/>
+      <type>
+        <code value="BackboneElement"/>
+      </type>
+    </element>
+    <element id="ViewDefinition.select.column.tag.name">
+      <path value="ViewDefinition.select.column.tag.name"/>
+      <short value="Name of tag"/>
+      <definition value="A name that identifies the meaning of the tag. A namespace should be used to scope the tag to &#xA;a particular context. For example, 'ansi/type' could be used to indicate the type that should &#xA;be used to represent the value within an ANSI SQL database."/>
+      <min value="1"/>
+      <max value="1"/>
+      <type>
+        <code value="string"/>
+      </type>
+    </element>
+    <element id="ViewDefinition.select.column.tag.value">
+      <path value="ViewDefinition.select.column.tag.value"/>
+      <short value="Value of tag"/>
+      <definition value="Value of tag"/>
+      <min value="1"/>
+      <max value="1"/>
+      <type>
+        <code value="string"/>
+      </type>
+    </element>
+    <element id="ViewDefinition.select.select">
+      <path value="ViewDefinition.select.select"/>
+      <short value="Nested select relative to a parent expression."/>
+      <definition value="Nested select relative to a parent expression. If the parent `select` has a `forEach` or `forEachOrNull`, this child select will apply for each item in that expression. "/>
+      <min value="0"/>
+      <max value="*"/>
+      <contentReference value="http://hl7.org/fhir/uv/sql-on-fhir/StructureDefinition/ViewDefinition#ViewDefinition.select"/>
+    </element>
+    <element id="ViewDefinition.select.forEach">
+      <path value="ViewDefinition.select.forEach"/>
+      <short value="A FHIRPath expression to retrieve the parent element(s) used in the containing select. The default is effectively `$this`."/>
+      <definition value="A FHIRPath expression to retrieve the parent element(s) used in the containing select, relative to the root resource or parent `select`,&#xA;if applicable. `forEach` will produce a row for each element selected in the expression. For example, using forEach on `address` in Patient will&#xA;generate a new row for each address, with columns defined in the corresponding `column` structure."/>
+      <min value="0"/>
+      <max value="1"/>
+      <type>
+        <code value="string"/>
+      </type>
+    </element>
+    <element id="ViewDefinition.select.forEachOrNull">
+      <path value="ViewDefinition.select.forEachOrNull"/>
+      <short value="Same as forEach, but will produce a row with null values if the collection is empty."/>
+      <definition value="Same as forEach, but produces a single row with null values in the nested expression if the collection is empty. For example,&#xA;with a Patient resource, a `forEachOrNull` on address will produce a row for each patient even if there are no addresses; it will&#xA;simply set the address columns to `null`."/>
+      <min value="0"/>
+      <max value="1"/>
+      <type>
+        <code value="string"/>
+      </type>
+    </element>
+    <element id="ViewDefinition.select.repeat">
+      <path value="ViewDefinition.select.repeat"/>
+      <short value="FHIRPath expressions to recursively select from."/>
+      <definition value="A list of FHIRPath expressions that define paths to recursively traverse. The view runner will recursively&#xA;follow each path to any depth, collecting results from all levels. All results are combined using a union&#xA;operation."/>
+      <min value="0"/>
+      <max value="*"/>
+      <type>
+        <code value="string"/>
+      </type>
+    </element>
+    <element id="ViewDefinition.select.unionAll">
+      <path value="ViewDefinition.select.unionAll"/>
+      <short value="Creates a union of all rows in the given selection structures."/>
+      <definition value="A `unionAll` combines the results of multiple selection structures. Each structure under the `unionAll` must produce the same column names&#xA;and types. The results from each nested selection will then have their own row."/>
+      <min value="0"/>
+      <max value="*"/>
+      <contentReference value="http://hl7.org/fhir/uv/sql-on-fhir/StructureDefinition/ViewDefinition#ViewDefinition.select"/>
+    </element>
+    <element id="ViewDefinition.where">
+      <path value="ViewDefinition.where"/>
+      <short value="A series of zero or more FHIRPath constraints to filter resources for the view."/>
+      <definition value="A series of zero or more FHIRPath constraints to filter resources for the view. Every constraint&#xA;must evaluate to true for the resource to be included in the view."/>
+      <min value="0"/>
+      <max value="*"/>
+      <type>
+        <code value="BackboneElement"/>
+      </type>
+    </element>
+    <element id="ViewDefinition.where.path">
+      <path value="ViewDefinition.where.path"/>
+      <short value="A FHIRPath expression defining a filter condition"/>
+      <definition value="A FHIRPath expression that defines a filter that must evaluate to true for a resource to be&#xA;included in the output. The input context is the collection of resources of the type specified in&#xA;the resource element. Constants defined in Reference({constant}) can be referenced as %[name]."/>
+      <min value="1"/>
+      <max value="1"/>
+      <type>
+        <code value="string"/>
+      </type>
+    </element>
+    <element id="ViewDefinition.where.description">
+      <path value="ViewDefinition.where.description"/>
+      <short value="A human-readable description of the above where constraint."/>
+      <definition value="A human-readable description of the above where constraint."/>
+      <min value="0"/>
+      <max value="1"/>
+      <type>
+        <code value="string"/>
+      </type>
+    </element>
+  </differential>
+</StructureDefinition>

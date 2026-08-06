@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<StructureDefinition xmlns="http://hl7.org/fhir">
+  <id value="ShareableViewDefinition"/>
+  <url value="http://hl7.org/fhir/uv/sql-on-fhir/StructureDefinition/ShareableViewDefinition"/>
+  <name value="ShareableViewDefinition"/>
+  <title value="Shareable View Definition"/>
+  <status value="draft"/>
+  <description value="A profile for View Definitions intended to be shared between multiple systems. This requires that &#xA;the View Definition have a defined URL and name. It also requires declaration of the FHIR version &#xA;that the view is intended to be executed over, and the FHIR type of each column. This ensures &#xA;consistent interpretation of the view across different view runner implementations."/>
+  <fhirVersion value="5.0.0"/>
+  <kind value="resource"/>
+  <abstract value="false"/>
+  <type value="ViewDefinition"/>
+  <baseDefinition value="http://hl7.org/fhir/uv/sql-on-fhir/StructureDefinition/ViewDefinition"/>
+  <derivation value="constraint"/>
+  <differential>
+    <element id="ViewDefinition">
+      <path value="ViewDefinition"/>
+    </element>
+    <element id="ViewDefinition.url">
+      <path value="ViewDefinition.url"/>
+      <min value="1"/>
+    </element>
+    <element id="ViewDefinition.name">
+      <path value="ViewDefinition.name"/>
+      <min value="1"/>
+    </element>
+    <element id="ViewDefinition.fhirVersion">
+      <path value="ViewDefinition.fhirVersion"/>
+      <min value="1"/>
+    </element>
+    <element id="ViewDefinition.select.column.type">
+      <path value="ViewDefinition.select.column.type"/>
+      <min value="1"/>
+    </element>
+  </differential>
+</StructureDefinition>
