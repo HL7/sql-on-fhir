@@ -35,7 +35,7 @@ a `targetProfile` on `relatedArtifact.resource`.
 #### Table Aliases
 
 Each dependency requires a `label` that defines the table name used in SQL.
-Labels must be unique within the Library and valid SQL identifiers (start with
+Labels SHALL be unique within the Library and valid SQL identifiers (start with
 letter or underscore, contain only letters/digits/underscores, avoid reserved
 words).
 

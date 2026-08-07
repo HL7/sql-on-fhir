@@ -226,7 +226,7 @@ Two further concepts are independent of each other and of the format:
 2. **Incremental result production** - whether the server can emit output before
    the full result set is materialized. This is a server/engine capability that
    genuinely varies by format: NDJSON and CSV are trivially row-incremental; a
-   JSON array needs bracket/comma bookkeeping; parquet must finalize its footer
+   JSON array needs bracket/comma bookkeeping; parquet finalizes its footer
    last but can still flush row groups progressively. Incremental production is
    neither required nor implied by chunked transfer encoding, and chunked
    transfer encoding is not reserved for "streamable" formats.

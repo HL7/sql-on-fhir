@@ -1,6 +1,6 @@
 ### Required FHIRPath Expressions/Functions
 
-All View Runners claiming conformance to the Shareable View Definition profile must implement these [FHIRPath](https://hl7.org/fhirpath/)
+All View Runners claiming conformance to the Shareable View Definition profile SHALL implement these [FHIRPath](https://hl7.org/fhirpath/)
 capabilities:
 
 -   [Literals](https://hl7.org/fhirpath/#literals) for String, Integer and Decimal

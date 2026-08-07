@@ -60,7 +60,7 @@ Description: "ValueSet of all codes from Export Status Codes codesystem"
 * codes from system ExportStatusCodes
 
 CodeSystem: OutputFormatCodes
-Title: "Output Format Codes"
+Title: "Output Format Code System"
 Description: "Output format codes for SQL on FHIR."
 * ^experimental = false
 * ^caseSensitive = true
@@ -72,7 +72,7 @@ Description: "Output format codes for SQL on FHIR."
 
 ValueSet: OutputFormatCodes
 Title: "Output Format Codes"
-Description: "ValueSet of all codes from Output Format Codes codesystem. Used by the synchronous run operations; see Common Operation Behavior."
+Description: "ValueSet of all codes from the Output Format Codes code system. Used by the synchronous run operations; see Common Operation Behavior."
 * ^experimental = false
 * codes from system OutputFormatCodes
 

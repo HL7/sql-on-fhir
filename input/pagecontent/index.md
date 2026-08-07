@@ -353,7 +353,7 @@ There are two popular categories of runners:
 
 #### The Analytics Layer
 
-Users must be able to easily leverage the above views with the analytic tools
+Users need to be able to easily leverage the above views with the analytic tools
 of their choice. This specification purposefully does not define what these
 are, but common use cases may be SQL queries by consuming applications,
 dataframe-based data science tools in Python or R, or integration with
