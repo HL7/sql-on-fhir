@@ -1,5 +1,6 @@
 {
   "resourceType": "ViewDefinition",
+  "resourceDefinition" : "http://hl7.org/fhir/StructureDefinition/ViewDefinition|3.0.0-ballot",
   "id": "PatientAndContactAddressUnion",
   "name": "patient_and_contact_addresses",
   "status": "draft",

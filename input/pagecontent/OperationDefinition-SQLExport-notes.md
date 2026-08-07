@@ -16,7 +16,7 @@ This operation follows the [FHIR Asynchronous Interaction Request Pattern](https
 6. Client fetches the result URL; a successful export returns `200 OK` with the manifest `Parameters` resource (`exportId`, `status`, `output`, …), and a failed export returns the error status code with an `OperationOutcome`
 7. Client downloads the exported files from the `output.location` URLs in the manifest
 
-The result resource for this operation is the manifest `Parameters` resource described under [Output Parameters](#output-parameters). Clients MUST treat the status and result URLs as opaque values.
+The result resource for this operation is the manifest `Parameters` resource described under [Output Parameters](#output-parameters). <span class="fhir-conformance" id="exp-29">Clients SHALL treat the status and result URLs as opaque values.</span>
 
 ##### Async Flow Diagram
 
@@ -442,7 +442,7 @@ either resolves it.
 }
 ```
 
-Clients MUST download all parts to obtain the complete dataset.
+<span class="fhir-conformance" id="exp-30">Clients SHALL download all parts to obtain the complete dataset.</span>
 
 #### Error Handling
 
@@ -657,8 +657,8 @@ Content-Type: application/fhir+json
    - `Location` header with the absolute result URL
    - An empty body
    - The status endpoint reflects polling machinery only; it never communicates
-     the job's outcome. Clients MUST treat the status and result URLs as opaque
-     values.
+     the job's outcome. <span class="fhir-conformance" id="exp-31">Clients SHALL treat the status and
+     result URLs as opaque values.</span>
 5. **Result Retrieval**: Client fetches the result URL with `GET`:
    - **Success**: `200 OK` with the manifest `Parameters` resource in the body
      containing `status` = `completed`, the export metadata, and one `output`
@@ -679,7 +679,7 @@ Content-Type: application/fhir+json
    export completion:</span>
    - <span class="fhir-conformance" id="exp-25">Servers SHOULD support multiple retrievals of the result</span>
    - <span class="fhir-conformance" id="exp-26">Servers MAY include an `Expires` header to indicate when the URLs expire</span>
-   - Clients SHOULD retrieve results promptly but can retry within the validity window
+   - <span class="fhir-conformance" id="exp-32">Clients SHOULD retrieve results promptly but can retry within the validity window</span>
 8. **Access Control**:
    <span class="fhir-conformance" id="exp-27">Servers SHALL protect status, result, and download URLs with appropriate access controls:</span>
    - <span class="fhir-conformance" id="exp-28">Same authorisation context as the original request (servers SHOULD limit

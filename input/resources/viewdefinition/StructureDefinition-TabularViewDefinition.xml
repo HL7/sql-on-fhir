@@ -5,13 +5,13 @@
   <url value="http://hl7.org/fhir/uv/sql-on-fhir/StructureDefinition/TabularViewDefinition"/>
   <name value="TabularViewDefinition"/>
   <title value="Tabular View Definition"/>
-  <status value="draft"/>
+  <status value="active"/>
   <description value="A profile for View Definitions where each resulting field must contain only a simple scalar value.&#xA;This is sometimes referred to as 'CSV Mode', but applies to any system that explicitly constrains &#xA;its views or tables to tabular data."/>
   <fhirVersion value="5.0.0"/>
   <kind value="resource"/>
   <abstract value="false"/>
   <type value="ViewDefinition"/>
-  <baseDefinition value="http://hl7.org/fhir/StructureDefinition/ViewDefinition"/>
+  <baseDefinition value="http://hl7.org/fhir/StructureDefinition/ViewDefinition|3.0.0-ballot"/>
   <derivation value="constraint"/>
   <differential>
     <element id="ViewDefinition">

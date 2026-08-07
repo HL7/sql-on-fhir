@@ -35,9 +35,9 @@ a `targetProfile` on `relatedArtifact.resource`.
 #### Table Aliases
 
 Each dependency requires a `label` that defines the table name used in SQL.
-Labels SHALL be unique within the Library and valid SQL identifiers (start with
-letter or underscore, contain only letters/digits/underscores, avoid reserved
-words).
+<span class="fhir-conformance" id="sqlquery-14">Labels SHALL be unique within the Library and
+valid SQL identifiers (start with letter or underscore, contain only
+letters/digits/underscores, avoid reserved words).</span>
 
 #### Parameters
 
@@ -56,10 +56,11 @@ Reference parameters in SQL with colon-prefix placeholders (`:name`):
 WHERE patient.id = :patient_id AND bp.effective_date >= :from_date
 ```
 
-Implementations MUST ensure parameter values are safely bound to queries and not
-subject to SQL injection. Use parameterized queries or equivalent safe binding
-mechanisms where available. Simple string interpolation MUST NOT be used to
-implement parameter binding.
+<span class="fhir-conformance" id="sqlquery-15">Implementations SHALL ensure parameter values are
+safely bound to queries and not subject to SQL injection.</span> Use parameterized
+queries or equivalent safe binding mechanisms where available.
+<span class="fhir-conformance" id="sqlquery-16">Simple string interpolation SHALL NOT be used to
+implement parameter binding.</span>
 
 #### SQL Attachments
 

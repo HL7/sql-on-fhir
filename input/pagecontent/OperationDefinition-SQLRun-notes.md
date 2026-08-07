@@ -788,8 +788,8 @@ When a subject returns zero rows, the response is a Parameters resource with no
 
 #### SQL to FHIR type mapping
 
-When `_format=fhir`, each result column SHALL be encoded using a FHIR `value[x]`
-type. The following table defines the mapping from
+<span class="fhir-conformance" id="run-10">When `_format=fhir`, each result column SHALL be
+encoded using a FHIR `value[x]` type.</span> The following table defines the mapping from
 [ISO/IEC 9075](https://www.iso.org/standard/76583.html) SQL types to FHIR
 parameter value types.
 
@@ -828,8 +828,9 @@ the absence of timezone information is preserved rather than trying to infer a
 time zone.
 
 ISO/IEC 9075 types not listed in this table (such as INTERVAL, ARRAY, XML, ROW,
-and MULTISET) are not supported. If a query produces a result column with an
-unsupported type, the server MUST return a `422 Unprocessable Entity` error.
+and MULTISET) are not supported. <span class="fhir-conformance" id="run-11">If a query produces a result
+column with an unsupported type, the server SHALL return a
+`422 Unprocessable Entity` error.</span>
 Query authors can work around this by casting unsupported types to a supported
 type within the SQL query.
 

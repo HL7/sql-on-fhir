@@ -1,5 +1,6 @@
 {
   "resourceType": "ViewDefinition",
+  "resourceDefinition" : "http://hl7.org/fhir/StructureDefinition/ViewDefinition|3.0.0-ballot",
   "id": "ConditionFlat",
   "name": "condition_flat",
   "status": "draft",

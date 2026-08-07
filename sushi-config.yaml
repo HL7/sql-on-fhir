@@ -8,7 +8,7 @@ canonical: http://hl7.org/fhir/uv/sql-on-fhir
 name: SQLonFHIR
 title: SQL on FHIR
 description: A specification for defining portable views of FHIR data that can be easily queried using tools such as SQL.
-status: draft # draft | active | retired | unknown
+status: active # draft | active | retired | unknown
 version: 3.0.0-ballot
 fhirVersion: 6.0.0-ballot3 # https://www.hl7.org/fhir/valueset-FHIR-version.html
 copyrightYear: 2023+
@@ -22,7 +22,9 @@ extension:
   - url: http://hl7.org/fhir/StructureDefinition/structuredefinition-wg
     valueCode: fhir
   - url: http://hl7.org/fhir/StructureDefinition/structuredefinition-standards-status
-    valueCode: draft
+    valueCode: trial-use
+  - url: http://hl7.org/fhir/StructureDefinition/structuredefinition-fmm
+    valueInteger: 2
 publisher:
   name: HL7 International / FHIR Infrastructure
   url: http://www.hl7.org/Special/committees/fiwg
