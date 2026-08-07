@@ -36,7 +36,7 @@ IG_DEPENDENCY_VERSION_WARNING
 # These code systems are defined in this IG rather than in THO. A TSMG exemption will be sought at a later time.
 %will need to move to THO later during the process%
 
-# eld-31 is a best-practice recommendation on the inherited Resource.language element, whose additional binding is defined by the core specification without a binding key. The additional bindings this IG defines carry keys.
+# eld-31 is a best-practice recommendation that additional bindings carry a key. Seven of these are on inherited language elements whose additional binding is defined by the core specification without one; the other four are on the content.contentType binding this IG defines on SQLQuery and SQLView, where a key cannot be supplied because binding.additional.key exists in R6 but not in R5, and the publisher processes these Library profiles through the R5 element model and strips it.
 %Constraint failed: eld-31%
 
 # eld-33 is a best-practice recommendation that flags any binding on an element with more than one bindable type. The bindings on ViewDefinition.versionAlgorithm[x] and the sql-text choice elements are inherited from the R5 base resources and are deliberate.
