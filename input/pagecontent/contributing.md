@@ -15,6 +15,7 @@ Contributors are welcome! Here are some places to start:
 * Nikolai Ryzhikov @niquola (Health Samurai)
 * Ryan Brush @rbrush (Google)
 * John Grimes @johngrimes (CSIRO)
+* Gino Canessa @ginocanessa (Microsoft)
 * Josh Mandel @jmandel (Microsoft)
 * Dan Gottlieb @gotdan (Central Square Solutions)
 * Arjun Sanyal @arjun (NCQA)

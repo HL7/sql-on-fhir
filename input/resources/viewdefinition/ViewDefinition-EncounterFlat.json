@@ -1,5 +1,6 @@
 {
   "resourceType": "ViewDefinition",
+  "resourceDefinition" : "http://hl7.org/fhir/StructureDefinition/ViewDefinition|3.0.0-ballot",
   "id": "EncounterFlat",
   "name": "encounter_flat",
   "status": "draft",

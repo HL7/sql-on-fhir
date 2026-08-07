@@ -1,7 +1,8 @@
 ### Required FHIRPath Expressions/Functions
 
-All View Runners claiming conformance to the Shareable View Definition profile SHALL implement these [FHIRPath](https://hl7.org/fhirpath/)
-capabilities:
+<span class="fhir-conformance" id="shareable-1">All View Runners claiming conformance to the
+Shareable View Definition profile SHALL implement these
+[FHIRPath](https://hl7.org/fhirpath/) capabilities:</span>
 
 -   [Literals](https://hl7.org/fhirpath/#literals) for String, Integer and Decimal
 -   [where](https://hl7.org/fhirpath/#wherecriteria-expression-collection)function

@@ -139,7 +139,8 @@ reference it rather than restating it.
 
 ### CapabilityStatement
 
-Server MUST support CapabilityStatement API for discovery of supported operations.
+<span class="fhir-conformance" id="ops-2">Server SHALL support CapabilityStatement API for
+discovery of supported operations.</span>
 
 See [CapabilityStatement for SQL-on-FHIR API](operations-capability.html)
 

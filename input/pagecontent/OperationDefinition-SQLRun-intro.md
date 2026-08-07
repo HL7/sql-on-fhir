@@ -33,7 +33,8 @@ and so require `POST`.
 4. Evaluate the view, or execute the SQL
 5. Return results in the requested format (a raw stream for flat formats, a `Parameters` resource for `_format=fhir`)
 
-Implementations MUST ensure parameter values are safely bound to queries and not
-subject to SQL injection. Use parameterized queries or equivalent safe binding
-mechanisms where available. Simple string interpolation MUST NOT be used to
-implement parameter binding.
+<span class="fhir-conformance" id="run-intro-1">Implementations SHALL ensure parameter values are
+safely bound to queries and not subject to SQL injection.</span> Use parameterized
+queries or equivalent safe binding mechanisms where available.
+<span class="fhir-conformance" id="run-intro-2">Simple string interpolation SHALL NOT be used to
+implement parameter binding.</span>

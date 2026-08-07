@@ -577,7 +577,8 @@ The export operation conforms to the
   body explaining the failure; repeated fetches return the same outcome within
   the validity window.
 
-Clients MUST treat the status and result URLs as opaque values. Note that many
+<span class="fhir-conformance" id="com-23">Clients SHALL treat the status and result URLs as
+opaque values.</span> Note that many
 HTTP libraries follow a `303` response to a `GET` automatically, so a polling
 client may transparently receive the result response; this is benign.
 

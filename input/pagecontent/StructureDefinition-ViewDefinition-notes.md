@@ -2,16 +2,18 @@
 
 Columns within a view are defined using the [FHIRPath](https://hl7.org/fhirpath/) language. FHIRPath contains a large number of functions and syntax constructs - not all of these are required to be implemented within a SQL on FHIR view runner.
 
-View runner implementations MUST support the following required additional FHIRPath functions. In
+<span class="fhir-conformance" id="viewdef-8">View runner implementations SHALL support the
+following required additional FHIRPath functions.</span> In
 addition to this, <span class="fhir-conformance" id="viewdef-1">runners SHOULD implement the FHIRPath subset defined in the
 [Shareable View Definition](StructureDefinition-ShareableViewDefinition.html) profile if the intent is for the runner to be able to
 execute shared view definitions.</span>
 
 ### Required Additional Functions
 
-All View Runners SHALL implement these functions that extend the FHIRPath
-specification. Despite not being in the [FHIRPath](https://hl7.org/fhirpath/)
-specification, they are necessary in the context of defining views:
+<span class="fhir-conformance" id="viewdef-9">All View Runners SHALL implement these functions
+that extend the FHIRPath specification.</span> Despite not being in the
+[FHIRPath](https://hl7.org/fhirpath/) specification, they are necessary in the
+context of defining views:
 
 - [getResourceKey](#getresourcekey--keytype) function
 - [getReferenceKey](#getreferencekeyresource-type-specifier--keytype) function
@@ -27,9 +29,10 @@ with [getReferenceKey](#getreferencekeyresource-type-specifier--keytype),
 which returns
 an equal value from references that point to this resource.
 
-The returned _KeyType_ is implementation dependent, but SHALL be a FHIR primitive
-type that can be used for efficient joins in the system's underlying data
-storage. Integers, strings, UUIDs, and other primitive types may be appropriate.
+<span class="fhir-conformance" id="viewdef-10">The returned _KeyType_ is implementation
+dependent, but SHALL be a FHIR primitive type that can be used for efficient
+joins in the system's underlying data storage.</span> Integers, strings, UUIDs,
+and other primitive types may be appropriate.
 
 See
 the [Joins with Resource and Reference Keys](#joins-with-resource-and-reference-keys)
@@ -39,9 +42,9 @@ section below for details.
 
 This is invoked on [Reference](https://hl7.org/fhir/references.html#Reference)
 elements and returns an opaque value that represents the database key of the row
-being referenced. The value returned SHALL be equal to
-the [getResourceKey](#getresourcekey--keytype) value returned on the resource
-itself.
+being referenced. <span class="fhir-conformance" id="viewdef-11">The value returned SHALL be equal
+to the [getResourceKey](#getresourcekey--keytype) value returned on the resource
+itself.</span>
 
 Users may pass an optional resource type (e.g., Patient or Observation) to
 indicate the expected type of the resource the reference points to. The
@@ -51,17 +54,17 @@ expected type. For example, `Observation.subject.getReferenceKey(Patient)` would
 return a row key if the subject is a Patient, or the empty collection (
 i.e., `{}`) if it is not.
 
-The returned _KeyType_ is implementation dependent, but SHALL be a FHIR primitive
-type that can be used for efficient joins in the systems underlying data
-storage. Integers, strings, UUIDs, and other primitive types may be appropriate.
+<span class="fhir-conformance" id="viewdef-12">The returned _KeyType_ is implementation
+dependent, but SHALL be a FHIR primitive type that can be used for efficient
+joins in the systems underlying data storage.</span> Integers, strings, UUIDs, and other primitive types may be appropriate.
 
 The getReferenceKey function has both required and optional functionality:
 
-- Implementations MUST support the relative literal form of reference (
-  e.g., `Patient/123`), and <span class="fhir-conformance" id="viewdef-2">MAY support other
-  types of references.</span> If the implementation does not support the
-  reference type, or is unable to resolve the reference, it MUST return the
-  empty collection (i.e., `{}`).
+- <span class="fhir-conformance" id="viewdef-13">Implementations SHALL support the relative
+  literal form of reference (e.g., `Patient/123`)</span>, and <span class="fhir-conformance" id="viewdef-2">MAY support other
+  types of references.</span> <span class="fhir-conformance" id="viewdef-14">If the implementation
+  does not support the reference type, or is unable to resolve the reference, it
+  SHALL return the empty collection (i.e., `{}`).</span>
 - <span class="fhir-conformance" id="viewdef-3">Implementations MAY generate a list of
   unprocessable references through query responses, logging or
   reporting.</span> The details of how this information would be provided to the
@@ -294,8 +297,9 @@ This would produce a flat table with all items regardless of nesting depth:
 A `select` can have an optional `unionAll`, which contains a list of `select`s
 that are used to create a union. `unionAll` effectively concatenates the results
 of the nested `select`s that it contains, but without a guarantee that row
-ordering will be preserved. Each `select` contained in the `unionAll` SHALL
-produce the same columns including their specified names and FHIR types.
+ordering will be preserved. <span class="fhir-conformance" id="viewdef-15">Each `select` contained
+in the `unionAll` SHALL produce the same columns including their specified names
+and FHIR types.</span>
 
 ```js
 "select": {
@@ -328,10 +332,11 @@ The columns produced from the `unionAll` list are effectively added to the
 parent `select`, following any other columns from its parent for column
 ordering. See the [column ordering](#column-ordering) section below for details.
 
-The `select`s in a `unionAll` MUST have matching columns. Specifically, each
-nested selection structure MUST produce the same number of columns with the same
-names and order, and the values for the columns MUST be of the same types as
-determined by the [column types](#column-types) part of this specification.
+<span class="fhir-conformance" id="viewdef-16">The `select`s in a `unionAll` SHALL have matching
+columns. Specifically, each nested selection structure SHALL produce the same
+number of columns with the same names and order, and the values for the columns
+SHALL be of the same types as determined by the
+[column types](#column-types) part of this specification.</span>
 
 `unionAll` behaves similarly to the `UNION ALL` in SQL and will not filter out
 duplicate rows. Note that each `select` can contain only one `unionAll` list
@@ -402,8 +407,9 @@ included purely for illustrative purposes.
 
 ## Column Ordering
 
-View Runners that support column ordering in their output format MUST order
-the columns of the result according to the rules defined in this section.
+<span class="fhir-conformance" id="viewdef-17">View Runners that support column ordering in
+their output format SHALL order the columns of the result according to the rules
+defined in this section.</span>
 
 `select`s that have nested `select`s will place the columns of the
 parent `select` before the columns of the nested `select`, and the columns from
@@ -492,8 +498,8 @@ order:
 
 ## Column Types
 
-All values in a given column SHALL be of a single data type. The data type can be
-explicitly specified with
+<span class="fhir-conformance" id="viewdef-18">All values in a given column SHALL be of a single
+data type.</span> The data type can be explicitly specified with
 the [collection](StructureDefinition-ViewDefinition-definitions.html#diff_ViewDefinition.select.column.collection)
 and [type](StructureDefinition-ViewDefinition-definitions.html#diff_ViewDefinition.select.column.type)
 for a column. In most cases, the data type for a column can be determined by
@@ -503,9 +509,9 @@ ViewDefinition without needing to look up and explicitly specify the data type.
 If the column is a primitive type (typical of tabular output), its type is
 inferred under the following conditions:
 
-1. If
+1. <span class="fhir-conformance" id="viewdef-19">If
    the [collection](StructureDefinition-ViewDefinition-definitions.html#diff_ViewDefinition.select.column.collection)
-   is not set to `true`, the returned data type SHALL be a single value.
+   is not set to `true`, the returned data type SHALL be a single value.</span>
 2. If the `path` is a series of `parent.child.subPath` navigation steps from a
    known data type, either from the root resource or a child of an `ofType`
    function, then the data type for each column is determined by the structure
@@ -517,10 +523,10 @@ inferred under the following conditions:
 4. A path that ends in `ofType()` will be of the type given to that function.
 
 Note that type inference is an optional feature and some implementations may not
-support it. Therefore, a ViewDefinition that is intended to be shared between
-different implementations SHOULD have
+support it. <span class="fhir-conformance" id="viewdef-20">Therefore, a ViewDefinition that is
+intended to be shared between different implementations SHOULD have
 the [type](StructureDefinition-ViewDefinition-definitions.html#diff_ViewDefinition.select.column.type)
-for each column set explicitly, even for primitives. It is reasonable for an
+for each column set explicitly, even for primitives.</span> It is reasonable for an
 implementation to treat any non-specified types as strings. Moreover,
 non-primitive data types will not be supported by all implementations.
 Therefore, it is important to always explicitly set
@@ -821,9 +827,9 @@ to `active_patients.id` using common join semantics.
 
 ### Suggested Implementations for getResourceKey() and getReferenceKey()
 
-While [getResourceKey](#getresourcekey--keytype)
+<span class="fhir-conformance" id="viewdef-21">While [getResourceKey](#getresourcekey--keytype)
 and [getReferenceKey](#getreferencekeyresource-type-specifier--keytype) SHALL
-return matching values for the same row, _how_ they do so is left to the
+return matching values for the same row</span>, _how_ they do so is left to the
 implementation. This is by design, allowing ViewDefinitions to be run across a
 wide set of systems that have different data invariants or pre-processing
 capabilities.
@@ -853,9 +859,9 @@ Here are some implementation options to meet different needs:
     </tbody>
 </table>
 
-There are many variations and alternatives to the above. This specification
+There are many variations and alternatives to the above. <span class="fhir-conformance" id="viewdef-22">This specification
 simply asserts that implementations SHALL be able to produce a row key for each
-resource and a matching key for references pointing at that resource, and
+resource and a matching key for references pointing at that resource</span>, and
 intentionally leaves the specific mechanism to the implementation.
 
 ## Contained Resources
@@ -957,9 +963,9 @@ output format.</span>
 
 {:.table-data}
 
-Where the representation is `CHARACTER VARYING`, the format MUST comply with
-the string representation of that type within the
-[FHIR spec](https://www.hl7.org/fhir/R4/datatypes.html#primitive).
+<span class="fhir-conformance" id="viewdef-23">Where the representation is `CHARACTER VARYING`,
+the format SHALL comply with the string representation of that type within the
+[FHIR spec](https://www.hl7.org/fhir/R4/datatypes.html#primitive).</span>
 
 Where a path has both a FHIR type and a FHIRPath type, the FHIR type mapping
 will take precedence.
@@ -1013,9 +1019,9 @@ the desired implementation-specific type for a column.
 ## Processing Algorithm
 
 The following description provides an algorithm for how to process a FHIR
-resource as input for a ViewDefinition. Implementations do not need to follow
-this algorithm directly, but their outputs SHOULD be consistent with what this
-model produces.
+resource as input for a ViewDefinition. <span class="fhir-conformance" id="viewdef-24">Implementations do not need to
+follow this algorithm directly, but their outputs SHOULD be consistent with what
+this model produces.</span>
 
 ### Validate Columns (entry point)
 

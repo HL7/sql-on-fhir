@@ -5,13 +5,13 @@
   <url value="http://hl7.org/fhir/uv/sql-on-fhir/StructureDefinition/ShareableViewDefinition"/>
   <name value="ShareableViewDefinition"/>
   <title value="Shareable View Definition"/>
-  <status value="draft"/>
+  <status value="active"/>
   <description value="A profile for View Definitions intended to be shared between multiple systems. This requires that &#xA;the View Definition have a defined URL and name. It also requires declaration of the FHIR version &#xA;that the view is intended to be executed over, and the FHIR type of each column. This ensures &#xA;consistent interpretation of the view across different view runner implementations."/>
   <fhirVersion value="5.0.0"/>
   <kind value="resource"/>
   <abstract value="false"/>
   <type value="ViewDefinition"/>
-  <baseDefinition value="http://hl7.org/fhir/StructureDefinition/ViewDefinition"/>
+  <baseDefinition value="http://hl7.org/fhir/StructureDefinition/ViewDefinition|3.0.0-ballot"/>
   <derivation value="constraint"/>
   <differential>
     <element id="ViewDefinition">

@@ -10,7 +10,7 @@
         <id value="ViewDefinition-context"/>
         <url value="http://hl7.org/fhir/uv/sql-on-fhir/SearchParameter/ViewDefinition-context"/>
         <name value="ViewDefinitionContext"/>
-        <status value="draft"/>
+        <status value="active"/>
         <description value="A use context assigned to the view definition"/>
         <code value="context"/>
         <base value="ViewDefinition"/>
@@ -27,7 +27,7 @@
         <id value="ViewDefinition-context-quantity"/>
         <url value="http://hl7.org/fhir/uv/sql-on-fhir/SearchParameter/ViewDefinition-context-quantity"/>
         <name value="ViewDefinitionContextQuantity"/>
-        <status value="draft"/>
+        <status value="active"/>
         <description value="A quantity- or range-valued use context assigned to the view definition"/>
         <code value="context-quantity"/>
         <base value="ViewDefinition"/>
@@ -44,7 +44,7 @@
         <id value="ViewDefinition-context-type"/>
         <url value="http://hl7.org/fhir/uv/sql-on-fhir/SearchParameter/ViewDefinition-context-type"/>
         <name value="ViewDefinitionContextType"/>
-        <status value="draft"/>
+        <status value="active"/>
         <description value="A type of use context assigned to the view definition"/>
         <code value="context-type"/>
         <base value="ViewDefinition"/>
@@ -61,7 +61,7 @@
         <id value="ViewDefinition-context-type-quantity"/>
         <url value="http://hl7.org/fhir/uv/sql-on-fhir/SearchParameter/ViewDefinition-context-type-quantity"/>
         <name value="ViewDefinitionContextTypeQuantity"/>
-        <status value="draft"/>
+        <status value="active"/>
         <description value="A use context type and quantity- or range-based value assigned to the view definition"/>
         <code value="context-type-quantity"/>
         <base value="ViewDefinition"/>
@@ -86,7 +86,7 @@
         <id value="ViewDefinition-context-type-value"/>
         <url value="http://hl7.org/fhir/uv/sql-on-fhir/SearchParameter/ViewDefinition-context-type-value"/>
         <name value="ViewDefinitionContextTypeValue"/>
-        <status value="draft"/>
+        <status value="active"/>
         <description value="A use context type and value assigned to the view definition"/>
         <code value="context-type-value"/>
         <base value="ViewDefinition"/>
@@ -111,7 +111,7 @@
         <id value="ViewDefinition-date"/>
         <url value="http://hl7.org/fhir/uv/sql-on-fhir/SearchParameter/ViewDefinition-date"/>
         <name value="ViewDefinitionDate"/>
-        <status value="draft"/>
+        <status value="active"/>
         <description value="The view definition publication date"/>
         <code value="date"/>
         <base value="ViewDefinition"/>
@@ -128,7 +128,7 @@
         <id value="ViewDefinition-description"/>
         <url value="http://hl7.org/fhir/uv/sql-on-fhir/SearchParameter/ViewDefinition-description"/>
         <name value="ViewDefinitionDescription"/>
-        <status value="draft"/>
+        <status value="active"/>
         <description value="The description of the view definition"/>
         <code value="description"/>
         <base value="ViewDefinition"/>
@@ -145,7 +145,7 @@
         <id value="ViewDefinition-identifier"/>
         <url value="http://hl7.org/fhir/uv/sql-on-fhir/SearchParameter/ViewDefinition-identifier"/>
         <name value="ViewDefinitionIdentifier"/>
-        <status value="draft"/>
+        <status value="active"/>
         <description value="External identifier for the view definition"/>
         <code value="identifier"/>
         <base value="ViewDefinition"/>
@@ -162,7 +162,7 @@
         <id value="ViewDefinition-jurisdiction"/>
         <url value="http://hl7.org/fhir/uv/sql-on-fhir/SearchParameter/ViewDefinition-jurisdiction"/>
         <name value="ViewDefinitionJurisdiction"/>
-        <status value="draft"/>
+        <status value="active"/>
         <description value="Intended jurisdiction for the view definition"/>
         <code value="jurisdiction"/>
         <base value="ViewDefinition"/>
@@ -179,7 +179,7 @@
         <id value="ViewDefinition-name"/>
         <url value="http://hl7.org/fhir/uv/sql-on-fhir/SearchParameter/ViewDefinition-name"/>
         <name value="ViewDefinitionName"/>
-        <status value="draft"/>
+        <status value="active"/>
         <description value="Computationally friendly name of the view definition"/>
         <code value="name"/>
         <base value="ViewDefinition"/>
@@ -196,7 +196,7 @@
         <id value="ViewDefinition-profile"/>
         <url value="http://hl7.org/fhir/uv/sql-on-fhir/SearchParameter/ViewDefinition-profile"/>
         <name value="ViewDefinitionProfile"/>
-        <status value="draft"/>
+        <status value="active"/>
         <description value="A FHIR profile the view definition is intended to be executed against"/>
         <code value="profile"/>
         <base value="ViewDefinition"/>
@@ -214,7 +214,7 @@
         <id value="ViewDefinition-publisher"/>
         <url value="http://hl7.org/fhir/uv/sql-on-fhir/SearchParameter/ViewDefinition-publisher"/>
         <name value="ViewDefinitionPublisher"/>
-        <status value="draft"/>
+        <status value="active"/>
         <description value="Name of the publisher of the view definition"/>
         <code value="publisher"/>
         <base value="ViewDefinition"/>
@@ -231,7 +231,7 @@
         <id value="ViewDefinition-resource"/>
         <url value="http://hl7.org/fhir/uv/sql-on-fhir/SearchParameter/ViewDefinition-resource"/>
         <name value="ViewDefinitionResource"/>
-        <status value="draft"/>
+        <status value="active"/>
         <description value="The FHIR resource type the view definition is based upon"/>
         <code value="resource"/>
         <base value="ViewDefinition"/>
@@ -248,7 +248,7 @@
         <id value="ViewDefinition-status"/>
         <url value="http://hl7.org/fhir/uv/sql-on-fhir/SearchParameter/ViewDefinition-status"/>
         <name value="ViewDefinitionStatus"/>
-        <status value="draft"/>
+        <status value="active"/>
         <description value="The current status of the view definition"/>
         <code value="status"/>
         <base value="ViewDefinition"/>
@@ -265,7 +265,7 @@
         <id value="ViewDefinition-title"/>
         <url value="http://hl7.org/fhir/uv/sql-on-fhir/SearchParameter/ViewDefinition-title"/>
         <name value="ViewDefinitionTitle"/>
-        <status value="draft"/>
+        <status value="active"/>
         <description value="The human-friendly name of the view definition"/>
         <code value="title"/>
         <base value="ViewDefinition"/>
@@ -282,7 +282,7 @@
         <id value="ViewDefinition-url"/>
         <url value="http://hl7.org/fhir/uv/sql-on-fhir/SearchParameter/ViewDefinition-url"/>
         <name value="ViewDefinitionUrl"/>
-        <status value="draft"/>
+        <status value="active"/>
         <description value="The uri that identifies the view definition"/>
         <code value="url"/>
         <base value="ViewDefinition"/>
@@ -299,7 +299,7 @@
         <id value="ViewDefinition-version"/>
         <url value="http://hl7.org/fhir/uv/sql-on-fhir/SearchParameter/ViewDefinition-version"/>
         <name value="ViewDefinitionVersion"/>
-        <status value="draft"/>
+        <status value="active"/>
         <description value="The business version of the view definition"/>
         <code value="version"/>
         <base value="ViewDefinition"/>
