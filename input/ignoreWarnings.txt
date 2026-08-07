@@ -2,29 +2,29 @@
 
 # Each pattern below is preceded by a single "# " line that the IG Publisher uses verbatim as the editor's comment shown against the message in qa.html. The publisher keeps only the last comment line before a pattern, so each justification is deliberately written as one long line rather than wrapped.
 
-# ViewDefinition is defined as an additional resource, so the publisher validates SearchParameter.base against the core Version Independent Resource Types (All) value set, which cannot contain a type that is not in the core specification. Inherent to the additional-resource design; see <ZULIP-THREAD-URL>.
+# ViewDefinition is defined as an additional resource, so the publisher validates SearchParameter.base against the core Version Independent Resource Types (All) value set, which cannot contain a type that is not in the core specification. Inherent to the additional-resource design; see https://chat.fhir.org/#narrow/channel/179219-analytics-on-FHIR/topic/Validation.20errors.20for.20additional.20resources/with/615144653.
 %was not found in the value set 'Version Independent Resource Types (All)'%
 %The System URI could not be determined for the code 'ViewDefinition'%
 
-# The publisher requires every instance of an additional resource to carry a resourceDefinition property naming the versioned canonical of its definition. Adding it would put FHIR tooling metadata into the published ViewDefinition examples and pin the IG version in each of them, so the examples are left as authored; see <ZULIP-THREAD-URL>.
+# The publisher requires every instance of an additional resource to carry a resourceDefinition property naming the versioned canonical of its definition. Adding it would put FHIR tooling metadata into the published ViewDefinition examples and pin the IG version in each of them, so the examples are left as authored; see https://chat.fhir.org/#narrow/channel/179219-analytics-on-FHIR/topic/Validation.20errors.20for.20additional.20resources/with/615144653.
 %so must have a resourceDefinition of%
 
-# ViewDefinition is an additional resource rather than a core FHIR type, so the publisher rejects its use as a StructureDefinition type. Inherent to the additional-resource design; see <ZULIP-THREAD-URL>.
+# ViewDefinition is an additional resource rather than a core FHIR type, so the publisher rejects its use as a StructureDefinition type. Inherent to the additional-resource design; see https://chat.fhir.org/#narrow/channel/179219-analytics-on-FHIR/topic/Validation.20errors.20for.20additional.20resources/with/615144653.
 %is not legal because it is not defined in the FHIR specification%
 
-# ViewDefinition is a canonical resource, but the publisher does not recognise additional resources as canonical when checking Library.relatedArtifact.resource targetProfiles. Inherent to the additional-resource design; see <ZULIP-THREAD-URL>.
+# ViewDefinition is a canonical resource, but the publisher does not recognise additional resources as canonical when checking Library.relatedArtifact.resource targetProfiles. Inherent to the additional-resource design; see https://chat.fhir.org/#narrow/channel/179219-analytics-on-FHIR/topic/Validation.20errors.20for.20additional.20resources/with/615144653.
 %which is not a Canonical Resource (which is required because the Library.relatedArtifact.resource element has the type canonical)%
 
-# ViewDefinition derives from MetadataResource, so the inherited cnl-1 invariant carries MetadataResource as its source and the publisher reports a mismatch against the deriving profile. Inherent to the additional-resource design; see <ZULIP-THREAD-URL>.
+# ViewDefinition derives from MetadataResource, so the inherited cnl-1 invariant carries MetadataResource as its source and the publisher reports a mismatch against the deriving profile. Inherent to the additional-resource design; see https://chat.fhir.org/#narrow/channel/179219-analytics-on-FHIR/topic/Validation.20errors.20for.20additional.20resources/with/615144653.
 %The invariant cnl-1 defined in the differential must have no source%
 
-# These are valid ViewDefinition FHIRPath expressions that the publisher's generic FHIRPath evaluator cannot resolve: %rowIndex is a ViewDefinition constant, and linkId, answer and code are evaluated inside a forEach scope that the evaluator does not apply. See <ZULIP-THREAD-URL>.
+# These are valid ViewDefinition FHIRPath expressions that the publisher's generic FHIRPath evaluator cannot resolve: %rowIndex is a ViewDefinition constant, and linkId, answer and code are evaluated inside a forEach scope that the evaluator does not apply. See https://chat.fhir.org/#narrow/channel/179219-analytics-on-FHIR/topic/Validation.20errors.20for.20additional.20resources/with/615144653.
 %Error evaluating FHIRPath expression: Invalid FHIRPath Constant %rowIndex%
 %Error evaluating FHIRPath expression: The name 'answer' is not valid%
 %Error evaluating FHIRPath expression: The name 'linkId' is not valid%
 %Error evaluating FHIRPath expression: The name 'code' is not valid%
 
-# This IG targets FHIR 6.0.0-ballot3, but no R6 build of hl7.fhir.uv.extensions, hl7.terminology or hl7.fhir.uv.tools has been released; the registry serves only R5-based versions, so the publisher auto-selects the .r5 variants. Nothing in this repository can resolve the mismatch; see <ZULIP-THREAD-URL>.
+# This IG targets FHIR 6.0.0-ballot3, but no R6 build of hl7.fhir.uv.extensions, hl7.terminology or hl7.fhir.uv.tools has been released; the registry serves only R5-based versions, so the publisher auto-selects the .r5 variants. Nothing in this repository can resolve the mismatch; see https://chat.fhir.org/#narrow/channel/179219-analytics-on-FHIR/topic/R6.20IGs.20depending.20on.20R5-only.20packages/with/615144821.
 This IG is version%
 This IG is for FHIR version%
 IG_DEPENDENCY_VERSION_ERROR
