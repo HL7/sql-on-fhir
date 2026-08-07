@@ -140,7 +140,7 @@ express the filter itself.
 
 ##### Kick-off Request
 
-- `Prefer: respond-async` (required) - Specifies that the response should be asynchronous
+- `Prefer: respond-async` (required) - Requests an asynchronous response
 - `Accept` (recommended) - Specifies the format of the kick-off response
 
 ##### Status Request
@@ -679,7 +679,7 @@ Content-Type: application/fhir+json
    export completion:</span>
    - <span class="fhir-conformance" id="exp-25">Servers SHOULD support multiple retrievals of the result</span>
    - <span class="fhir-conformance" id="exp-26">Servers MAY include an `Expires` header to indicate when the URLs expire</span>
-   - Clients should retrieve results promptly but can retry within the validity window
+   - Clients SHOULD retrieve results promptly but can retry within the validity window
 8. **Access Control**:
    <span class="fhir-conformance" id="exp-27">Servers SHALL protect status, result, and download URLs with appropriate access controls:</span>
    - <span class="fhir-conformance" id="exp-28">Same authorisation context as the original request (servers SHOULD limit

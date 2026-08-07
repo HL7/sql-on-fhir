@@ -788,7 +788,7 @@ When a subject returns zero rows, the response is a Parameters resource with no
 
 #### SQL to FHIR type mapping
 
-When `_format=fhir`, each result column must be encoded using a FHIR `value[x]`
+When `_format=fhir`, each result column SHALL be encoded using a FHIR `value[x]`
 type. The following table defines the mapping from
 [ISO/IEC 9075](https://www.iso.org/standard/76583.html) SQL types to FHIR
 parameter value types.

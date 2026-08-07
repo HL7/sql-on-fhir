@@ -2,13 +2,16 @@
   "package-id" : "hl7.fhir.uv.sql-on-fhir",
   "version" : "3.0.0-ballot",
   "desc" : "A specification for defining portable views of FHIR data that can be easily queried using tools such as SQL.",
-  "path" : "http://hl7.org/fhir/uv/sql-on-fhir/3.0.0-ballot",
+  "path" : "http://hl7.org/fhir/uv/sql-on-fhir/3.0.0-202609-ballot",
   "mode" : "working",
   "status" : "ballot",
-  "sequence" : "R3",
-  "first" : false,
+  "sequence" : "STU 3",
+  "first" : true,
   "title" : "SQL on FHIR",
   "ci-build" : "http://build.fhir.org/ig/HL7/sql-on-fhir",
   "category" : "Infrastructure",
-  "introduction" : "A specification for defining portable views of FHIR data that can be easily queried using tools such as SQL."
+  "introduction" : "A specification for defining portable views of FHIR data that can be easily queried using tools such as SQL.",
+  "registry-description" : "A specification for defining portable views of FHIR data that can be easily queried using tools such as SQL.",
+  "registry-country" : "uv",
+  "registry-authority" : "hl7"
 }
