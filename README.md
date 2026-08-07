@@ -17,7 +17,7 @@ are tailored to specific needs. Views are defined
 with [FHIRPath](https://hl7.org/fhirpath/) expressions in a logical structure to
 specify things like column names and unnested items.
 
-[**Read the specification &rarr;**](https://sql-on-fhir.org/ig/latest/)
+[**Read the specification &rarr;**](https://sql-on-fhir.org/)
 
 Check the existing [implementations page][] or register your own (see the
 [sql-on-fhir.js](https://github.com/FHIR/sql-on-fhir.js) repository).
