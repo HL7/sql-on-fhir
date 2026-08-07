@@ -1,0 +1,70 @@
+{
+  "resourceType": "ViewDefinition",
+  "id": "QuestionnaireResponseItems",
+  "name": "questionnaire_response_items",
+  "status": "draft",
+  "resource": "QuestionnaireResponse",
+  "select": [
+    {
+      "column": [
+        {
+          "path": "getResourceKey()",
+          "name": "id",
+          "description": "Unique questionnaire response identifier"
+        },
+        {
+          "path": "questionnaire",
+          "name": "questionnaire",
+          "description": "Canonical URL of the questionnaire"
+        },
+        {
+          "path": "subject.getReferenceKey(Patient)",
+          "name": "patient_id",
+          "description": "Patient identifier"
+        },
+        {
+          "path": "authored",
+          "name": "authored",
+          "description": "Date and time the response was authored"
+        }
+      ]
+    },
+    {
+      "column": [
+        {
+          "path": "linkId",
+          "name": "item_link_id",
+          "description": "Unique identifier for this item within the questionnaire"
+        },
+        {
+          "path": "text",
+          "name": "item_text",
+          "description": "Question text"
+        },
+        {
+          "path": "answer.value.ofType(string)",
+          "name": "answer_value_string",
+          "description": "String answer value"
+        },
+        {
+          "path": "answer.value.ofType(integer)",
+          "name": "answer_value_integer",
+          "description": "Integer answer value"
+        },
+        {
+          "path": "answer.value.ofType(boolean)",
+          "name": "answer_value_boolean",
+          "description": "Boolean answer value"
+        },
+        {
+          "path": "answer.value.ofType(date)",
+          "name": "answer_value_date",
+          "description": "Date answer value"
+        }
+      ],
+      "repeat": [
+        "item"
+      ]
+    }
+  ]
+}

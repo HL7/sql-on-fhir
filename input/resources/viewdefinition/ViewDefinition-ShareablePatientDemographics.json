@@ -1,0 +1,50 @@
+{
+  "resourceType": "ViewDefinition",
+  "id": "ShareablePatientDemographics",
+  "meta": {
+    "profile": [
+      "http://hl7.org/fhir/uv/sql-on-fhir/StructureDefinition/ShareableViewDefinition",
+      "http://hl7.org/fhir/uv/sql-on-fhir/StructureDefinition/TabularViewDefinition"
+    ]
+  },
+  "url": "http://hl7.org/fhir/uv/sql-on-fhir/StructureDefinition/ShareablePatientDemographics",
+  "name": "patient_demographics",
+  "status": "draft",
+  "resource": "Patient",
+  "fhirVersion": [
+    "4.0",
+    "5.0"
+  ],
+  "select": [
+    {
+      "column": [
+        {
+          "path": "getResourceKey()",
+          "name": "id",
+          "type": "string"
+        },
+        {
+          "path": "gender",
+          "name": "gender",
+          "type": "code"
+        }
+      ]
+    },
+    {
+      "column": [
+        {
+          "path": "given.join(' ')",
+          "name": "given_name",
+          "description": "A single given name field with all names joined together.",
+          "type": "string"
+        },
+        {
+          "path": "family",
+          "name": "family_name",
+          "type": "string"
+        }
+      ],
+      "forEach": "name.where(use = 'official').first()"
+    }
+  ]
+}

@@ -6,7 +6,9 @@ A minimal SQLQuery Library:
 {
   "resourceType": "Library",
   "meta": {
-    "profile": ["http://hl7.org/fhir/uv/sql-on-fhir/StructureDefinition/SQLQuery"]
+    "profile": [
+      "http://hl7.org/fhir/uv/sql-on-fhir/StructureDefinition/SQLQuery"
+    ]
   },
   "type": {
     "coding": [
@@ -69,9 +71,10 @@ under a canonical URL; an SQLQuery composes both as its table sources.
 
 These references form a directed graph of ViewDefinitions, SQLViews, and
 SQLQueries, in which each referenced result acts as a virtual table for the
-referencing query. Authors SHOULD keep this graph acyclic. Whether circular
-dependencies are detected, any limit on dependency depth, and whether
-intermediate results are materialised or inlined (for example as CTEs or
+referencing query.
+<span class="fhir-conformance" id="sqlquery-notes-1">Authors SHOULD keep this graph acyclic.</span>
+Whether circular dependencies are detected, any limit on dependency depth, and
+whether intermediate results are materialised or inlined (for example as CTEs or
 database views) are implementation decisions and are not mandated by this
 specification.
 
@@ -79,12 +82,17 @@ The [Active Patient Addresses](Library-ActivePatientAddressesQuery.html) example
 shows an SQLQuery that references the
 [Active Patients](Library-ActivePatientsView.html) SQLView.
 
+How these dependencies are resolved when a query is invoked, including how a
+client may supply one inline that the server cannot itself resolve, is specified
+in
+[Supporting artefacts](operations-common.html#context).
+
 ### Parameter Types
 
 Each `Library.parameter` declares a `type` that callers must honour when
 supplying values. When parameters are passed at invocation time via a
-`Parameters` resource (for example to [`$sqlquery-run`](OperationDefinition-SQLQueryRun.html)
-or [`$sqlquery-export`](OperationDefinition-SQLQueryExport.html)), each entry
+`Parameters` resource (for example to [`$sql-run`](OperationDefinition-SQLRun.html)
+or [`$sql-export`](OperationDefinition-SQLExport.html)), each entry
 is bound by name to the matching `Library.parameter`, and the appropriate
 `value[x]` element must be used for the declared type:
 
@@ -101,9 +109,8 @@ is bound by name to the matching `Library.parameter`, and the appropriate
 
 ### SQL Annotations
 
-SQL files MAY include annotations to generate SQLQuery Libraries automatically.
-Library elements are authoritative. Based on
-[Brian Kaney's sql-fhir-library-builder](https://github.com/reason-healthcare/sql-fhir-library-builder).
+<span class="fhir-conformance" id="sqlquery-notes-2">SQL files MAY include annotations to generate
+SQLQuery Libraries automatically.</span> Library elements are authoritative.
 
 Syntax: `@key: value` in SQL comments.
 
@@ -141,7 +148,7 @@ Annotation reference:
 
 ### Tooling
 
-Builders SHALL:
+<span class="fhir-conformance" id="sqlquery-notes-3">Builders SHALL:</span>
 
 1. Parse annotations from block (`/* */`) and line (`--`) comments
 2. Populate the `sql-text` extension with the SQL text (plain text)
@@ -151,7 +158,7 @@ Builders SHALL:
 6. Set `parameter.use` to `in` for all parameters
 7. Set `relatedArtifact.type` to `depends-on` for all dependencies
 
-Builders SHOULD:
+<span class="fhir-conformance" id="sqlquery-notes-4">Builders SHOULD:</span>
 
 1. Infer `name` from filename if `@name` not provided
 2. Default `status` to `draft` if not specified

@@ -57,6 +57,15 @@ multiple sources are combined
 Informal synonym for "tabular". Not recommended.
 
 
+### manifest
+
+The `Parameters` resource an export job returns from its result URL. It carries
+the export identifier, the job's status, its timing and output format, and one
+`output` entry per subject, each with a name and one or more download locations.
+Because the manifest states no ordering, a client correlates an entry with the
+subject it requested by that name.
+
+
 ### package identifier
 
 The name under which a FHIR implementation guide is distributed and installed,
@@ -65,6 +74,29 @@ guide's canonical URL, and it is how one guide declares a dependency on another.
 
 This specification is distributed as `hl7.fhir.uv.sql-on-fhir`. Published version
 2.0.0 was distributed as `org.sql-on-fhir.ig`.
+
+
+### snapshot
+
+A single consistent view of the data at one point in time. Every subject in one
+`$sql-export` job is computed against one snapshot, so two of that job's outputs
+can be joined on a shared key without a skew window - the inconsistency that
+arises when two results are computed at different moments and the data changes in
+between.
+
+The term is borrowed from database systems, where a snapshot is the state a
+transaction sees for its duration. This specification requires the observable
+property and says nothing about how a server achieves it.
+
+
+### subject
+
+The artefact a data operation acts on: a ViewDefinition, a
+[SQLQuery](StructureDefinition-SQLQuery.html) Library or a
+[SQLView](StructureDefinition-SQLView.html) Library. A subject is named by
+canonical URL, by a literal reference, or supplied inline in the request, rather
+than by the request path. `$sql-run` takes exactly one subject; `$sql-export`
+takes one or more, each producing one entry in the manifest.
 
 
 ### tabular

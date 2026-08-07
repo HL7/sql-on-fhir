@@ -8,8 +8,8 @@ its table sources.
 
 References made through `relatedArtifact` form a directed graph of
 ViewDefinitions, SQLViews, and SQLQueries, in which each referenced result acts
-as a virtual table for the referencing query. Authors SHOULD keep this graph
-acyclic.
+as a virtual table for the referencing query.
+<span class="fhir-conformance" id="sqlview-notes-1">Authors SHOULD keep this graph acyclic.</span>
 
 Whether circular dependencies are detected or rejected, any limit on dependency
 depth, and whether intermediate results are materialised or inlined (for example
