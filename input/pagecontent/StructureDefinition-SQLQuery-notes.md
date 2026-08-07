@@ -89,12 +89,12 @@ in
 
 ### Parameter Types
 
-Each `Library.parameter` declares a `type` that callers must honour when
+Each `Library.parameter` declares a `type` that callers SHALL honour when
 supplying values. When parameters are passed at invocation time via a
 `Parameters` resource (for example to [`$sql-run`](OperationDefinition-SQLRun.html)
 or [`$sql-export`](OperationDefinition-SQLExport.html)), each entry
 is bound by name to the matching `Library.parameter`, and the appropriate
-`value[x]` element must be used for the declared type:
+`value[x]` element SHALL be used for the declared type:
 
 | Library.parameter.type | Parameters.parameter value |
 | ---------------------- | -------------------------- |

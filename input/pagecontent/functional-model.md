@@ -347,7 +347,7 @@ To interpret such nodes, you have to re-order keywords (functions) according to
 precedence (higher bubble up):
 
 In a ViewDefinition, different keywords/functions can appear at the same level.
-To interpret such node in a ViewDefinition, an implementation must reorder the
+To interpret such node in a ViewDefinition, an implementation SHALL reorder the
 keywords/functions according to the following precedence rule.
 
 Keyword/function reordering rule (highest to lowest precedence):
@@ -358,7 +358,7 @@ Keyword/function reordering rule (highest to lowest precedence):
 - column
 
 For example given the following ViewDefinition snippet with all
-keywords/functions at the top level, the keywords/functions should be reordered
+keywords/functions at the top level, the keywords/functions are reordered
 as shown in the output.
 
 ```js
