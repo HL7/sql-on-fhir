@@ -52,7 +52,31 @@ dependencies:
 # with supported extensions (e.g., .md/.xml) will be treated as
 # sub-pages.
 #
-#
+# The list is declared here only so that a standards status can be set on the
+# Changes page, which requires a page-level extension. Because declaring any
+# page hands the whole list to the author, every authored page must appear
+# below. The titles reproduce the ones SUSHI derived automatically, so the table
+# of contents is unchanged apart from the addition of Changes.
+pages:
+  index.md:
+    title: Home
+  contributing.md:
+    title: Contributing
+  functional-model.md:
+    title: Functional Model
+  glossary.md:
+    title: Glossary
+  operations.md:
+    title: Operations
+  operations-capability.md:
+    title: Operations Capability
+  operations-common.md:
+    title: Operations Common
+  changes.md:
+    title: Changes
+    extension:
+      - url: http://hl7.org/fhir/StructureDefinition/structuredefinition-standards-status
+        valueCode: informative
 
 #
 # The parameters property represents IG.definition.parameter. Rather
@@ -69,6 +93,12 @@ parameters:
   # Root OID arc assigned to this IG in the FHIR ig-registry. The IG Publisher
   # uses it to auto-assign and persist OIDs for code systems and value sets.
   auto-oid-root: 2.16.840.1.113883.4.642.40.77
+  # Automatic comparison against the previous release is disabled. The publisher
+  # resolves the prior release through the package identifier recorded in
+  # {canonical}/package-list.json, so it cannot reach 2.0.0, which was published
+  # as org.sql-on-fhir.ig rather than hl7.fhir.uv.sql-on-fhir. The delta is
+  # hand-authored on the Changes page instead.
+  version-comparison: n/a
   # ViewDefinition is defined as an additional resource type. Its definition and
   # supporting artefacts are authored directly as XML rather than via FSH.
   path-resource:
@@ -111,6 +141,7 @@ menu:
   Playground: http://sql-on-fhir.org/extra/playground.html
   Tests: http://sql-on-fhir.org/extra/tests.html
   Implementations: http://sql-on-fhir.org/extra/impls.html
+  Changes: changes.html
 
 # ╭───────────────────────────Less Common Implementation Guide Properties──────────────────────────╮
 # │  Uncomment the properties below to configure additional properties on the ImplementationGuide  │
