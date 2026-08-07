@@ -1,52 +1,58 @@
 == Suppressed Messages ==
 
-# Add warning and/or information messages here after you've confirmed that they aren't really a problem
-# (And include comments like this justifying why)
-# See https://github.com/FHIR/sample-ig/blob/master/input/ignoreWarnings.txt for examples
+# Each pattern below is preceded by a single "# " line that the IG Publisher uses verbatim as the editor's comment shown against the message in qa.html. The publisher keeps only the last comment line before a pattern, so each justification is deliberately written as one long line rather than wrapped.
 
-# Publisher bug?
-Error in constraint 'sql-expressions' with expression '(path | forEach | forEachOrNull | union).count() = 1': Cannot assign field "sourceDefinition" because "res" is null
+# ViewDefinition is defined as an additional resource, so the publisher validates SearchParameter.base against the core Version Independent Resource Types (All) value set, which cannot contain a type that is not in the core specification. Inherent to the additional-resource design; see <ZULIP-THREAD-URL>.
+%was not found in the value set 'Version Independent Resource Types (All)'%
+%The System URI could not be determined for the code 'ViewDefinition'%
 
-# ViewDefinition names are deliberately snake_case so they can be used directly
-# as SQL table and column identifiers (enforced by the sql-name invariant). This
-# is incompatible with the cnl-0 canonical-resource name pattern, which expects
-# a leading uppercase identifier.
-%Constraint failed: cnl-0%
+# The publisher requires every instance of an additional resource to carry a resourceDefinition property naming the versioned canonical of its definition. Adding it would put FHIR tooling metadata into the published ViewDefinition examples and pin the IG version in each of them, so the examples are left as authored; see <ZULIP-THREAD-URL>.
+%so must have a resourceDefinition of%
 
-# The ViewDefinition examples are logical-model instances stored as Binary and
-# carry no generated narrative. dom-6 is a best-practice recommendation that does
-# not apply to these example instances.
-%Constraint failed: dom-6%
+# ViewDefinition is an additional resource rather than a core FHIR type, so the publisher rejects its use as a StructureDefinition type. Inherent to the additional-resource design; see <ZULIP-THREAD-URL>.
+%is not legal because it is not defined in the FHIR specification%
 
-# These elements are inherited from the R5 base resources and bind to core FHIR
-# value sets (jurisdiction, resource-types, version-algorithm,
-# participant-resource-types) that HL7 flags as experimental in R5. The SQL on
-# FHIR artefacts are not experimental, and the upstream value sets cannot be
-# changed here.
-%which is experimental, but this structure is not labeled as experimental%
+# ViewDefinition is a canonical resource, but the publisher does not recognise additional resources as canonical when checking Library.relatedArtifact.resource targetProfiles. Inherent to the additional-resource design; see <ZULIP-THREAD-URL>.
+%which is not a Canonical Resource (which is required because the Library.relatedArtifact.resource element has the type canonical)%
 
-# The mimetypes value set is unbounded and cannot be expanded by the terminology
-# server. The required binding is intentional and is supplemented by an
-# extensible additional binding to the SQL content type codes.
-%http://hl7.org/fhir/ValueSet/mimetypes|5.0.0 could not be expanded%
+# ViewDefinition derives from MetadataResource, so the inherited cnl-1 invariant carries MetadataResource as its source and the publisher reports a mismatch against the deriving profile. Inherent to the additional-resource design; see <ZULIP-THREAD-URL>.
+%The invariant cnl-1 defined in the differential must have no source%
 
-# The recursive ViewDefinition.select contentReference produces multiple anchors
-# with the same name in the generated narrative, so the auto-generated hyperlink
-# matches more than one target. This is a rendering artefact of the logical model.
+# These are valid ViewDefinition FHIRPath expressions that the publisher's generic FHIRPath evaluator cannot resolve: %rowIndex is a ViewDefinition constant, and linkId, answer and code are evaluated inside a forEach scope that the evaluator does not apply. See <ZULIP-THREAD-URL>.
+%Error evaluating FHIRPath expression: Invalid FHIRPath Constant %rowIndex%
+%Error evaluating FHIRPath expression: The name 'answer' is not valid%
+%Error evaluating FHIRPath expression: The name 'linkId' is not valid%
+%Error evaluating FHIRPath expression: The name 'code' is not valid%
+
+# This IG targets FHIR 6.0.0-ballot3, but no R6 build of hl7.fhir.uv.extensions, hl7.terminology or hl7.fhir.uv.tools has been released; the registry serves only R5-based versions, so the publisher auto-selects the .r5 variants. Nothing in this repository can resolve the mismatch; see <ZULIP-THREAD-URL>.
+This IG is version%
+This IG is for FHIR version%
+IG_DEPENDENCY_VERSION_ERROR
+IG_DEPENDENCY_VERSION_WARNING
+
+# The jurisdiction value set is deprecated in the core specification and this message originates there; the jurisdiction values are inherited from the HL7 universal realm conventions and cannot be changed in this IG.
+%Reference to deprecated ValueSet http://hl7.org/fhir/ValueSet/jurisdiction%
+
+# These code systems are defined in this IG rather than in THO. A TSMG exemption will be sought at a later time.
+%will need to move to THO later during the process%
+
+# eld-31 is a best-practice recommendation on the inherited Resource.language element, whose additional binding is defined by the core specification without a binding key. The additional bindings this IG defines carry keys.
+%Constraint failed: eld-31%
+
+# eld-33 is a best-practice recommendation that flags any binding on an element with more than one bindable type. The bindings on ViewDefinition.versionAlgorithm[x] and the sql-text choice elements are inherited from the R5 base resources and are deliberate.
+%Constraint failed: eld-33%
+
+# The core mimetypes value set is unbounded and cannot be expanded by any terminology server. The required binding is intentional and is supplemented by an extensible additional binding to the SQL content type codes.
+%Binding http://hl7.org/fhir/ValueSet/mimetypes%
+
+# The recursive ViewDefinition.select contentReference produces multiple anchors with the same name in the generated narrative, so the auto-generated hyperlink matches more than one target. This is a rendering artefact of the logical model.
 %Hyperlink '#ViewDefinition.select' at 'div/table/tr/td/a' for 'select' resolves to multiple targets%
 
-# These template-provided HTML fragments (IP statements, dependency table,
-# globals table) are generated by the template but are not referenced by any page
-# in this IG's layout.
+# These template-provided HTML fragments (IP statements, dependency table, globals table) are generated by the template but are not referenced by any page in this IG's layout.
 %is not included anywhere in the produced implementation guide%
 
-# The operation definitions are active, usable definitions; the draft maturity
-# expressed by standards-status = draft is the IG's overall pre-ballot maturity,
-# not a statement that the operations themselves are drafts. The publisher flags
-# the active/draft pairing as inconsistent, but the two axes describe different
-# things here.
+# The operation definitions are active, usable definitions; the draft maturity expressed by standards-status = draft is the IG's overall pre-ballot maturity, not a statement that the operations themselves are drafts. The publisher flags the active/draft pairing as inconsistent, but the two axes describe different things here.
 %The resource status 'active' and the standards status 'draft' are not consistent%
 
-# The IG maturity (FMM) has not been assigned ahead of the first ballot. An
-# explicit FMM extension will be added when the maturity level is agreed.
+# The IG maturity (FMM) has not been assigned ahead of the first ballot. An explicit FMM extension will be added when the maturity level is agreed.
 %should state their maturity explicitly using the extension%
