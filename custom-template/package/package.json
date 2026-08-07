@@ -7,7 +7,7 @@
   "canonical": "http://fhir.org/templates/hl7.fhir.uv.sql-on-fhir.ig-template",
   "base": "hl7.fhir.template",
   "dependencies": {
-    "hl7.fhir.template": "1.0.0"
+    "hl7.fhir.template": "current"
   },
   "version": "0.1.0"
 }

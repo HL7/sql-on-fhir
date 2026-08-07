@@ -1,10 +1,11 @@
 # CapabilityStatement for SQL-on-FHIR API
 
-The server SHALL support the CapabilityStatement resource to allow clients to discover supported operations.
+<span class="fhir-conformance" id="cap-1">The server SHALL support the CapabilityStatement resource to allow clients to discover supported operations.</span>
 
 Both data operations are invoked at the system level, so they are declared in
-`CapabilityStatement.rest.operation` rather than under a resource type. The
-`CapabilityStatement.rest.operation` array SHALL contain:
+`CapabilityStatement.rest.operation` rather than under a resource type.
+<span class="fhir-conformance" id="cap-2">The `CapabilityStatement.rest.operation` array
+SHALL contain:</span>
 
 - An operation element with:
   - name = "$sql-run"
@@ -17,10 +18,11 @@ A client therefore learns which data operations a server offers without reading
 any `rest.resource` entry.
 
 The `rest.resource` entries remain relevant for the artefacts themselves, which
-a server may still expose as FHIR resources. If the server supports CRUD and
-search interactions for the ViewDefinition resource type, the
+a server may still expose as FHIR resources.
+<span class="fhir-conformance" id="cap-3">If the server supports CRUD and search
+interactions for the ViewDefinition resource type, the
 `CapabilityStatement.rest.resource` array SHALL contain an entry for it whose
-interaction array includes the appropriate codes:
+interaction array includes the appropriate codes:</span>
 
 - read
 - search-type
@@ -37,18 +39,19 @@ type.
 
 ## Declaring partial operation support {#partial-operation-support}
 
-A server need not support every parameter of an operation. Which subset it does
-support SHALL be discoverable from its CapabilityStatement, using the mechanism
-base FHIR already defines for
-[`CapabilityStatement.rest.operation.definition`](https://hl7.org/fhir/R5/capabilitystatement-definitions.html#CapabilityStatement.rest.operation.definition):
+A server need not support every parameter of an operation.
+<span class="fhir-conformance" id="cap-4">Which subset it does support SHALL be
+discoverable from its CapabilityStatement, using the mechanism base FHIR already
+defines for
+[`CapabilityStatement.rest.operation.definition`](https://hl7.org/fhir/R5/capabilitystatement-definitions.html#CapabilityStatement.rest.operation.definition):</span>
 
 - Citing an OperationDefinition published by this guide asserts support for the
   **full** capabilities of that operation, including every parameter it declares.
-- A server supporting only a subset SHALL publish its own OperationDefinition
-  whose `base` is the canonical URL of the one this guide publishes, declaring
-  only the parameters it supports, and SHALL point
+- <span class="fhir-conformance" id="cap-5">A server supporting only a subset SHALL publish
+  its own OperationDefinition whose `base` is the canonical URL of the one this
+  guide publishes, declaring only the parameters it supports, and SHALL point
   `CapabilityStatement.rest.operation.definition` at its own definition rather
-  than at this guide's.
+  than at this guide's.</span>
 
 This applies to the three ways of naming an operation's subject as it does to any
 other parameter: a server that resolves canonical URLs and inline resources but

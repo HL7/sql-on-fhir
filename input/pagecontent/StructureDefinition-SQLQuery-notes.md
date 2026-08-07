@@ -71,9 +71,10 @@ under a canonical URL; an SQLQuery composes both as its table sources.
 
 These references form a directed graph of ViewDefinitions, SQLViews, and
 SQLQueries, in which each referenced result acts as a virtual table for the
-referencing query. Authors SHOULD keep this graph acyclic. Whether circular
-dependencies are detected, any limit on dependency depth, and whether
-intermediate results are materialised or inlined (for example as CTEs or
+referencing query.
+<span class="fhir-conformance" id="sqlquery-notes-1">Authors SHOULD keep this graph acyclic.</span>
+Whether circular dependencies are detected, any limit on dependency depth, and
+whether intermediate results are materialised or inlined (for example as CTEs or
 database views) are implementation decisions and are not mandated by this
 specification.
 
@@ -108,8 +109,8 @@ is bound by name to the matching `Library.parameter`, and the appropriate
 
 ### SQL Annotations
 
-SQL files MAY include annotations to generate SQLQuery Libraries automatically.
-Library elements are authoritative.
+<span class="fhir-conformance" id="sqlquery-notes-2">SQL files MAY include annotations to generate
+SQLQuery Libraries automatically.</span> Library elements are authoritative.
 
 Syntax: `@key: value` in SQL comments.
 
@@ -147,7 +148,7 @@ Annotation reference:
 
 ### Tooling
 
-Builders SHALL:
+<span class="fhir-conformance" id="sqlquery-notes-3">Builders SHALL:</span>
 
 1. Parse annotations from block (`/* */`) and line (`--`) comments
 2. Populate the `sql-text` extension with the SQL text (plain text)
@@ -157,7 +158,7 @@ Builders SHALL:
 6. Set `parameter.use` to `in` for all parameters
 7. Set `relatedArtifact.type` to `depends-on` for all dependencies
 
-Builders SHOULD:
+<span class="fhir-conformance" id="sqlquery-notes-4">Builders SHOULD:</span>
 
 1. Infer `name` from filename if `@name` not provided
 2. Default `status` to `draft` if not specified

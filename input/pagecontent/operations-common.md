@@ -85,26 +85,28 @@ their native media types, and the shape they produce are:
 
 Conformance rules that apply to every operation:
 
-- It is RECOMMENDED to support `json`, `ndjson` and `csv` by default. Servers
-  MAY support `parquet`, and MAY support `fhir` on the run operation; any
-  format a server supports SHALL be declared in its CapabilityStatement, and
-  any format it does not support SHALL be rejected with `400 Bad Request` and
-  an `OperationOutcome`.
-- A supplied `_format` SHALL take precedence over the `Accept` header.
+- <span class="fhir-conformance" id="com-1">It is RECOMMENDED to support `json`, `ndjson`
+  and `csv` by default. Servers MAY support `parquet`, and MAY support `fhir` on
+  the run operation; any format a server supports SHALL be declared in its
+  CapabilityStatement, and any format it does not support SHALL be rejected with
+  `400 Bad Request` and an `OperationOutcome`.</span>
+- <span class="fhir-conformance" id="com-2">A supplied `_format` SHALL take precedence over
+  the `Accept` header.</span>
 - `header` applies only to `csv` and defaults to `true`.
 
 What happens when `_format` is omitted differs between the two delivery models,
 because `Accept` describes the response the client is about to receive and only
 the run operation returns the result in that response:
 
-- **The run operation** (`$sql-run`): the server MAY derive the format from the
-  `Accept` header (see [Content Negotiation](#content-negotiation)); if neither
-  `_format` nor `Accept` selects one, the server SHALL use `ndjson`.
-- **The export operation** (`$sql-export`): the server SHALL use `ndjson`,
-  irrespective of `Accept`. There `Accept` governs only the representation of
-  the kick-off, status and result responses; it never selects the format of the
-  exported files, which are fetched later from the `output.location` URLs as
-  independent HTTP responses.
+- **The run operation** (`$sql-run`): <span class="fhir-conformance" id="com-3">the server
+  MAY derive the format from the `Accept` header (see
+  [Content Negotiation](#content-negotiation)); if neither `_format` nor
+  `Accept` selects one, the server SHALL use `ndjson`.</span>
+- **The export operation** (`$sql-export`): <span class="fhir-conformance" id="com-4">the
+  server SHALL use `ndjson`, irrespective of `Accept`.</span> There `Accept`
+  governs only the representation of the kick-off, status and result responses;
+  it never selects the format of the exported files, which are fetched later
+  from the `output.location` URLs as independent HTTP responses.
 
 Apart from `fhir`, this enumeration and the return-shape rules below are
 identical on both operations. The two delivery models differ only in **how** the
@@ -167,11 +169,11 @@ operation response at all but a separately fetched file; see
 Two independent axes govern the response. They are specified separately so they
 are not conflated:
 
-**Axis 1 - which format (`_format` vs `Accept`).** When `_format` is supplied,
-its value SHALL take precedence over the `Accept` header. When `_format` is not
-supplied, the server MAY honor `Accept` to select an
-[output format](#output-formats); if neither selects a format, the server uses
-`ndjson`.
+**Axis 1 - which format (`_format` vs `Accept`).**
+<span class="fhir-conformance" id="com-5">When `_format` is supplied, its value SHALL take
+precedence over the `Accept` header. When `_format` is not supplied, the server
+MAY honor `Accept` to select an [output format](#output-formats); if neither
+selects a format, the server uses `ndjson`.</span>
 
 **Axis 2 - representation (raw payload vs FHIR envelope).** Once the format is
 chosen, the `Accept` header further selects how the payload is represented:
@@ -190,13 +192,13 @@ resource itself, serialized according to the FHIR media type in the `Accept`
 header (`application/fhir+json` by default); neither the raw-payload nor the
 `Binary`-envelope representation applies.
 
-Because base64 inflates the payload by roughly a third and defeats streaming,
-servers MAY decline the envelope representation for the large/streaming formats
-(`parquet`, `ndjson`): a server that does not support the envelope form for a
-given format SHALL respond `406 Not Acceptable` with an `OperationOutcome`
-rather than silently returning raw bytes under a FHIR media type. Support for
-the envelope representation per format SHOULD be documented in the
-CapabilityStatement.
+<span class="fhir-conformance" id="com-6">Because base64 inflates the payload by roughly a
+third and defeats streaming, servers MAY decline the envelope representation for
+the large/streaming formats (`parquet`, `ndjson`): a server that does not support
+the envelope form for a given format SHALL respond `406 Not Acceptable` with an
+`OperationOutcome` rather than silently returning raw bytes under a FHIR media
+type. Support for the envelope representation per format SHOULD be documented in
+the CapabilityStatement.</span>
 
 These two axes are distinct: Axis 1 decides _what_ is encoded, Axis 2 decides
 _how_ it is wrapped.
@@ -213,12 +215,13 @@ Two further concepts are independent of each other and of the format:
 
 1. **Transfer framing** - `Transfer-Encoding: chunked` (RFC 9112 §7.1) is an
    HTTP/1.1 message-framing mechanism. It is independent of `Content-Type` and
-   of `_format`: _any_ payload - CSV, JSON, NDJSON, parquet,
-   `application/octet-stream`, or a `Binary` envelope - MAY be sent chunked. The
-   choice between `Content-Length` and chunked framing depends solely on whether
-   the server knows the body size before emitting the first byte, never on the
-   format. Servers MAY use chunked transfer encoding for the response of any
-   format on the run operation.
+   of `_format`: <span class="fhir-conformance" id="com-7">_any_ payload - CSV, JSON,
+   NDJSON, parquet, `application/octet-stream`, or a `Binary` envelope - MAY be
+   sent chunked.</span> The choice between `Content-Length` and chunked framing
+   depends solely on whether the server knows the body size before emitting the
+   first byte, never on the format.
+   <span class="fhir-conformance" id="com-8">Servers MAY use chunked transfer encoding for
+   the response of any format on the run operation.</span>
 
 2. **Incremental result production** - whether the server can emit output before
    the full result set is materialized. This is a server/engine capability that
@@ -259,25 +262,26 @@ offered on the run operation only (see
 
 **Applies to:** both operations.
 
-When provided, the server SHALL NOT return resources in the patient compartments
-belonging to patients outside of this list.
+<span class="fhir-conformance" id="com-9">When provided, the server SHALL NOT return
+resources in the patient compartments belonging to patients outside of this
+list.</span>
 
-If a client supplies a `patient` naming a resource the server cannot find, the
-server SHALL respond `400 Bad Request` with an `OperationOutcome` whose
-`expression` names the `patient` parameter (see
-[Status code for a value that cannot be resolved](#filter-resolution-errors)).
+<span class="fhir-conformance" id="com-10">If a client supplies a `patient` naming a
+resource the server cannot find, the server SHALL respond `400 Bad Request` with
+an `OperationOutcome` whose `expression` names the `patient` parameter</span>
+(see [Status code for a value that cannot be resolved](#filter-resolution-errors)).
 
 ### `group` {#group-filter}
 
 **Applies to:** both operations.
 
-When provided, the server SHALL NOT return resources that are not a member of the
-supplied `Group`.
+<span class="fhir-conformance" id="com-11">When provided, the server SHALL NOT return
+resources that are not a member of the supplied `Group`.</span>
 
-If a client supplies a `group` naming a resource the server cannot find, the
-server SHALL respond `400 Bad Request` with an `OperationOutcome` whose
-`expression` names the `group` parameter (see
-[Status code for a value that cannot be resolved](#filter-resolution-errors)).
+<span class="fhir-conformance" id="com-12">If a client supplies a `group` naming a resource
+the server cannot find, the server SHALL respond `400 Bad Request` with an
+`OperationOutcome` whose `expression` names the `group` parameter</span>
+(see [Status code for a value that cannot be resolved](#filter-resolution-errors)).
 
 ### `_since` {#since-filter}
 
@@ -287,18 +291,18 @@ Resources will be included in the response if their state has changed after the
 supplied time (e.g., if `Resource.meta.lastUpdated` is later than the supplied
 `_since` time).
 
-For a Group-scoped request, the server MAY return additional resources modified
-prior to the supplied time if the resources belong to the patient compartment of a
-patient added to the Group after the supplied time; this behavior SHOULD be
-clearly documented by the server.
+<span class="fhir-conformance" id="com-13">For a Group-scoped request, the server MAY
+return additional resources modified prior to the supplied time if the resources
+belong to the patient compartment of a patient added to the Group after the
+supplied time; this behavior SHOULD be clearly documented by the server.</span>
 
-For patient- and Group-scoped requests, the server MAY return resources that are
-referenced by the resources being returned, regardless of when the referenced
-resources were last updated.
+<span class="fhir-conformance" id="com-14">For patient- and Group-scoped requests, the server
+MAY return resources that are referenced by the resources being returned,
+regardless of when the referenced resources were last updated.</span>
 
-For resources where the server does not maintain a last updated time, the server
-MAY include these resources in a response irrespective of the `_since` value
-supplied by a client.
+<span class="fhir-conformance" id="com-15">For resources where the server does not maintain a
+last updated time, the server MAY include these resources in a response
+irrespective of the `_since` value supplied by a client.</span>
 
 ### Status code for a value that cannot be resolved {#filter-resolution-errors}
 
@@ -322,9 +326,10 @@ at fault. HTTP ties `404` to the request target, which at the system level is th
 operation endpoint rather than the patient, so reporting a missing `patient` as
 `404` would misdescribe what was not found.
 
-The response SHALL carry an `OperationOutcome` whose `expression` names the
-parameter at fault. `issue.code` remains `not-found`, since that describes the
-underlying condition accurately even where the HTTP status does not.
+<span class="fhir-conformance" id="com-16">The response SHALL carry an `OperationOutcome`
+whose `expression` names the parameter at fault.</span> `issue.code` remains
+`not-found`, since that describes the underlying condition accurately even where
+the HTTP status does not.
 
 Where a request supplies both an unresolvable filter value and an unresolvable
 subject, the subject failure is the more fundamental, so the response is
@@ -343,8 +348,9 @@ The complete set of rejection conditions is stated on each operation page:
 When supplied, `_limit` is the maximum number of rows the server returns to the
 client.
 
-- Servers MAY enforce a maximum value, silently capping a client-supplied
-  `_limit` at that maximum. A server that does so SHOULD document the cap.
+- <span class="fhir-conformance" id="com-17">Servers MAY enforce a maximum value, silently
+  capping a client-supplied `_limit` at that maximum. A server that does so
+  SHOULD document the cap.</span>
 - The limit is applied **after** the query has been evaluated, so it truncates
   the result set rather than changing what the query computes. A `_limit` never
   alters an aggregate, an ordering or a join.
@@ -474,7 +480,9 @@ Consistent with what the [SQLQuery](StructureDefinition-SQLQuery.html) and
 specification requires nothing of servers on the following points, and they
 remain implementation decisions:
 
-- Cycle detection. Authors SHOULD keep the dependency graph acyclic.
+- Cycle detection.
+  <span class="fhir-conformance" id="com-18">Authors SHOULD keep the dependency graph
+  acyclic.</span>
 - Any limit on dependency depth.
 - Whether intermediate results are materialised as tables or inlined into the
   enclosing query.
@@ -543,17 +551,19 @@ The export operation conforms to the
 
 - **Kick-off** → the client sends the request with a `Prefer: respond-async`
   header; the server responds `202 Accepted` with a `Content-Location` header
-  carrying the status (polling) URL. An informative `Parameters` body MAY be
-  included. Invalid requests (bad or unsupported parameters, authorisation
+  carrying the status (polling) URL.
+  <span class="fhir-conformance" id="com-19">An informative `Parameters` body MAY be
+  included.</span> Invalid requests (bad or unsupported parameters, authorisation
   failures, referenced resources not found) are rejected synchronously with the
   relevant `4xx`/`5xx` status code and an `OperationOutcome` body - rejection
   is never deferred to the status URL.
 - **Polling while processing** → `GET` on the status URL returns
   `202 Accepted`, with a `Retry-After` header (recommended), an `X-Progress`
   header (optional), and an optional, informative, implementation-defined
-  interim status body. A server MAY respond `429 Too Many Requests` to a client
-  that polls excessively; clients SHOULD apply exponential backoff, guided by
-  `Retry-After` where present.
+  interim status body.
+  <span class="fhir-conformance" id="com-20">A server MAY respond `429 Too Many Requests` to
+  a client that polls excessively; clients SHOULD apply exponential backoff,
+  guided by `Retry-After` where present.</span>
 - **Completion and failure** → once the job has finished - whether it succeeded
   or failed - the status poll returns `303 See Other` with a `Location` header
   carrying the result URL and an empty body. The status endpoint reflects
@@ -571,16 +581,16 @@ Clients MUST treat the status and result URLs as opaque values. Note that many
 HTTP libraries follow a `303` response to a `GET` automatically, so a polling
 client may transparently receive the result response; this is benign.
 
-The result URL and all `output.location` download URLs SHALL remain valid for
-at least 24 hours after job completion. Servers SHOULD support multiple
-retrievals within that window and MAY include an `Expires` header indicating
-when the URLs expire.
+<span class="fhir-conformance" id="com-21">The result URL and all `output.location` download
+URLs SHALL remain valid for at least 24 hours after job completion. Servers
+SHOULD support multiple retrievals within that window and MAY include an
+`Expires` header indicating when the URLs expire.</span>
 
-The same access control applies to status-URL and result-URL requests as to
-the original kick-off request, and servers SHOULD limit access to the client
-that initiated the job; non-guessable URLs (e.g. cryptographically random
-tokens) remain documented as an alternative control. Unauthorised access
-attempts return `401 Unauthorized` or `403 Forbidden`.
+<span class="fhir-conformance" id="com-22">The same access control applies to status-URL and
+result-URL requests as to the original kick-off request, and servers SHOULD limit
+access to the client that initiated the job;</span> non-guessable URLs (e.g.
+cryptographically random tokens) remain documented as an alternative control.
+Unauthorised access attempts return `401 Unauthorized` or `403 Forbidden`.
 
 File downloads referenced by `output.location` are independent HTTP responses;
 their transfer framing is governed by HTTP itself and is not constrained by

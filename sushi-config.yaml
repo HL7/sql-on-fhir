@@ -10,7 +10,7 @@ title: SQL on FHIR
 description: A specification for defining portable views of FHIR data that can be easily queried using tools such as SQL.
 status: draft # draft | active | retired | unknown
 version: 3.0.0-ballot
-fhirVersion: 5.0.0 # https://www.hl7.org/fhir/valueset-FHIR-version.html
+fhirVersion: 6.0.0-ballot3 # https://www.hl7.org/fhir/valueset-FHIR-version.html
 copyrightYear: 2023+
 releaseLabel: STU 3 Ballot # free text shown in the publish box, e.g. "CI Build", "STU 3 Ballot", "STU 3"
 license: CC0-1.0 # https://www.hl7.org/fhir/valueset-spdx-license.html
@@ -67,6 +67,19 @@ parameters:
   # Root OID arc assigned to this IG in the FHIR ig-registry. The IG Publisher
   # uses it to auto-assign and persist OIDs for code systems and value sets.
   auto-oid-root: 2.16.840.1.113883.4.642.40.77
+  # ViewDefinition is defined as an additional resource type. Its definition and
+  # supporting artefacts are authored directly as XML rather than via FSH.
+  path-resource:
+    - input/resources/viewdefinition
+  additional-resource:
+    - input/resources/viewdefinition/StructureDefinition-ViewDefinition.xml
+  # Additional resources are published under the core FHIR URL base, following the
+  # convention used by the other HL7 resource incubator guides (see fhir-testing-ig
+  # and api-incubator-ig). This is also required in practice: the IG Publisher
+  # resolves the base of a profiled resource by prefixing the root of
+  # ElementDefinition.base.path with http://hl7.org/fhir/StructureDefinition/, so
+  # profiles of ViewDefinition cannot be rendered unless it lives in that namespace.
+  special-url-base: http://hl7.org/fhir
 
 #   validation: [allow-any-extensions, no-broken-links]
 #
@@ -154,45 +167,84 @@ menu:
 #     exampleBoolean: true
 #   Patient/bad-example: omit
 
-# Add the implementationguide-resource-logical extension to ViewDefinition examples
-# so the IG Publisher knows to validate them as logical model instances.
+# ViewDefinition artefacts are authored directly as XML/JSON under
+# input/resources/viewdefinition, so their IG metadata is declared here.
 resources:
-  Binary/PatientDemographics:
-    extension:
-      - url: http://hl7.org/fhir/tools/StructureDefinition/implementationguide-resource-logical
-        valueCanonical: http://hl7.org/fhir/uv/sql-on-fhir/StructureDefinition/ViewDefinition
-  Binary/ShareablePatientDemographics:
-    extension:
-      - url: http://hl7.org/fhir/tools/StructureDefinition/implementationguide-resource-logical
-        valueCanonical: http://hl7.org/fhir/uv/sql-on-fhir/StructureDefinition/ViewDefinition
-  Binary/PatientAddresses:
-    extension:
-      - url: http://hl7.org/fhir/tools/StructureDefinition/implementationguide-resource-logical
-        valueCanonical: http://hl7.org/fhir/uv/sql-on-fhir/StructureDefinition/ViewDefinition
-  Binary/PatientAndContactAddressUnion:
-    extension:
-      - url: http://hl7.org/fhir/tools/StructureDefinition/implementationguide-resource-logical
-        valueCanonical: http://hl7.org/fhir/uv/sql-on-fhir/StructureDefinition/ViewDefinition
-  Binary/UsCoreBloodPressures:
-    extension:
-      - url: http://hl7.org/fhir/tools/StructureDefinition/implementationguide-resource-logical
-        valueCanonical: http://hl7.org/fhir/uv/sql-on-fhir/StructureDefinition/ViewDefinition
-  Binary/ConditionFlat:
-    extension:
-      - url: http://hl7.org/fhir/tools/StructureDefinition/implementationguide-resource-logical
-        valueCanonical: http://hl7.org/fhir/uv/sql-on-fhir/StructureDefinition/ViewDefinition
-  Binary/EncounterFlat:
-    extension:
-      - url: http://hl7.org/fhir/tools/StructureDefinition/implementationguide-resource-logical
-        valueCanonical: http://hl7.org/fhir/uv/sql-on-fhir/StructureDefinition/ViewDefinition
-  Binary/QuestionnaireResponseItems:
-    extension:
-      - url: http://hl7.org/fhir/tools/StructureDefinition/implementationguide-resource-logical
-        valueCanonical: http://hl7.org/fhir/uv/sql-on-fhir/StructureDefinition/ViewDefinition
-  Binary/CodeSystemHierarchy:
-    extension:
-      - url: http://hl7.org/fhir/tools/StructureDefinition/implementationguide-resource-logical
-        valueCanonical: http://hl7.org/fhir/uv/sql-on-fhir/StructureDefinition/ViewDefinition
+  List/ViewDefinition-operations:
+    name: ViewDefinition Operations
+    description: All the ViewDefinition operations defined by this guide.
+  ViewDefinition/PatientDemographics:
+    name: Patient Demographics
+    description: >-
+      A minimal example of a patient demographics view. This view uses the first
+      'official' patient name for our demographics table.
+    exampleBoolean: true
+  ViewDefinition/ShareablePatientDemographics:
+    name: Shareable Patient Demographics
+    description: >-
+      Creates the same view as the 'PatientDemographics' example, but applies both
+      the ShareableViewDefinition and TabularViewDefinition profiles.
+    exampleBoolean: true
+  ViewDefinition/PatientAddresses:
+    name: Patient Addresses
+    description: >-
+      An example of unnesting patient addresses into multiple rows. This view uses
+      `forEach` to indicate we are unrolling these into separate rows. The `join`
+      function is used to create a single address line.
+    exampleBoolean: true
+  ViewDefinition/PatientAndContactAddressUnion:
+    name: Patient and Contact Address Union
+    description: >-
+      An example of unnesting patient addresses and contact addresss into multiple
+      rows, which are unioned together into a single table.
+    exampleBoolean: true
+  ViewDefinition/PatientNamesWithIndex:
+    name: Patient Names with Index
+    description: >-
+      An example demonstrating the use of %rowIndex to capture the position of
+      elements within a collection. This is useful for preserving FHIR ordering
+      semantics and creating surrogate keys that combine resource ID with element
+      position.
+    exampleBoolean: true
+  ViewDefinition/UsCoreBloodPressures:
+    name: US Core Blood Pressures
+    description: >-
+      A simple view of blood pressure observations, with separate columns for
+      systolic and diastolic values.
+    exampleBoolean: true
+  ViewDefinition/ConditionFlat:
+    name: Condition Flat
+    description: >-
+      A simple view for flattening a Condition resource. Some of the more commonly
+      used fields are included in this flat view. A notable point is flattening of
+      `category.coding` fields with one `forEach` construct as FHIRPath will take
+      care of handling of nested arrays.
+    exampleBoolean: true
+  ViewDefinition/EncounterFlat:
+    name: Encounter Flat
+    description: >-
+      A simple view for flattening an Encounter resource. Some of the more commonly
+      used fields are included in this flat view. Note this is valid for an R4
+      Encounter resource but not R5 (hence the `fhirVersion`).
+    exampleBoolean: true
+  ViewDefinition/QuestionnaireResponseItems:
+    name: Questionnaire Response Items
+    description: >-
+      Demonstrates using the `repeat` directive to recursively flatten nested
+      QuestionnaireResponse items. Unlike `forEach`, which only unnests a single
+      level, `repeat` traverses all levels of nesting to produce one row per item
+      regardless of depth. This is useful for analysing survey responses where
+      questions may be grouped into nested sections.
+    exampleBoolean: true
+  ViewDefinition/CodeSystemHierarchy:
+    name: CodeSystem Hierarchy
+    description: >-
+      Demonstrates using `repeat` with nested `select` to traverse a CodeSystem
+      concept hierarchy. This produces parent-child code pairs by using `repeat` to
+      walk down the concept tree and a nested `forEach` to extract each child
+      concept at every level. Useful for building concept maps or analysing
+      hierarchical terminologies.
+    exampleBoolean: true
 
 #
 # Groups can control certain aspects of the IG generation.  The IG

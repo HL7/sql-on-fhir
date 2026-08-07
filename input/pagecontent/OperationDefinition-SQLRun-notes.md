@@ -109,9 +109,9 @@ a FHIR resource, so `ViewDefinition` is not a value `parameter.type` accepts;
 the real constraint is carried by `targetProfile`. See
 [Why the declared type is `CanonicalResource`](operations-common.html#declared-type).
 
-A request SHALL supply exactly one of the three. Supplying none, or more than
-one, is rejected with `400 Bad Request` and an `OperationOutcome` naming the
-problem.
+<span class="fhir-conformance" id="run-1">A request SHALL supply exactly one of the
+three.</span> Supplying none, or more than one, is rejected with
+`400 Bad Request` and an `OperationOutcome` naming the problem.
 
 A `subjectCanonical` or `subjectReference` the server cannot resolve is rejected
 with `404 Not Found` and an `OperationOutcome`. A resolved artefact conforming to
@@ -173,10 +173,11 @@ specified.
 Because a `Bundle` is itself a `Resource`, a `Bundle` satisfies the parameter's
 `Resource` type. To avoid ambiguity, the following rule applies:
 
-When a `resource` value is a `Bundle`, the server SHALL **unwrap** it and run the
-ViewDefinition against each `Bundle.entry[*].resource`, exactly as if those
-entries had been supplied as individual repeated `resource` values. The `Bundle`
-itself is not treated as an input resource for the ViewDefinition.
+<span class="fhir-conformance" id="run-2">When a `resource` value is a `Bundle`, the server
+SHALL **unwrap** it and run the ViewDefinition against each
+`Bundle.entry[*].resource`, exactly as if those entries had been supplied as
+individual repeated `resource` values.</span> The `Bundle` itself is not treated
+as an input resource for the ViewDefinition.
 
 Unwrapping is applied one level deep. Resources within the bundle are evaluated
 against the ViewDefinition's `resource` type just like directly supplied
@@ -232,17 +233,20 @@ axis, and transfer framing are defined in
 [Common Operation Behavior](operations-common.html) and apply identically to
 this operation:
 
-- It is RECOMMENDED to support `json`, `ndjson` and `csv` by default; servers MAY
-  support `parquet` and `fhir`, and SHALL document supported formats in the
-  CapabilityStatement.
-- If `_format` is omitted (and no format is derivable from `Accept`), the server
-  SHALL return the result in `ndjson` format.
-- When `_format` is supplied, its value SHALL take precedence over `Accept`.
+- <span class="fhir-conformance" id="run-3">It is RECOMMENDED to support `json`, `ndjson` and
+  `csv` by default; servers MAY support `parquet` and `fhir`, and SHALL document
+  supported formats in the CapabilityStatement.</span>
+- <span class="fhir-conformance" id="run-4">If `_format` is omitted (and no format is
+  derivable from `Accept`), the server SHALL return the result in `ndjson`
+  format.</span>
+- <span class="fhir-conformance" id="run-5">When `_format` is supplied, its value SHALL take
+  precedence over `Accept`.</span>
 - `_format=fhir` returns a `Parameters` resource with one repeating `row` per
   result row, using the
   [SQL to FHIR type mapping](#sql-to-fhir-type-mapping).
-- The response of any format MAY use `Transfer-Encoding: chunked`; chunked
-  transfer is independent of the format. See
+- <span class="fhir-conformance" id="run-6">The response of any format MAY use
+  `Transfer-Encoding: chunked`;</span> chunked transfer is independent of the
+  format. See
   [Streaming and Transfer Encoding](operations-common.html#streaming).
 
 #### Examples
@@ -709,7 +713,8 @@ Content-Type: application/x-ndjson
 For flat formats (`csv`, `json`, `ndjson`, `parquet`), the response body is the
 raw payload in the format's native media type (the `Binary` stream), not a
 serialized `Binary` resource envelope; `Content-Type` is set to that media type.
-The response MAY be sent with `Transfer-Encoding: chunked` regardless of format.
+<span class="fhir-conformance" id="run-7">The response MAY be sent with
+`Transfer-Encoding: chunked` regardless of format.</span>
 See [Return Representation](operations-common.html#return-representation) and
 [Streaming](operations-common.html#streaming).
 
@@ -814,8 +819,8 @@ decimal floating point.
 
 TIMESTAMP WITH TIME ZONE values may carry sub-millisecond precision (e.g.
 microseconds), but FHIR `instant` supports at most millisecond precision.
-Implementations SHOULD round to the nearest millisecond when converting to
-`valueInstant`.
+<span class="fhir-conformance" id="run-8">Implementations SHOULD round to the nearest
+millisecond when converting to `valueInstant`.</span>
 
 TIMESTAMP (without time zone) values are converted to `valueDateTime` without a
 timezone offset. FHIR `dateTime` permits values with or without a timezone, so
@@ -873,8 +878,8 @@ placeholder - a different semantic that deserves its own proposal.
 
 {:.table-data}
 
-All error responses (4xx and 5xx) SHOULD include an `OperationOutcome` resource
-providing details about the error. Where a request carries both an unresolvable
-subject and an unresolvable filter value, the subject failure is the more
-fundamental: the response is `404 Not Found` and the `OperationOutcome` reports
-both issues.
+<span class="fhir-conformance" id="run-9">All error responses (4xx and 5xx) SHOULD include
+an `OperationOutcome` resource providing details about the error.</span> Where a
+request carries both an unresolvable subject and an unresolvable filter value,
+the subject failure is the more fundamental: the response is `404 Not Found` and
+the `OperationOutcome` reports both issues.

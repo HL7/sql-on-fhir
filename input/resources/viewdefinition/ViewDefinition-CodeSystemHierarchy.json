@@ -1,0 +1,42 @@
+{
+  "resourceType": "ViewDefinition",
+  "id": "CodeSystemHierarchy",
+  "name": "code_system_hierarchy",
+  "status": "draft",
+  "resource": "CodeSystem",
+  "select": [
+    {
+      "column": [
+        {
+          "path": "getResourceKey()",
+          "name": "id",
+          "description": "CodeSystem identifier"
+        }
+      ]
+    },
+    {
+      "column": [
+        {
+          "path": "code",
+          "name": "parent_code",
+          "description": "Code of the parent concept in the hierarchy"
+        }
+      ],
+      "select": [
+        {
+          "column": [
+            {
+              "path": "code",
+              "name": "code",
+              "description": "Code of the child concept"
+            }
+          ],
+          "forEach": "concept"
+        }
+      ],
+      "repeat": [
+        "concept"
+      ]
+    }
+  ]
+}
