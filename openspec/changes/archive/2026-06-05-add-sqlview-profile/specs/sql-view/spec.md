@@ -98,7 +98,7 @@ ViewDefinitions, SQLViews, and SQLQueries, in which each referenced result acts
 as a virtual table for the referencing query. Authors SHOULD ensure these
 dependencies are acyclic. Whether circular dependencies are detected or
 rejected, any limit on dependency depth, and whether intermediate results are
-materialised or inlined (for example as CTEs or database views) are
+materialized or inlined (for example as CTEs or database views) are
 implementation decisions and SHALL NOT be mandated by this specification.
 
 #### Scenario: Materialisation left to implementations

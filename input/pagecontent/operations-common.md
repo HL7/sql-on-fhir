@@ -41,7 +41,7 @@ than an alignment fix, and is left to a separate proposal.
 **Applies to:** both operations.
 
 The parameter tables on the operation pages give the type of an inline subject
-as the artefact kinds a client may send - a ViewDefinition, a SQLQuery Library or
+as the artifact kinds a client may send - a ViewDefinition, a SQLQuery Library or
 a SQLView Library. The generated OperationDefinitions declare it as
 `CanonicalResource`, which is a consequence of how this guide models
 ViewDefinition rather than a difference in meaning.
@@ -310,10 +310,10 @@ irrespective of the `_since` value supplied by a client.</span>
 
 A filter value that names a resource the server cannot find is rejected with
 `400 Bad Request`, not `404 Not Found`. The distinction rests on a single
-principle, which applies to every unresolvable artefact named in a request to
+principle, which applies to every unresolvable artifact named in a request to
 either operation:
 
-- An artefact the operation is **about**, or **requires in order to run**,
+- An artifact the operation is **about**, or **requires in order to run**,
   yields `404 Not Found` when it cannot be resolved. That covers a subject named
   by `subjectCanonical` or `subjectReference`, and a dependency neither supplied
   as a `context` entry nor resolvable by the server.
@@ -324,7 +324,7 @@ The operation in the first case cannot proceed because the thing it would act on
 is missing; in the second it was routed and understood, and a parameter value is
 at fault. HTTP ties `404` to the request target, which at the system level is the
 operation endpoint rather than the patient, so reporting a missing `patient` as
-`404` would misdescribe what was not found.
+`404` would mis-describe what was not found.
 
 <span class="fhir-conformance" id="com-16">The response SHALL carry an `OperationOutcome`
 whose `expression` names the parameter at fault.</span> `issue.code` remains
@@ -360,7 +360,7 @@ client.
 The [run operation page](OperationDefinition-SQLRun.html#limit-example) shows a
 worked example.
 
-## Supporting artefacts (`context`) {#context}
+## Supporting artifacts (`context`) {#context}
 
 **Applies to:** both operations.
 
@@ -375,19 +375,19 @@ transitive, and its leaves are always ViewDefinitions. A ViewDefinition subject
 contributes no dependencies at all.
 
 A server may be unable to resolve every dependency: a client may hold a view that
-exists only locally. The repeating `context` parameter carries such artefacts
+exists only locally. The repeating `context` parameter carries such artifacts
 inline.
 
 `context` applies to the **job as a whole**, not to one subject. Where an export
 names several subjects, one set of entries is matched against every dependency of
-every subject, so an artefact three subjects depend on is supplied once rather
+every subject, so an artifact three subjects depend on is supplied once rather
 than three times.
 
 The parameter accepts an inline ViewDefinition or SQLView **today**. It is named
-and shaped so that further artefact kinds - terminology artefacts among them -
+and shaped so that further artifact kinds - terminology artifacts among them -
 can be admitted later by widening the accepted `targetProfile` list alone,
 without a rename and without a second parameter. Nothing in the name commits it
-to artefacts that play the role of a table.
+to artifacts that play the role of a table.
 
 `context` accepts inline resources only. There is deliberately no
 `contextCanonical` or `contextReference` sibling, even though the parameters
@@ -397,7 +397,7 @@ dependencies the server cannot resolve, so naming one by canonical URL would han
 the server the same URL it has already failed to resolve. The absence is a
 consequence of what the parameter is for, not an oversight.
 
-### Matching supplied artefacts to dependencies {#context-matching}
+### Matching supplied artifacts to dependencies {#context-matching}
 
 **Applies to:** both operations.
 
@@ -412,28 +412,28 @@ the whole job as follows:
    it, in this order:
    1. A `context` entry whose `url` equals the dependency's canonical URL and,
       where the dependency pins a version, whose `version` equals that version.
-   2. Failing that, an artefact the server can resolve for that canonical URL.
+   2. Failing that, an artifact the server can resolve for that canonical URL.
    3. Failing that, the request fails with `404 Not Found` and an
       `OperationOutcome` naming the unresolved canonical URL.
 3. Record the resolution against that canonical URL for the remainder of the job.
-4. If the resolved artefact is a SQLView, add its own `depends-on` entries to the
+4. If the resolved artifact is a SQLView, add its own `depends-on` entries to the
    worklist. If it is a ViewDefinition, it is a leaf.
 5. Repeat from step 2 until the worklist is empty.
 6. If any ViewDefinition or SQLView `context` entry was never selected at step
    2.1, the request fails with `400 Bad Request` and an `OperationOutcome`
    identifying it.
-7. Bind each resolved artefact to the SQL identifier in the `label` of the
+7. Bind each resolved artifact to the SQL identifier in the `label` of the
    dependency that reached it.
 
 Step 2's memoisation is what makes one resolution per job true: a canonical URL
 reached from two subjects is resolved once, and both subjects see the same
-artefact. What is constrained is the resolution, not the execution - whether the
-resolved artefact is then materialised once or several times is left to the
+artifact. What is constrained is the resolution, not the execution - whether the
+resolved artifact is then materialized once or several times is left to the
 implementation, as [below](#context-undefined).
 
 Step 2.1 preceding step 2.2 is the precedence rule: a supplied `context` entry
-takes precedence over an artefact with the same canonical URL that the server
-could itself resolve. A client that supplies an entry gets the artefact it
+takes precedence over an artifact with the same canonical URL that the server
+could itself resolve. A client that supplies an entry gets the artifact it
 supplied.
 
 Step 6 runs after the traversal rather than during it, because an entry may match
@@ -463,7 +463,7 @@ specifically. Such an entry is a table source: it exists to satisfy a named
 dependency, so one that matches nothing is almost always a typo in its `url`, and
 rejecting it reports the mistake where it was made rather than letting it
 resurface as a `404` on the dependency or an SQL error naming a table the client
-believes it supplied. Scoping the rule this way means that admitting artefact
+believes it supplied. Scoping the rule this way means that admitting artifact
 kinds which some subjects may legitimately not use does not require revisiting
 it.
 
@@ -471,7 +471,7 @@ it.
 
 **Applies to:** both operations.
 
-Supplied artefacts are supporting artefacts, not export subjects: on
+Supplied artifacts are supporting artifacts, not export subjects: on
 `$sql-export` they produce no `output` entries in the manifest, which carries one
 entry per `subject` and nothing else.
 
@@ -484,11 +484,11 @@ remain implementation decisions:
   <span class="fhir-conformance" id="com-18">Authors SHOULD keep the dependency graph
   acyclic.</span>
 - Any limit on dependency depth.
-- Whether intermediate results are materialised as tables or inlined into the
+- Whether intermediate results are materialized as tables or inlined into the
   enclosing query.
-- Whether an artefact resolved once for a job is materialised once or several
-  times. Resolution is constrained so that every subject sees the same artefact;
-  how many times that artefact is computed is not.
+- Whether an artifact resolved once for a job is materialized once or several
+  times. Resolution is constrained so that every subject sees the same artifact;
+  how many times that artifact is computed is not.
 
 ### Worked example {#context-example}
 
@@ -536,7 +536,7 @@ with label `c`. The traversal resolves:
 The second subject reaches an already-resolved canonical URL, so step 2's
 memoisation returns the recorded resolution rather than resolving again: both
 subjects see the same ViewDefinition. The entry was selected, so it is not
-unmatched. It is a supporting artefact rather than a subject, so the manifest
+unmatched. It is a supporting artifact rather than a subject, so the manifest
 carries two `output` entries - `cohort_bp` and `cohort_labs` - and none for it.
 
 Had the server been able to resolve `local_cohort` itself, step 2.1 would still
@@ -553,7 +553,7 @@ The export operation conforms to the
   header; the server responds `202 Accepted` with a `Content-Location` header
   carrying the status (polling) URL.
   <span class="fhir-conformance" id="com-19">An informative `Parameters` body MAY be
-  included.</span> Invalid requests (bad or unsupported parameters, authorisation
+  included.</span> Invalid requests (bad or unsupported parameters, authorization
   failures, referenced resources not found) are rejected synchronously with the
   relevant `4xx`/`5xx` status code and an `OperationOutcome` body - rejection
   is never deferred to the status URL.
@@ -591,7 +591,7 @@ SHOULD support multiple retrievals within that window and MAY include an
 result-URL requests as to the original kick-off request, and servers SHOULD limit
 access to the client that initiated the job;</span> non-guessable URLs (e.g.
 cryptographically random tokens) remain documented as an alternative control.
-Unauthorised access attempts return `401 Unauthorized` or `403 Forbidden`.
+Unauthorized access attempts return `401 Unauthorized` or `403 Forbidden`.
 
 File downloads referenced by `output.location` are independent HTTP responses;
 their transfer framing is governed by HTTP itself and is not constrained by

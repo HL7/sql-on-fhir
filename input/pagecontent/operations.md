@@ -18,7 +18,7 @@ Both data operations act on a **subject**: a ViewDefinition, a
 [SQLQuery](StructureDefinition-SQLQuery.html) Library or a
 [SQLView](StructureDefinition-SQLView.html) Library. The subject is named by a
 parameter rather than by the request path, so one operation serves all three
-artefact kinds.
+artifact kinds.
 
 ## Use Cases
 
@@ -48,7 +48,7 @@ manifest.
 
 **Flow:**
 
-1. The client submits one `$sql-export` request naming every artefact as a
+1. The client submits one `$sql-export` request naming every artifact as a
    repetition of the `subject` parameter, with `patient`, `group` and `_since`
    stated once for the job and `Prefer: respond-async`.
 2. The server returns `202 Accepted` with a `Content-Location` header pointing to
@@ -173,7 +173,7 @@ large-scale extraction where results are delivered to file storage for analysis,
 reporting or loading into a data warehouse.
 
 It is invoked at the system level (`[base]/$sql-export`) with `POST`, since it
-creates a job. Each repetition of the `subject` parameter names an artefact by
+creates a job. Each repetition of the `subject` parameter names an artifact by
 canonical URL, by a literal reference, or supplies it inline, and any mixture of
 ViewDefinitions, SQLQuery Libraries and SQLView Libraries may be named in one
 request. Every subject is computed against a single snapshot of the data, under

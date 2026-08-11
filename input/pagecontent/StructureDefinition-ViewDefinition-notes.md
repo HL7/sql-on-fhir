@@ -1095,7 +1095,7 @@ Resource, by setting up a recursive call.
         - If `R` is not a candidate for `V`, return immediately without emitting
           any rows
         - Otherwise, continue
-3. Initialise `%rowIndex` to `0` (the top-level row index)
+3. Initialize `%rowIndex` to `0` (the top-level row index)
 4. Emit all rows from `Process(S, V)` with `%rowIndex` available in the
    evaluation context
 

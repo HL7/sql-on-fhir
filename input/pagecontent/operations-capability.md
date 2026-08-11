@@ -17,7 +17,7 @@ SHALL contain:</span>
 A client therefore learns which data operations a server offers without reading
 any `rest.resource` entry.
 
-The `rest.resource` entries remain relevant for the artefacts themselves, which
+The `rest.resource` entries remain relevant for the artifacts themselves, which
 a server may still expose as FHIR resources.
 <span class="fhir-conformance" id="cap-3">If the server supports CRUD and search
 interactions for the ViewDefinition resource type, the

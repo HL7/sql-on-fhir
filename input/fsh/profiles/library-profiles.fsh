@@ -81,7 +81,7 @@ SQLView cannot declare parameters.
 
 // Parameters are not permitted on views.
 * parameter 0..0
-* parameter ^short = "Not permitted (views cannot be parameterised)"
+* parameter ^short = "Not permitted (views cannot be parameterized)"
 
 // Content constraints - SQL attachment(s)
 * content 1..* MS

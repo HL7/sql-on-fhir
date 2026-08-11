@@ -91,7 +91,7 @@ property and says nothing about how a server achieves it.
 
 ### subject
 
-The artefact a data operation acts on: a ViewDefinition, a
+The artifact a data operation acts on: a ViewDefinition, a
 [SQLQuery](StructureDefinition-SQLQuery.html) Library or a
 [SQLView](StructureDefinition-SQLView.html) Library. A subject is named by
 canonical URL, by a literal reference, or supplied inline in the request, rather

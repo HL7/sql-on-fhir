@@ -389,7 +389,7 @@ maintain reference implementations, a test report and a playground at
 
 The contributors identified in PSS-2716 as the developers of this externally
 developed content contribute it to HL7 under section 09.01.02 (Commitment) of
-the GOM. Accordingly, each contributor grants HL7 a free, irrevocable licence to
+the GOM. Accordingly, each contributor grants HL7 a free, irrevocable license to
 incorporate their contributions, in any media or form, and any subsequent
 modifications, in the creation or maintenance of HL7 Protocol Specifications; to
 copyright in HL7's name any Protocol Specification that includes portions of
