@@ -65,3 +65,15 @@ Terminology_TX_NoValid_16
 # 18. This is a combinations of bugs - Resource definitions must be namespaced in hl7.org/fhir, and publisher is not processing the JSON version of the example additional resource correctly.
 VALIDATION_ADDITIONAL_RESOURCE_NO_WRONG
 % ViewDefinition: The value for resourceDefinition of 'http://hl7.org/fhir/StructureDefinition/ViewDefinition|3.0.0-ballot' does not match the required value of 'http://hl7.org/fhir/uv/sql-on-fhir/StructureDefinition/ShareableViewDefinition|3.0.0-ballot'. In addition, this is not an additional resource, and shouldn't have a resourceDefinition at all
+
+# 19. The publisher's built-in ViewDefinition validator does not apply the forEach/forEachOrNull scope when checking column path cardinality, so columns that are single-valued within their forEach scope (e.g. system and code within a forEachOrNull of code.coding) are flagged as potentially multi-valued. False positive with the same root cause as 07; verified against the current example set. See https://chat.fhir.org/#narrow/channel/179219-analytics-on-FHIR/topic/Validation.20errors.20for.20additional.20resources/with/615144653.
+%might return multiple values for the column%
+
+# 20. Same forEach scoping defect as 19: the text column in the QuestionnaireResponseItems example selects item.text (a string) inside a forEach scope, but the validator resolves the path against the resource root, where text is the Narrative.
+%is a complex type ('Narrative'). This is not supported in some Runners%
+
+# 21. Message-ID variant of eld-33 (see 12): the binding on ViewDefinition.versionAlgorithm[x] is inherited from the R5 base resources and is deliberate.
+SD_ED_BIND_MULTIPLE_TYPES
+
+# 22. The ViewDefinition instances in this IG are examples of an additional resource, which the publisher does not associate with the ViewDefinition StructureDefinition as linked examples.
+%contains no explicitly linked examples for this profile%
