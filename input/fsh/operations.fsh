@@ -63,7 +63,7 @@ Description: "Execute a ViewDefinition, SQLQuery Library or SQLView Library and 
 * parameter[=].type = #CanonicalResource
 * parameter[=].targetProfile[0] = Canonical(ViewDefinition)
 * parameter[=].targetProfile[1] = Canonical(SQLView)
-* parameter[=].documentation = "Supporting artefacts the server cannot itself resolve, supplied inline and matched by canonical URL against the dependencies in the subject's transitive relatedArtifact graph. Accepts inline resources only; there is no context by canonical URL, because a URL is exactly what the server has already failed to resolve. Carries a resource, so it requires POST. See Common Operation Behavior (operations-common.html#context)."
+* parameter[=].documentation = "Supporting artifacts the server cannot itself resolve, supplied inline and matched by canonical URL against the dependencies in the subject's transitive relatedArtifact graph. Accepts inline resources only; there is no context by canonical URL, because a URL is exactly what the server has already failed to resolve. Carries a resource, so it requires POST. See Common Operation Behavior (operations-common.html#context)."
 
 * parameter[+].name = #resource
 * parameter[=].use = #in
@@ -156,7 +156,7 @@ Description: "Export one or more ViewDefinitions, SQLQuery Libraries and SQLView
 * parameter[=].use = #in
 * parameter[=].min = 1
 * parameter[=].max = "*"
-* parameter[=].documentation = "One or more artefacts to export, in any mixture of ViewDefinitions, SQLQuery Libraries and SQLView Libraries. Each repetition names a single subject and produces exactly one output entry in the manifest. A request supplying no subject is rejected with 400 Bad Request, as is a request in which two repetitions would produce the same output name."
+* parameter[=].documentation = "One or more artifacts to export, in any mixture of ViewDefinitions, SQLQuery Libraries and SQLView Libraries. Each repetition names a single subject and produces exactly one output entry in the manifest. A request supplying no subject is rejected with 400 Bad Request, as is a request in which two repetitions would produce the same output name."
 * parameter[=].part[+].name = #name
 * parameter[=].part[=].use = #in
 * parameter[=].part[=].min = 0
@@ -197,7 +197,7 @@ Description: "Export one or more ViewDefinitions, SQLQuery Libraries and SQLView
 * parameter[=].part[=].type = #Parameters
 * parameter[=].part[=].documentation = "Input parameter values for this subject, bound by name to the parameters the Library declares (Library.parameter.name). Permitted only where this repetition's subject is a SQLQuery or SQLView; supplying it where the subject is a ViewDefinition is rejected with 400 Bad Request, because a ViewDefinition declares no parameters."
 
-// Input parameters - supporting artefacts, supplied once for the whole job
+// Input parameters - supporting artifacts, supplied once for the whole job
 * parameter[+].name = #context
 * parameter[=].use = #in
 * parameter[=].min = 0
@@ -205,7 +205,7 @@ Description: "Export one or more ViewDefinitions, SQLQuery Libraries and SQLView
 * parameter[=].type = #CanonicalResource
 * parameter[=].targetProfile[0] = Canonical(ViewDefinition)
 * parameter[=].targetProfile[1] = Canonical(SQLView)
-* parameter[=].documentation = "Supporting artefacts the server cannot itself resolve, supplied inline and matched by canonical URL against the dependencies in the subjects' transitive relatedArtifact graphs. Applies to the job as a whole rather than to one subject, so an artefact several subjects depend on is supplied once. Accepts inline resources only; there is no context by canonical URL, because a URL is exactly what the server has already failed to resolve. A context entry produces no output entry. See Common Operation Behavior (operations-common.html#context)."
+* parameter[=].documentation = "Supporting artifacts the server cannot itself resolve, supplied inline and matched by canonical URL against the dependencies in the subjects' transitive relatedArtifact graphs. Applies to the job as a whole rather than to one subject, so an artifact several subjects depend on is supplied once. Accepts inline resources only; there is no context by canonical URL, because a URL is exactly what the server has already failed to resolve. A context entry produces no output entry. See Common Operation Behavior (operations-common.html#context)."
 
 // Input parameters - export control
 * parameter[+].name = #clientTrackingId

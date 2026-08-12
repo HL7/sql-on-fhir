@@ -46,7 +46,7 @@ that cannot be resolved the constraint is advisory.
 <span class="fhir-conformance" id="sqlview-2">Unlike SQLQuery, an SQLView SHALL NOT declare
 `Library.parameter` entries (`parameter` is constrained to `0..0`).</span> A view
 is a fixed, reusable building block; callers compose with it by referencing it
-from a parameterised SQLQuery.
+from a parameterized SQLQuery.
 
 #### SQL Attachments
 

@@ -12,7 +12,7 @@ as a virtual table for the referencing query.
 <span class="fhir-conformance" id="sqlview-notes-1">Authors SHOULD keep this graph acyclic.</span>
 
 Whether circular dependencies are detected or rejected, any limit on dependency
-depth, and whether intermediate results are materialised or inlined (for example
+depth, and whether intermediate results are materialized or inlined (for example
 as CTEs or database views) are implementation decisions and are not mandated by
 this specification. A SQL engine that creates real views will reject a cyclic
 definition; a CTE-based implementation detects loops itself.
@@ -24,5 +24,5 @@ patients from a ViewDefinition. The
 [Active Patient Addresses](Library-ActivePatientAddressesQuery.html) query then
 references that SQLView by its canonical URL, using the `active_patients` label
 as a table name and joining it to a further ViewDefinition. The executing engine
-may materialise the view's result or inline it; either approach conforms to this
+may materialize the view's result or inline it; either approach conforms to this
 specification.

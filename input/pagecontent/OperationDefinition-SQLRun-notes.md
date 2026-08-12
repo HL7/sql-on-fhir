@@ -28,7 +28,7 @@ subject alike.
 2. **When POST is required**: use `POST` instead of `GET` when you need to:
    - name the subject inline via `subjectResource`
    - bind parameter values via `parameters`
-   - supply a supporting artefact inline via `context`
+   - supply a supporting artifact inline via `context`
    - supply FHIR resources to transform via `resource`
 
    Each of those four carries a resource, which is the reason it cannot be
@@ -54,7 +54,7 @@ inside a `Parameters` resource in the request body on a `POST`.
 | subjectReference | Reference                              | 0¹  | 1   | Literal location of the subject on the server. [Details](#subject-clarification)                  |
 | subjectResource  | ViewDefinition \| SQLQuery \| SQLView² | 0¹  | 1   | Inline subject resource. [Details](#subject-clarification)                                        |
 | parameters       | Parameters                             | 0   | 1   | Parameter values bound by name to those the Library declares; requires a SQL subject. [Details](#parameter-passing) |
-| context          | ViewDefinition \| SQLView²             | 0   | \*  | Inline supporting artefact, matched to a dependency by canonical URL. [Details](#supporting-artefacts) |
+| context          | ViewDefinition \| SQLView²             | 0   | \*  | Inline supporting artifact, matched to a dependency by canonical URL. [Details](#supporting-artifacts) |
 | resource         | Resource                               | 0   | \*  | FHIR resources to transform; requires a ViewDefinition subject. [Details](#resource-parameter-clarification) |
 | \_format         | code                                   | 0   | 1   | Output format: `json`, `ndjson`, `csv`, `parquet`, `fhir`. [Details](#format-parameter-clarification) |
 | header           | boolean                                | 0   | 1   | Include CSV headers (default: true). Only applies to `csv` format                                 |
@@ -86,7 +86,7 @@ rather than a repeating set; see
 
 ##### Naming the subject {#subject-clarification}
 
-The artefact to execute is named in exactly one of three ways, each with its own
+The artifact to execute is named in exactly one of three ways, each with its own
 parameter so that the intended meaning is carried by the parameter's type rather
 than inferred from the shape of a string. All three admit a
 [ViewDefinition](StructureDefinition-ViewDefinition.html), a
@@ -98,7 +98,7 @@ independently of the subject's kind:
 | ------------------ | -------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `subjectCanonical` | `canonical`                            | Its canonical URL, optionally with a `\|version` suffix pinning a version (e.g. `http://example.org/ViewDefinition/patient_demographics\|2.0.0`). Absent a suffix, the server selects a version according to FHIR's [canonical resolution](https://hl7.org/fhir/R5/references.html#canonical) rules |
 | `subjectReference` | `Reference`                            | A literal location: a relative URL on this server (e.g. `ViewDefinition/123` or `Library/patient-bp-query`) or an absolute URL. This is not a canonical URL                                                                                                                                 |
-| `subjectResource`  | ViewDefinition \| SQLQuery \| SQLView² | Carrying the artefact itself in the request                                                                                                                                                                                                                                                  |
+| `subjectResource`  | ViewDefinition \| SQLQuery \| SQLView² | Carrying the artifact itself in the request                                                                                                                                                                                                                                                  |
 
 {:.table-data}
 
@@ -114,7 +114,7 @@ three.</span> Supplying none, or more than one, is rejected with
 `400 Bad Request` and an `OperationOutcome` naming the problem.
 
 A `subjectCanonical` or `subjectReference` the server cannot resolve is rejected
-with `404 Not Found` and an `OperationOutcome`. A resolved artefact conforming to
+with `404 Not Found` and an `OperationOutcome`. A resolved artifact conforming to
 none of the three profiles is rejected with `422 Unprocessable Entity`.
 
 What the subject resolves to determines how it is processed, and which of the
@@ -124,26 +124,26 @@ SQLQuery or SQLView has its dependency graph resolved first and may have values
 bound through [`parameters`](#parameter-passing).
 
 How a server resolves a canonical URL or an absolute reference - from a local
-artefact registry, by dereferencing the URL, or not at all - is an implementation
+artifact registry, by dereferencing the URL, or not at all - is an implementation
 matter. A server that supports only some of these parameters declares the subset
 it supports as described in
 [Declaring partial operation support](operations-capability.html#partial-operation-support).
 
-##### Supporting artefacts (`context`) {#supporting-artefacts}
+##### Supporting artifacts (`context`) {#supporting-artifacts}
 
 Where the subject is a SQLQuery or SQLView, the tables it selects from are named
 by its `relatedArtifact` entries and are normally resolved by the server. Where
-the server cannot resolve one - typically because the artefact exists only on the
+the server cannot resolve one - typically because the artifact exists only on the
 client - the client supplies it inline with the repeating `context` parameter,
 which accepts a ViewDefinition or a
 [SQLView](StructureDefinition-SQLView.html).
 
 The matching, precedence and error rules are specified once in
-[Supporting artefacts](operations-common.html#context) and apply identically here
+[Supporting artifacts](operations-common.html#context) and apply identically here
 and on [`$sql-export`](OperationDefinition-SQLExport.html). That section governs;
 in outline, the supplied entries are matched by canonical URL against every
 dependency in the subject's transitive dependency graph, a supplied entry
-outranks an artefact the server could itself resolve, an entry that cannot be
+outranks an artifact the server could itself resolve, an entry that cannot be
 bound or matches nothing is rejected with `400 Bad Request`, and a dependency
 neither supplied nor resolvable is rejected with `404 Not Found`.
 
@@ -221,7 +221,7 @@ specified once in
 
 Where the subject is a SQLQuery or SQLView, "after the subject has been
 evaluated" includes any in-query `LIMIT`: implementations are free to push the
-cap down into the SQL as an optimisation, but the observable behaviour is
+cap down into the SQL as an optimization, but the observable behaviour is
 post-evaluation. A worked example is given under
 [Capping result rows with `_limit`](#limit-example).
 
@@ -502,7 +502,7 @@ pt-2,Doe
 Supplying `resource` alongside a SQLQuery or SQLView subject is rejected with
 `400 Bad Request`.
 
-##### Fully ad-hoc: an inline query with an inline supporting artefact
+##### Fully ad-hoc: an inline query with an inline supporting artifact
 
 Nothing is stored on the server. The query is supplied as `subjectResource` and
 the ViewDefinition its `relatedArtifact` entry depends on is supplied as
@@ -872,7 +872,7 @@ placeholder - a different semantic that deserves its own proposal.
 | `404 Not Found`             | `not-found`     | subject       | An unresolvable `subjectCanonical` or `subjectReference`                                                                                      |
 | `404 Not Found`             | `not-found`     | -             | A dependency neither supplied as a `context` entry nor resolvable by the server                                                               |
 | `406 Not Acceptable`        | `not-supported` | -             | An envelope representation the server declines for the chosen format (see [Content Negotiation](operations-common.html#content-negotiation))  |
-| `422 Unprocessable Entity`  | `invalid`       | subject       | A resolved artefact conforming to none of ViewDefinition, SQLQuery or SQLView                                                                 |
+| `422 Unprocessable Entity`  | `invalid`       | subject       | A resolved artifact conforming to none of ViewDefinition, SQLQuery or SQLView                                                                 |
 | `422 Unprocessable Entity`  | `invalid`       | subject       | A conformant subject that cannot be processed, such as an invalid FHIRPath expression or an SQL syntax error                                  |
 | `422 Unprocessable Entity`  | `invalid`       | -             | A result column of an SQL type with no `value[x]` mapping, where `_format=fhir` (see [type mapping](#sql-to-fhir-type-mapping))               |
 | `500 Internal Server Error` | `exception`     | -             | Unexpected server error                                                                                                                       |

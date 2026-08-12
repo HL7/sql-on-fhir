@@ -47,7 +47,7 @@ Usage: #example
 * description = """
 Joins the [Active Patients](Library-ActivePatientsView.html) view to patient
 addresses. The `active_patients` label resolves to the referenced SQLView, which
-the executing engine may materialise or inline.
+the executing engine may materialize or inline.
 
 ```sql
 SELECT

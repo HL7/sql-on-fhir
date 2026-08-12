@@ -7,7 +7,7 @@ Asynchronous Interaction Request Pattern.
 - Exporting a mixed analytics bundle, the views and the queries over them, as one job whose outputs can be joined
 - Large-scale SQL query execution against ViewDefinition tables
 - Long-running analytical queries that would time out synchronously
-- Exporting subjects that depend on artefacts the server cannot itself resolve
+- Exporting subjects that depend on artifacts the server cannot itself resolve
 
 **Endpoint:**
 
@@ -31,7 +31,7 @@ repeating `subject` parameter rather than by the request path.
 - **Mixed-subject batching** - one job exports any mixture of ViewDefinitions, SQLQuery Libraries and SQLView Libraries, each named by a `subject` repetition and each producing one manifest entry
 - **One snapshot** - every subject in the job is computed against a single consistent view of the data, so two outputs of one job can be joined without a skew window
 - **One set of filters** - `patient`, `group` and `_since` are stated once and apply to every subject
-- **Job-wide supporting artefacts** - the repeating `context` parameter supplies artefacts the server cannot itself resolve, once for the whole job however many subjects depend on them
+- **Job-wide supporting artifacts** - the repeating `context` parameter supplies artifacts the server cannot itself resolve, once for the whole job however many subjects depend on them
 - **Per-subject parameters** - each `subject` repetition carries its own `parameters` resource
 - **Client tracking** - `clientTrackingId` is echoed in the manifest, correlating the job with the client's own records
 

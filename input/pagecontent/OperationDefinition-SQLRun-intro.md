@@ -12,7 +12,7 @@ synchronously, returning the result in the requested output format.
 
 The operation is invoked at the system level only. The subject is named by a
 parameter rather than by the request path, so one endpoint serves all three
-artefact kinds.
+artifact kinds.
 
 | Endpoint                | Subject named by                                                                                    |
 | ----------------------- | ----------------------------------------------------------------------------------------------------- |
@@ -28,7 +28,7 @@ and so require `POST`.
 1. Resolve the subject named by `subjectCanonical`, `subjectReference` or `subjectResource`
 2. Branch on what it resolves to:
    - A **ViewDefinition** is evaluated directly, against the supplied `resource` values where present and otherwise against server data
-   - A **SQLQuery** or **SQLView** Library has each `relatedArtifact` dependency resolved first, preferring an artefact supplied inline via `context` over one the server can itself resolve, and each resolved artefact bound to the SQL identifier in the dependency's `label`
+   - A **SQLQuery** or **SQLView** Library has each `relatedArtifact` dependency resolved first, preferring an artifact supplied inline via `context` over one the server can itself resolve, and each resolved artifact bound to the SQL identifier in the dependency's `label`
 3. Bind `parameters` values to the SQL placeholders the Library declares (SQL subjects only)
 4. Evaluate the view, or execute the SQL
 5. Return results in the requested format (a raw stream for flat formats, a `Parameters` resource for `_format=fhir`)

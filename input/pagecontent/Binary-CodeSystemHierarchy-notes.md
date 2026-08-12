@@ -24,4 +24,4 @@ Given a CodeSystem with nested concepts like:
     - semi
   - motorbike
 
-The `repeat` directive walks down the concept tree, and at each level the nested `forEach` extracts each child concept. This produces parent-child pairs that can be used to build adjacency lists for hierarchical queries or to analyse the structure of a terminology.
+The `repeat` directive walks down the concept tree, and at each level the nested `forEach` extracts each child concept. This produces parent-child pairs that can be used to build adjacency lists for hierarchical queries or to analyze the structure of a terminology.

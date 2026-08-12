@@ -100,7 +100,7 @@ parameters:
   # hand-authored on the Changes page instead.
   version-comparison: n/a
   # ViewDefinition is defined as an additional resource type. Its definition and
-  # supporting artefacts are authored directly as XML rather than via FSH.
+  # supporting artifacts are authored directly as XML rather than via FSH.
   path-resource:
     - input/resources/viewdefinition
   additional-resource:
@@ -200,7 +200,7 @@ menu:
 #     exampleBoolean: true
 #   Patient/bad-example: omit
 
-# ViewDefinition artefacts are authored directly as XML/JSON under
+# ViewDefinition artifacts are authored directly as XML/JSON under
 # input/resources/viewdefinition, so their IG metadata is declared here.
 resources:
   List/ViewDefinition-operations:

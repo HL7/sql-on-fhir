@@ -74,7 +74,7 @@ SQLQueries, in which each referenced result acts as a virtual table for the
 referencing query.
 <span class="fhir-conformance" id="sqlquery-notes-1">Authors SHOULD keep this graph acyclic.</span>
 Whether circular dependencies are detected, any limit on dependency depth, and
-whether intermediate results are materialised or inlined (for example as CTEs or
+whether intermediate results are materialized or inlined (for example as CTEs or
 database views) are implementation decisions and are not mandated by this
 specification.
 
@@ -85,7 +85,7 @@ shows an SQLQuery that references the
 How these dependencies are resolved when a query is invoked, including how a
 client may supply one inline that the server cannot itself resolve, is specified
 in
-[Supporting artefacts](operations-common.html#context).
+[Supporting artifacts](operations-common.html#context).
 
 ### Parameter Types
 

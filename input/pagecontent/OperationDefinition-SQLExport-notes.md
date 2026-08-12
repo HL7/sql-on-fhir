@@ -102,14 +102,14 @@ entries with the subjects they requested by
 
 **One resolution per canonical URL.** A canonical URL appearing as a dependency
 of more than one subject is resolved once for the job, and every subject
-depending on it sees the same resolved artefact; see
-[Supporting artefacts](operations-common.html#context). Whether that artefact is
-then materialised once or several times is not constrained, consistent with what
+depending on it sees the same resolved artifact; see
+[Supporting artifacts](operations-common.html#context). Whether that artifact is
+then materialized once or several times is not constrained, consistent with what
 this specification already leaves to implementations.
 
 **One `output` per subject.** The manifest carries exactly one `output` entry per
-`subject` repetition and none for any other supplied artefact. A `context` entry
-is a supporting artefact rather than a subject, so it never produces one.
+`subject` repetition and none for any other supplied artifact. A `context` entry
+is a supporting artifact rather than a subject, so it never produces one.
 
 #### Data Sources
 
@@ -166,7 +166,7 @@ client to negotiate a different representation for interim status responses
 
 ###### Subjects - `subject` Parameter (1..\*)
 
-Each repetition names a single artefact to export - a ViewDefinition, a SQLQuery
+Each repetition names a single artifact to export - a ViewDefinition, a SQLQuery
 Library or a SQLView Library - and produces exactly one `output` entry in the
 manifest. One job may name any mixture of the three. At least one `subject` is
 required; a request supplying none is rejected with `400 Bad Request`.
@@ -193,32 +193,32 @@ permitted only where that repetition's subject is a SQLQuery or SQLView.
 Supplying it where the subject is a ViewDefinition is rejected with
 `400 Bad Request`, because a ViewDefinition declares no parameters.
 
-###### Supporting artefacts - `context` Parameter
+###### Supporting artifacts - `context` Parameter
 
 A subject's dependencies are named by its `relatedArtifact` entries and are
 normally resolved by the server. Where the server cannot resolve one - typically
-because the artefact exists only on the client - the client supplies it inline
+because the artifact exists only on the client - the client supplies it inline
 with `context`.
 
 | Name    | Type                       | Min | Max | Description                                                                                                     |
 | ------- | -------------------------- | --- | --- | ----------------------------------------------------------------------------------------------------------------- |
-| context | ViewDefinition \| SQLView² | 0   | \*  | Inline supporting artefact, matched to a dependency by canonical URL. [Details](operations-common.html#context) |
+| context | ViewDefinition \| SQLView² | 0   | \*  | Inline supporting artifact, matched to a dependency by canonical URL. [Details](operations-common.html#context) |
 
 {:.table-data}
 
 `context` applies to the job as a whole rather than to one subject, so an
-artefact several subjects depend on is supplied once and
+artifact several subjects depend on is supplied once and
 [resolved once](#one-snapshot). The matching, precedence and error rules are
 specified once in
-[Supporting artefacts](operations-common.html#context) and apply identically here
+[Supporting artifacts](operations-common.html#context) and apply identically here
 and on [`$sql-run`](OperationDefinition-SQLRun.html). That section governs; in
 outline, the supplied entries are matched by canonical URL against every
-dependency of every subject in the request, a supplied entry outranks an artefact
+dependency of every subject in the request, a supplied entry outranks an artifact
 the server could itself resolve, an entry that cannot be bound or matches nothing
 is rejected with `400 Bad Request`, and a dependency neither supplied nor
 resolvable is rejected with `404 Not Found`.
 
-A `context` entry is a supporting artefact, not an export subject: it produces no
+A `context` entry is a supporting artifact, not an export subject: it produces no
 `output` entry in the manifest, which carries one entry per `subject` and nothing
 else.
 
@@ -261,7 +261,7 @@ and rejects a request supplying it as specified there.
 
 ###### Naming each subject {#subject-clarification}
 
-Each `subject` repetition names the artefact to export in exactly one of three
+Each `subject` repetition names the artifact to export in exactly one of three
 ways, each with its own part so that the intended meaning is carried by the
 part's type rather than inferred from the shape of a string. All three admit a
 [ViewDefinition](StructureDefinition-ViewDefinition.html), a
@@ -273,7 +273,7 @@ independently of the subject's kind:
 | -------------------------- | -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `subject.subjectCanonical` | `canonical`                            | Its canonical URL, optionally with a `\|version` suffix pinning a version (e.g. `http://example.org/Library/bp-summary\|2.1.0`). Absent a suffix, the server selects a version according to FHIR's [canonical resolution](https://hl7.org/fhir/R5/references.html#canonical) rules |
 | `subject.subjectReference` | `Reference`                            | A literal location: a relative URL on this server (e.g. `Library/patient-bp-query`) or an absolute URL (e.g. `http://example.org/fhir/Library/patient-bp-query`). This is not a canonical URL                                                                                      |
-| `subject.subjectResource`  | ViewDefinition \| SQLQuery \| SQLView² | Carrying the artefact itself in the request                                                                                                                                                                                                                                        |
+| `subject.subjectResource`  | ViewDefinition \| SQLQuery \| SQLView² | Carrying the artifact itself in the request                                                                                                                                                                                                                                        |
 
 {:.table-data}
 
@@ -290,11 +290,11 @@ is rejected with `400 Bad Request` and an `OperationOutcome` naming the problem.
 
 A `subject.subjectCanonical` or `subject.subjectReference` the server cannot
 resolve is rejected with `404 Not Found` and an `OperationOutcome`. A resolved
-artefact conforming to none of the three profiles is rejected with
+artifact conforming to none of the three profiles is rejected with
 `422 Unprocessable Entity`.
 
 How a server resolves a canonical URL or an absolute reference - from a local
-artefact registry, by dereferencing the URL, or not at all - is an implementation
+artifact registry, by dereferencing the URL, or not at all - is an implementation
 matter. A server that supports only some of these parts declares the subset it
 supports as described in
 [Declaring partial operation support](operations-capability.html#partial-operation-support).
@@ -476,7 +476,7 @@ either resolves it.
 | `404 Not Found`             | `not-found`     | `subject`     | An unresolvable `subjectCanonical` or `subjectReference`                                                                                                     |
 | `404 Not Found`             | `not-found`     | -             | A dependency neither supplied as a `context` entry nor resolvable by the server                                                                              |
 | `404 Not Found`             | `not-found`     | -             | A status URL for a cancelled job                                                                                                                             |
-| `422 Unprocessable Entity`  | `invalid`       | `subject`     | A resolved artefact conforming to none of ViewDefinition, SQLQuery or SQLView                                                                                |
+| `422 Unprocessable Entity`  | `invalid`       | `subject`     | A resolved artifact conforming to none of ViewDefinition, SQLQuery or SQLView                                                                                |
 | `422 Unprocessable Entity`  | `invalid`       | `subject`     | A conformant subject that cannot be processed, such as an SQL syntax error or an invalid FHIRPath expression                                                 |
 | `429 Too Many Requests`     | `throttled`     | -             | Excessive polling; back off exponentially, guided by `Retry-After`                                                                                           |
 | `500 Internal Server Error` | `exception`     | -             | Unexpected server error; on the result URL, the failure outcome of the job                                                                                   |
@@ -492,7 +492,7 @@ value, the subject failure is the more fundamental: the response is
 ##### Timing of Rejection
 
 Invalid requests are rejected **synchronously at kick-off** - bad or unsupported
-parameters, authorisation failures, unresolvable subjects, unresolvable
+parameters, authorization failures, unresolvable subjects, unresolvable
 dependencies and unmatched `context` entries alike. Rejection is never deferred
 to the status URL. The status endpoint reflects polling machinery only; it never
 communicates the job's outcome, which is why a finished job returns
@@ -682,10 +682,10 @@ Content-Type: application/fhir+json
    - <span class="fhir-conformance" id="exp-32">Clients SHOULD retrieve results promptly but can retry within the validity window</span>
 8. **Access Control**:
    <span class="fhir-conformance" id="exp-27">Servers SHALL protect status, result, and download URLs with appropriate access controls:</span>
-   - <span class="fhir-conformance" id="exp-28">Same authorisation context as the original request (servers SHOULD limit
+   - <span class="fhir-conformance" id="exp-28">Same authorization context as the original request (servers SHOULD limit
      access to the client that initiated the export), OR</span>
    - Non-guessable URLs (e.g., cryptographically random tokens)
-   - Unauthorised access attempts return `401 Unauthorized` or `403 Forbidden`
+   - Unauthorized access attempts return `401 Unauthorized` or `403 Forbidden`
 9. **File Download**: Client downloads the output from URLs in the `output.location` parameters.
 
 #### Examples
@@ -969,7 +969,7 @@ Patient/456,152,2026-01-20
 
 ##### Inline Subject Resource
 
-Pass the artefact inline for an ad-hoc export, with nothing stored on the server:
+Pass the artifact inline for an ad-hoc export, with nothing stored on the server:
 
 ```http
 POST /$sql-export HTTP/1.1
@@ -1012,7 +1012,7 @@ Prefer: respond-async
 }
 ```
 
-##### A Shared Supporting Artefact, Supplied Once
+##### A Shared Supporting artifact, Supplied Once
 
 Two SQLQuery subjects both depend on a ViewDefinition that exists only on the
 client. It is supplied once as a `context` entry, resolved once for the job, and
