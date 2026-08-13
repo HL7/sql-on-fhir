@@ -10,7 +10,7 @@ title: SQL on FHIR
 description: A specification for defining portable views of FHIR data that can be easily queried using tools such as SQL.
 status: active # draft | active | retired | unknown
 version: 3.0.0-ballot
-fhirVersion: 6.0.0-ballot3 # https://www.hl7.org/fhir/valueset-FHIR-version.html
+fhirVersion: 6.0.0-ballot5 # https://www.hl7.org/fhir/valueset-FHIR-version.html
 copyrightYear: 2023+
 releaseLabel: STU 3 Ballot # free text shown in the publish box, e.g. "CI Build", "STU 3 Ballot", "STU 3"
 license: CC0-1.0 # https://www.hl7.org/fhir/valueset-spdx-license.html
