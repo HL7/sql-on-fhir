@@ -25,7 +25,7 @@ ED_INVARIANT_DIFF_NO_SOURCE
 %Error evaluating FHIRPath expression: The name 'linkId' is not valid%
 %Error evaluating FHIRPath expression: The name 'code' is not valid%
 
-# 08. This IG targets FHIR 6.0.0-ballot3, but no R6 build of hl7.fhir.uv.extensions, hl7.terminology or hl7.fhir.uv.tools has been released; the registry serves only R5-based versions, so the publisher auto-selects the .r5 variants. Nothing in this repository can resolve the mismatch; see https://chat.fhir.org/#narrow/channel/179219-analytics-on-FHIR/topic/R6.20IGs.20depending.20on.20R5-only.20packages/with/615144821.
+# 08. This IG targets FHIR 6.0.0-ballot5, but no R6 build of hl7.fhir.uv.extensions, hl7.terminology or hl7.fhir.uv.tools has been released; the registry serves only R5-based versions, so the publisher auto-selects the .r5 variants. Nothing in this repository can resolve the mismatch; see https://chat.fhir.org/#narrow/channel/179219-analytics-on-FHIR/topic/R6.20IGs.20depending.20on.20R5-only.20packages/with/615144821.
 This IG is version%
 This IG is for FHIR version%
 IG_DEPENDENCY_VERSION_ERROR
@@ -53,14 +53,14 @@ IG_DEPENDENCY_VERSION_WARNING
 %is not included anywhere in the produced implementation guide%
 
 # 16. The CodeSystem fhirpath-types was incorrectly tagged as experimental: https://jira.hl7.org/browse/FHIR-58168
-%Reference to experimental CodeSystem http://hl7.org/fhir/CodeSystem/fhirpath-types|6.0.0-ballot3
+%Reference to experimental CodeSystem http://hl7.org/fhir/CodeSystem/fhirpath-types|6.0.0-ballot5
 MSG_EXPERIMENTAL
 
 # 17. FHIR R6 Additional Resource mechanisms are still WIP
 UNABLE_TO_INFER_CODESYSTEM
 Terminology_TX_NoValid_16
-%The value provided ('ViewDefinition') was not found in the value set 'Version Independent Resource Types (All)' (http://hl7.org/fhir/ValueSet/version-independent-all-resource-types|6.0.0-ballot3), and a code is required from this value set  (error message = The System URI could not be determined for the code 'ViewDefinition' in the ValueSet 'http://hl7.org/fhir/ValueSet/version-independent-all-resource-types|6.0.0-ballot3'; The provided code '#ViewDefinition' was not found in the value set 'http://hl7.org/fhir/ValueSet/version-independent-all-resource-types|6.0.0-ballot3')
-%The System URI could not be determined for the code 'ViewDefinition' in the ValueSet 'http://hl7.org/fhir/ValueSet/version-independent-all-resource-types|6.0.0-ballot3'
+%The value provided ('ViewDefinition') was not found in the value set 'Version Independent Resource Types (All)' (http://hl7.org/fhir/ValueSet/version-independent-all-resource-types|6.0.0-ballot5), and a code is required from this value set  (error message = The System URI could not be determined for the code 'ViewDefinition' in the ValueSet 'http://hl7.org/fhir/ValueSet/version-independent-all-resource-types|6.0.0-ballot5'; The provided code '#ViewDefinition' was not found in the value set 'http://hl7.org/fhir/ValueSet/version-independent-all-resource-types|6.0.0-ballot5')
+%The System URI could not be determined for the code 'ViewDefinition' in the ValueSet 'http://hl7.org/fhir/ValueSet/version-independent-all-resource-types|6.0.0-ballot5'
 
 # 18. This is a combinations of bugs - Resource definitions must be namespaced in hl7.org/fhir, and publisher is not processing the JSON version of the example additional resource correctly.
 VALIDATION_ADDITIONAL_RESOURCE_NO_WRONG
