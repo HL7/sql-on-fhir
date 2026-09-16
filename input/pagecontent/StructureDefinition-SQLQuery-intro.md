@@ -31,7 +31,7 @@ are recorded as a `targetProfile` on `relatedArtifact.resource`.
 "relatedArtifact": [
   { "type": "depends-on", "resource": "https://example.org/ViewDefinition/patient_view", "label": "patient" },
   { "type": "depends-on", "resource": "http://hl7.org/fhir/uv/sql-on-fhir/Library/ActivePatientsView", "label": "active_patients" },
-  { "type": "depends-on", "resource": "http://example.org/ValueSet/diabetes|2026", "label": "diabetes_codes" }
+  { "type": "depends-on", "resource": "http://example.org/ValueSet/cardiovascular-disease|2026", "label": "cvd_codes" }
 ]
 ```
 
