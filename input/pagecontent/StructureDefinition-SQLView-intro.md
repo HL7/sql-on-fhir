@@ -15,31 +15,36 @@ The key differences from SQLQuery are:
 
 ### Boundaries and Relationships
 
-SQLView does not define table schemas, data extraction, execution behaviour, or
+SQLView does not define table schemas, data extraction, execution behavior, or
 APIs; those belong to ViewDefinition and its operations. An SQLView references
-ViewDefinitions and other SQLViews; execution environments resolve these to
-physical or virtual tables.
+ViewDefinitions, other SQLViews and ValueSets; execution environments resolve
+these to physical or virtual tables. A ValueSet is exposed to the SQL as a
+relation of its member codes (see [Terminology in SQL](terminology-in-sql.html)).
 
 ### Resource Content
 
 #### Dependencies
 
-Use `relatedArtifact` with `type = "depends-on"` to list the ViewDefinitions and
-SQLViews this view builds upon. Each `resource` is the canonical URL of a
-ViewDefinition or another SQLView, and each `label` defines the table name used
-in the SQL.
+Use `relatedArtifact` with `type = "depends-on"` to list the ViewDefinitions,
+SQLViews and ValueSets this view builds upon. Each `resource` is the canonical
+URL of a ViewDefinition, another SQLView or a ValueSet, and each `label` defines
+the table name used in the SQL.
 
 ```json
 "relatedArtifact": [
   { "type": "depends-on", "resource": "https://example.org/ViewDefinition/patient_view", "label": "patient_view" },
-  { "type": "depends-on", "resource": "http://hl7.org/fhir/uv/sql-on-fhir/Library/ActivePatientsView", "label": "active_patients" }
+  { "type": "depends-on", "resource": "http://hl7.org/fhir/uv/sql-on-fhir/Library/ActivePatientsView", "label": "active_patients" },
+  { "type": "depends-on", "resource": "http://example.org/ValueSet/diabetes|2026", "label": "diabetes_codes" }
 ]
 ```
 
 The allowed targets are recorded as a `targetProfile` on
-`relatedArtifact.resource` (`Canonical(ViewDefinition or SQLView)`). Validators
-enforce this whenever the canonical resolves to a known resource; for canonicals
-that cannot be resolved the constraint is advisory.
+`relatedArtifact.resource` (`Canonical(ViewDefinition or SQLView or ValueSet)`).
+Validators enforce this whenever the canonical resolves to a known resource; for
+canonicals that cannot be resolved the constraint is advisory. A ValueSet
+dependency is read as a relation with the columns `system`, `version`, `code`,
+`display` and `inactive`, as specified in
+[Terminology in SQL](terminology-in-sql.html#relation).
 
 #### No Parameters
 
@@ -69,6 +74,6 @@ SQLQuery.
   extension MAY carry a plain-text copy</span>
 - <span class="fhir-conformance" id="sqlview-7">Dependencies SHALL use `relatedArtifact` with
   `type = "depends-on"`, a `label`, and a `resource` referencing a
-  ViewDefinition or SQLView</span>
+  ViewDefinition, SQLView or ValueSet</span>
 
 For notes on query composition, see the Notes tab below.

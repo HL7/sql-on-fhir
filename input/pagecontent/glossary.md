@@ -30,6 +30,17 @@ that base followed by its type and id, for example
 `http://hl7.org/fhir/uv/sql-on-fhir/StructureDefinition/ViewDefinition`.
 
 
+### code system
+
+A named collection of codes and their meanings, such as SNOMED CT, LOINC or
+ICD-10, identified in FHIR by a canonical URL (for example
+`http://snomed.info/sct`). A code is meaningful only together with the code
+system it belongs to, which is why a coded value in FHIR carries both a `system`
+and a `code`, and why a value set relation identifies a member by both. Code
+systems are versioned, and a code's meaning or active status may differ between
+versions.
+
+
 ### data layer
 
 The optional first conceptual layer described by this specification. The
@@ -50,6 +61,16 @@ performance
 simplify queries
 - The creation of hash-based resource ids to avoid conflicts when data from
 multiple sources are combined
+
+
+### expansion
+
+The enumerated list of codes that are members of a value set, computed from its
+definition at a point in time under a given set of parameters, and recorded in
+FHIR as `ValueSet.expansion`. An expansion is a record rather than a definition:
+the same value set expanded against a later code system version may yield
+different members. It is the form in which a runner holds membership when it
+exposes a value set to SQL as a relation.
 
 
 ### flattened
@@ -74,6 +95,15 @@ guide's canonical URL, and it is how one guide declares a dependency on another.
 
 This specification is distributed as `hl7.fhir.uv.sql-on-fhir`. Published version
 2.0.0 was distributed as `org.sql-on-fhir.ig`.
+
+
+### relation
+
+A table in the relational sense: a set of rows sharing one fixed set of typed
+columns, whether the rows are stored or computed on demand. In this
+specification the term names what a runner exposes for a value set dependency,
+because the emphasis is on the shape and invariants of the rows rather than on
+any stored table.
 
 
 ### snapshot
@@ -117,6 +147,17 @@ ephemeral.
 
 The process of extracting repeating elements of a resource into a row for each
 item.
+
+
+### value set
+
+A selection of codes drawn from one or more code systems for a particular
+purpose, such as the codes that denote diabetes; defined in FHIR by the
+`ValueSet` resource and identified by canonical URL. A value set may be defined
+by listing its codes, or intensionally by rules that are evaluated against a code
+system to produce an expansion. A SQLQuery or SQLView declares a value set as a
+dependency and reads its membership as a relation; see
+[Terminology in SQL](terminology-in-sql.html).
 
 
 ### view definition

@@ -279,3 +279,52 @@ JOIN diagnoses_view
   ON diagnoses_view.patient_id = fhir_patient.id
 WHERE omop_person.source_system = :source_system"""
 * content.data = "U0VMRUNUCiAgb21vcF9wZXJzb24ucGVyc29uX2lkIEFTIG9tb3BfcGVyc29uX2lkLAogIGZoaXJfcGF0aWVudC5pZCBBUyBmaGlyX3BhdGllbnRfaWQsCiAgZmhpcl9wYXRpZW50Lm5hbWUsCiAgZGlhZ25vc2VzX3ZpZXcuY29kZSBBUyBkaWFnbm9zaXNfY29kZSwKICBkaWFnbm9zZXNfdmlldy5kaXNwbGF5IEFTIGRpYWdub3Npc19kaXNwbGF5CkZST00gb21vcF9wZXJzb24KSk9JTiBmaGlyX3BhdGllbnQKICBPTiBvbW9wX3BlcnNvbi5wZXJzb25faWQgPSBmaGlyX3BhdGllbnQubXJuCkpPSU4gZGlhZ25vc2VzX3ZpZXcKICBPTiBkaWFnbm9zZXNfdmlldy5wYXRpZW50X2lkID0gZmhpcl9wYXRpZW50LmlkCldIRVJFIG9tb3BfcGVyc29uLnNvdXJjZV9zeXN0ZW0gPSA6c291cmNlX3N5c3RlbQ=="
+
+
+Instance: DiabetesPatientsQuery
+InstanceOf: SQLQuery
+Description: "Selects patients with a condition whose code is a member of a diabetes value set, by joining a ViewDefinition table to a ValueSet dependency exposed as a relation."
+Usage: #example
+* name = "DiabetesPatientsQuery"
+* status = #active
+* title = "Diabetes Patients"
+* description = """
+Returns each patient with at least one condition whose code is a member of the
+`http://example.org/ValueSet/diabetes|2026` value set. The value set is declared
+as a dependency and the runner exposes it under the `diabetes_codes` label as a
+relation with the columns `system`, `version`, `code`, `display` and `inactive`
+(see [Terminology in SQL](terminology-in-sql.html)). Because the `conditions`
+view carries no code system version, membership is tested on `system` and
+`code` with a semi-join, which cannot multiply rows.
+
+```sql
+SELECT DISTINCT conditions.patient_id
+FROM conditions
+WHERE EXISTS (
+  SELECT 1
+  FROM diabetes_codes
+  WHERE diabetes_codes.system = conditions.system
+    AND diabetes_codes.code = conditions.code
+)
+```
+"""
+* relatedArtifact[+]
+  * type = #depends-on
+  * resource = "https://example.org/ViewDefinition/conditions"
+  * label = "conditions"
+  * display = "Condition view with patient_id, system, version and code columns"
+* relatedArtifact[+]
+  * type = #depends-on
+  * resource = "http://example.org/ValueSet/diabetes|2026"
+  * label = "diabetes_codes"
+  * display = "Diabetes value set, exposed as a relation"
+* content.contentType = #application/sql
+* content.extension[sql-text].valueString = """SELECT DISTINCT conditions.patient_id
+FROM conditions
+WHERE EXISTS (
+  SELECT 1
+  FROM diabetes_codes
+  WHERE diabetes_codes.system = conditions.system
+    AND diabetes_codes.code = conditions.code
+)"""
+* content.data = "U0VMRUNUIERJU1RJTkNUIGNvbmRpdGlvbnMucGF0aWVudF9pZApGUk9NIGNvbmRpdGlvbnMKV0hFUkUgRVhJU1RTICgKICBTRUxFQ1QgMQogIEZST00gZGlhYmV0ZXNfY29kZXMKICBXSEVSRSBkaWFiZXRlc19jb2Rlcy5zeXN0ZW0gPSBjb25kaXRpb25zLnN5c3RlbQogICAgQU5EIGRpYWJldGVzX2NvZGVzLmNvZGUgPSBjb25kaXRpb25zLmNvZGUKKQ=="

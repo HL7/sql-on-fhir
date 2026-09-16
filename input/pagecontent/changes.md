@@ -42,7 +42,8 @@ than a rewrite.
 
 **New capabilities.** Version 2.0.0 standardized a single layer, the flat view.
 The queries built on views, and the interface for asking a server to evaluate
-them, remained outside the specification. Version 3.0.0 adds both layers:
+them, remained outside the specification. Version 3.0.0 adds both, and gives
+queries access to terminology:
 
 - **Queries as artifacts.** `SQLQuery` packages one logical SQL query as a FHIR
   resource, with its dependencies declared as aliases, its parameters bound
@@ -51,6 +52,10 @@ them, remained outside the specification. Version 3.0.0 adds both layers:
   to be composed rather than duplicated.
 - **A standard API.** `$sql-run` returns rows synchronously and `$sql-export`
   produces files asynchronously, over both views and queries.
+- **Terminology in SQL.** A `SQLQuery` or `SQLView` can declare a `ValueSet` as
+  a dependency in the same way as a view, and the runner exposes the value set's
+  membership to the SQL as a relation with fixed columns, so that code
+  membership is tested with an ordinary join.
 
 These additions separate authoring from implementation and implementation from
 use: one party defines the analytics, any conforming engine evaluates them, any
@@ -233,6 +238,28 @@ SQLQuery: [#293](https://github.com/HL7/sql-on-fhir/pull/293) and
 [#291](https://github.com/HL7/sql-on-fhir/issues/291). SQLView:
 [#364](https://github.com/HL7/sql-on-fhir/pull/364), requested in
 [#329](https://github.com/HL7/sql-on-fhir/issues/329).
+
+#### Value set dependencies
+
+A `SQLQuery` or `SQLView` can declare a `ValueSet` as a `relatedArtifact`
+dependency alongside its views. The runner resolves the value set to its
+membership before any SQL runs and exposes it under the dependency's `label` as
+a relation with the columns `system`, `version`, `code`, `display` and
+`inactive`, unique on the first three. The SQL tests membership with a join or a
+semi-join and never names a canonical URL or a terminology server. The `context`
+parameter of both operations admits an inline `ValueSet`, matched to a
+dependency by canonical URL like a view. See
+[Terminology in SQL](terminology-in-sql.html).
+
+**Rationale.** A query over clinical data is very often a question about a
+value set, and SQL has no notion of one. A relation uses standard SQL, so it
+works on every engine and in every tool without a bespoke function vocabulary,
+and it makes membership inspectable and countable. How membership is computed -
+by a terminology server, a local store, a cached expansion or a package - is
+left to the terminology layer.
+
+Proposed in
+[ValueSet abstraction for SQL on FHIR](https://gist.github.com/niquola/0bc5f4c852cbe4a0194a84d1019a9361).
 
 #### `repeat`
 

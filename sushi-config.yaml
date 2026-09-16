@@ -72,6 +72,8 @@ pages:
     title: Operations Capability
   operations-common.md:
     title: Operations Common
+  terminology-in-sql.md:
+    title: Terminology in SQL
   changes.md:
     title: Changes
     extension:
@@ -129,6 +131,7 @@ menu:
   SQL:
     SQL Query: StructureDefinition-SQLQuery.html
     SQL View: StructureDefinition-SQLView.html
+    Terminology in SQL: terminology-in-sql.html
   Artifacts: artifacts.html
   Operations:
     Overview: operations.html

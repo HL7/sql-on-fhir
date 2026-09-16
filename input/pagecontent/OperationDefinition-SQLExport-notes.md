@@ -195,14 +195,16 @@ Supplying it where the subject is a ViewDefinition is rejected with
 
 ###### Supporting artifacts - `context` Parameter
 
-A subject's dependencies are named by its `relatedArtifact` entries and are
-normally resolved by the server. Where the server cannot resolve one - typically
-because the artifact exists only on the client - the client supplies it inline
-with `context`.
+A subject's dependencies - the views and value sets it reads - are named by its
+`relatedArtifact` entries and are normally resolved by the server. Where the
+server cannot resolve one - typically because the artifact exists only on the
+client - the client supplies it inline with `context`, which accepts a
+ViewDefinition, a SQLView or a ValueSet (see
+[Terminology in SQL](terminology-in-sql.html#inline)).
 
-| Name    | Type                       | Min | Max | Description                                                                                                     |
-| ------- | -------------------------- | --- | --- | ----------------------------------------------------------------------------------------------------------------- |
-| context | ViewDefinition \| SQLView² | 0   | \*  | Inline supporting artifact, matched to a dependency by canonical URL. [Details](operations-common.html#context) |
+| Name    | Type                                   | Min | Max | Description                                                                                                     |
+| ------- | -------------------------------------- | --- | --- | ----------------------------------------------------------------------------------------------------------------- |
+| context | ViewDefinition \| SQLView \| ValueSet² | 0   | \*  | Inline supporting artifact, matched to a dependency by canonical URL. [Details](operations-common.html#context) |
 
 {:.table-data}
 
@@ -478,6 +480,7 @@ either resolves it.
 | `404 Not Found`             | `not-found`     | -             | A status URL for a cancelled job                                                                                                                             |
 | `422 Unprocessable Entity`  | `invalid`       | `subject`     | A resolved artifact conforming to none of ViewDefinition, SQLQuery or SQLView                                                                                |
 | `422 Unprocessable Entity`  | `invalid`       | `subject`     | A conformant subject that cannot be processed, such as an SQL syntax error or an invalid FHIRPath expression                                                 |
+| `422 Unprocessable Entity`  | `invalid`       | -             | A ValueSet dependency that resolves, but whose membership the server cannot determine (see [Terminology in SQL](terminology-in-sql.html#membership-snapshot))    |
 | `429 Too Many Requests`     | `throttled`     | -             | Excessive polling; back off exponentially, guided by `Retry-After`                                                                                           |
 | `500 Internal Server Error` | `exception`     | -             | Unexpected server error; on the result URL, the failure outcome of the job                                                                                   |
 

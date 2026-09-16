@@ -9,28 +9,35 @@ content attachments while keeping parameters and aliases consistent.
 
 SQLQuery does not define table schemas, data extraction, execution behavior, or
 APIs; those belong to ViewDefinition and its operations.
-SQLQuery references ViewDefinitions and SQLViews; execution environments resolve
-these to physical or virtual tables. An SQLView is itself a reusable named query
-that other queries reference as a virtual table source, letting queries build on
-one another like SQL views (see [Query Composition](StructureDefinition-SQLQuery.html#notes)
-in the Notes tab).
+SQLQuery references ViewDefinitions, SQLViews and ValueSets; execution
+environments resolve these to physical or virtual tables. An SQLView is itself a
+reusable named query that other queries reference as a virtual table source,
+letting queries build on one another like SQL views (see [Query Composition](StructureDefinition-SQLQuery.html#notes)
+in the Notes tab). A ValueSet is exposed to the SQL as a relation of its member
+codes, so that a query tests code membership with an ordinary join (see
+[Terminology in SQL](terminology-in-sql.html)).
 
 ### Resource Content
 
 #### Dependencies
 
-Use `relatedArtifact` with `type = "depends-on"` to list required ViewDefinitions
-and SQLViews. Use `label` to define the table name in SQL. Each `resource` may
-be the canonical URL of a ViewDefinition or of an
-[SQLView](StructureDefinition-SQLView.html); the allowed targets are recorded as
-a `targetProfile` on `relatedArtifact.resource`.
+Use `relatedArtifact` with `type = "depends-on"` to list required ViewDefinitions,
+SQLViews and ValueSets. Use `label` to define the table name in SQL. Each
+`resource` may be the canonical URL of a ViewDefinition, of an
+[SQLView](StructureDefinition-SQLView.html) or of a ValueSet; the allowed targets
+are recorded as a `targetProfile` on `relatedArtifact.resource`.
 
 ```json
 "relatedArtifact": [
   { "type": "depends-on", "resource": "https://example.org/ViewDefinition/patient_view", "label": "patient" },
-  { "type": "depends-on", "resource": "http://hl7.org/fhir/uv/sql-on-fhir/Library/ActivePatientsView", "label": "active_patients" }
+  { "type": "depends-on", "resource": "http://hl7.org/fhir/uv/sql-on-fhir/Library/ActivePatientsView", "label": "active_patients" },
+  { "type": "depends-on", "resource": "http://example.org/ValueSet/diabetes|2026", "label": "diabetes_codes" }
 ]
 ```
+
+A ValueSet dependency is read as a relation with the columns `system`,
+`version`, `code`, `display` and `inactive`, as specified in
+[Terminology in SQL](terminology-in-sql.html#relation).
 
 #### Table Aliases
 
@@ -136,7 +143,7 @@ be supplied (subject to the constraint that every `contentType` starts with
   extension MAY carry a plain-text copy</span>
 - <span class="fhir-conformance" id="sqlquery-12">Dependencies SHALL use `relatedArtifact` with
   `type = "depends-on"` and `label`, each `resource` referencing a
-  ViewDefinition or an SQLView</span>
+  ViewDefinition, an SQLView or a ValueSet</span>
 - <span class="fhir-conformance" id="sqlquery-13">Parameters SHALL use `Library.parameter` with
   `use = "in"`</span>
 
