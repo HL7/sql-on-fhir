@@ -283,13 +283,13 @@ WHERE omop_person.source_system = :source_system"""
 
 Instance: CardiovascularDiseasePatientsQuery
 InstanceOf: SQLQuery
-Description: "Selects patients with a condition whose code is a member of a cardiovascular disease value set, by joining a ViewDefinition table to a ValueSet dependency exposed as a relation."
+Description: "Selects conditions whose code is a member of a cardiovascular disease value set, by joining a ViewDefinition table to a ValueSet dependency exposed as a relation."
 Usage: #example
 * name = "CardiovascularDiseasePatientsQuery"
 * status = #active
 * title = "Cardiovascular Disease Patients"
 * description = """
-Returns each patient with at least one condition whose code is a member of the
+Returns each condition whose code is a member of the
 `http://example.org/ValueSet/cardiovascular-disease|2026` value set. The value
 set is declared as a dependency and the runner exposes it under the `cvd_codes`
 label as a relation with the columns `system`, `version`, `code`, `display` and
@@ -298,7 +298,7 @@ label as a relation with the columns `system`, `version`, `code`, `display` and
 `system` and `code` with a semi-join, which cannot multiply rows.
 
 ```sql
-SELECT DISTINCT conditions.patient_id
+SELECT conditions.patient_id, conditions.code
 FROM conditions
 WHERE EXISTS (
   SELECT 1
@@ -319,7 +319,7 @@ WHERE EXISTS (
   * label = "cvd_codes"
   * display = "Cardiovascular disease value set, exposed as a relation"
 * content.contentType = #application/sql
-* content.extension[sql-text].valueString = """SELECT DISTINCT conditions.patient_id
+* content.extension[sql-text].valueString = """SELECT conditions.patient_id, conditions.code
 FROM conditions
 WHERE EXISTS (
   SELECT 1
@@ -327,4 +327,4 @@ WHERE EXISTS (
   WHERE cvd_codes.system = conditions.system
     AND cvd_codes.code = conditions.code
 )"""
-* content.data = "U0VMRUNUIERJU1RJTkNUIGNvbmRpdGlvbnMucGF0aWVudF9pZApGUk9NIGNvbmRpdGlvbnMKV0hFUkUgRVhJU1RTICgKICBTRUxFQ1QgMQogIEZST00gY3ZkX2NvZGVzCiAgV0hFUkUgY3ZkX2NvZGVzLnN5c3RlbSA9IGNvbmRpdGlvbnMuc3lzdGVtCiAgICBBTkQgY3ZkX2NvZGVzLmNvZGUgPSBjb25kaXRpb25zLmNvZGUKKQ=="
+* content.data = "U0VMRUNUIGNvbmRpdGlvbnMucGF0aWVudF9pZCwgY29uZGl0aW9ucy5jb2RlCkZST00gY29uZGl0aW9ucwpXSEVSRSBFWElTVFMgKAogIFNFTEVDVCAxCiAgRlJPTSBjdmRfY29kZXMKICBXSEVSRSBjdmRfY29kZXMuc3lzdGVtID0gY29uZGl0aW9ucy5zeXN0ZW0KICAgIEFORCBjdmRfY29kZXMuY29kZSA9IGNvbmRpdGlvbnMuY29kZQop"

@@ -125,14 +125,15 @@ the scope of this page.
 
 The examples below select from a `conditions` dependency with columns
 `patient_id`, `system`, `version` and `code`, and from two value set
-dependencies, `cvd_codes` and `excluded_codes`. Where both the source data
-and the relation carry a code system version, the membership test is a join on
-all three identifying columns; a null `version` on either side makes the
-comparison unknown and drops the row, so this form suits only data that is
-versioned throughout:
+dependencies, `cvd_codes` and `excluded_codes`. Each returns the matching
+condition rows themselves, so a condition that matches must appear exactly
+once. Where both the source data and the relation carry a code system version,
+the membership test is a join on all three identifying columns; a null
+`version` on either side makes the comparison unknown and drops the row, so
+this form suits only data that is versioned throughout:
 
 ```sql
-SELECT DISTINCT conditions.patient_id
+SELECT conditions.patient_id, conditions.code
 FROM conditions
 JOIN cvd_codes
   ON cvd_codes.system = conditions.system
@@ -144,11 +145,13 @@ Source data projected by a ViewDefinition rarely carries a version, because
 `Coding.version` is rarely populated, and the test is then on `system` and
 `code` alone. Because rows are unique on (`system`, `version`, `code`), the
 relation may hold the same code under two versions of one code system, and a
-`JOIN` on two columns would then return the condition row twice. A semi-join
-tests membership without multiplying rows:
+`JOIN` on two columns would then return the condition row twice. Applying
+`DISTINCT` to the output hides the duplication at the cost of a sort, and does
+not help an aggregate such as `COUNT(*)`, which has already counted the row
+twice. A semi-join tests membership without multiplying rows:
 
 ```sql
-SELECT DISTINCT conditions.patient_id
+SELECT conditions.patient_id, conditions.code
 FROM conditions
 WHERE EXISTS (
   SELECT 1
@@ -351,7 +354,7 @@ The `2026` in the canonical URL is the value set's version; the `2019` in the
 second row is the version of the ICD-10 code system its expansion was computed
 against. The two are independent, which is why the relation records the latter.
 
-The query is the semi-join shown [above](#joining), and returns `p1` and `p2`:
-their codes are members, and `73211009` (diabetes mellitus) is not. Had the
-runner been unable to resolve the value set, the request would have failed before
-the SQL ran, rather than returning no patients.
+The query is the semi-join shown [above](#joining), and returns the `p1` and
+`p2` rows: their codes are members, and `73211009` (diabetes mellitus) is not.
+Had the runner been unable to resolve the value set, the request would have
+failed before the SQL ran, rather than returning no patients.
