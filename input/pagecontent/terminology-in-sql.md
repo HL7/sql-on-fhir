@@ -81,7 +81,7 @@ is the dependency's `label` and whose columns are:
 | `version`  | `CHARACTER VARYING` | Yes  | Version of that code system used to determine membership; null where no version was recorded        |
 | `code`     | `CHARACTER VARYING` | No   | The member code                                                                                     |
 | `display`  | `CHARACTER VARYING` | Yes  | Display text for the code, informative only                                                         |
-| `inactive` | `BOOLEAN`           | Yes  | `true` where the code is inactive in the code system version used; null where inactivity was not recorded |
+| `inactive` | `BOOLEAN`           | Yes  | `true` where the code is inactive in the code system version used; null where the expansion does not say, which is the normal case for an active code |
 
 {:.table-data}
 
@@ -116,17 +116,22 @@ depth of nesting, whose `abstract` is not `true`, populated from such an entry's
 row.</span> Nesting in an expansion is presentational, so a nested entry is as
 much a member as a top-level one, and a code that a hierarchical expansion lists
 under two parents is one member, not two. An inactive code the expansion
-includes is a member; the `inactive` column lets a query exclude it. Whether
-inactive codes appear in the expansion at all is decided when the value set is
-expanded, which is outside the scope of this page.
+includes is a member. The `inactive` column lets a query exclude it, but
+because FHIR populates `contains.inactive` only for inactive codes, the column is
+null rather than `false` for an active code, and a filter must admit null:
+`inactive IS NULL OR inactive = FALSE`. Whether inactive codes appear in the
+expansion at all is decided when the value set is expanded, which is outside
+the scope of this page.
 
 ## Joining to a value set {#joining}
 
 The examples below select from a `conditions` dependency with columns
 `patient_id`, `system`, `version` and `code`, and from two value set
-dependencies, `diabetes_codes` and `excluded_codes`. Where the source data
-carries a code system version, the membership test is a join on all three
-identifying columns:
+dependencies, `diabetes_codes` and `excluded_codes`. Where both the source data
+and the relation carry a code system version, the membership test is a join on
+all three identifying columns; a null `version` on either side makes the
+comparison unknown and drops the row, so this form suits only data that is
+versioned throughout:
 
 ```sql
 SELECT DISTINCT conditions.patient_id
@@ -225,9 +230,10 @@ the runner cannot determine the value set's membership - the runner SHALL fail
 the request before executing any SQL.</span> Executing with a partial or empty
 membership would return rows that are wrong rather than a request that is
 rejected. In the [operations](operations.html), a canonical URL that cannot be
-resolved is rejected with `404 Not Found`, as for any other dependency, and a
-value set that resolves but whose membership the server cannot determine is
-rejected with `422 Unprocessable Entity`; see
+resolved, or cannot be resolved to a single version, is rejected with
+`404 Not Found`, as for any other dependency, and a value set that resolves but
+whose membership the server cannot determine is rejected with
+`422 Unprocessable Entity`; see
 [Rejected requests](operations-common.html#context-errors). On `$sql-export`
 both are kick-off rejections, made before the job is accepted, like every other
 dependency failure.
@@ -315,15 +321,13 @@ inline would carry. The expansion records the code system versions it used as
             "system": "http://snomed.info/sct",
             "version": "http://snomed.info/sct/900000000000207008/version/20260201",
             "code": "73211009",
-            "display": "Diabetes mellitus",
-            "inactive": false
+            "display": "Diabetes mellitus"
           },
           {
             "system": "http://hl7.org/fhir/sid/icd-10",
             "version": "2019",
             "code": "E11",
-            "display": "Type 2 diabetes mellitus",
-            "inactive": false
+            "display": "Type 2 diabetes mellitus"
           }
         ]
       }
@@ -334,12 +338,13 @@ inline would carry. The expansion records the code system versions it used as
 
 The abstract entry is navigational and contributes no row; the two nested
 entries are members, so the runner exposes the relation `diabetes_codes` with
-two rows:
+two rows. Neither entry carries `inactive`, as is usual for an active code, so
+the column is null:
 
 | system                           | version                                                      | code       | display                    | inactive |
 | -------------------------------- | ------------------------------------------------------------ | ---------- | -------------------------- | -------- |
-| `http://snomed.info/sct`         | `http://snomed.info/sct/900000000000207008/version/20260201` | `73211009` | `Diabetes mellitus`        | `false`  |
-| `http://hl7.org/fhir/sid/icd-10` | `2019`                                                       | `E11`      | `Type 2 diabetes mellitus` | `false`  |
+| `http://snomed.info/sct`         | `http://snomed.info/sct/900000000000207008/version/20260201` | `73211009` | `Diabetes mellitus`        |          |
+| `http://hl7.org/fhir/sid/icd-10` | `2019`                                                       | `E11`      | `Type 2 diabetes mellitus` |          |
 
 {:.table-data}
 
