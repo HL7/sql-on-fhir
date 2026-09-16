@@ -496,10 +496,11 @@ value, the subject failure is the more fundamental: the response is
 
 Invalid requests are rejected **synchronously at kick-off** - bad or unsupported
 parameters, authorization failures, unresolvable subjects, unresolvable
-dependencies and unmatched `context` entries alike. Rejection is never deferred
-to the status URL. The status endpoint reflects polling machinery only; it never
-communicates the job's outcome, which is why a finished job returns
-`303 See Other` whether it succeeded or failed.
+dependencies, value set dependencies whose membership cannot be determined, and
+unmatched `context` entries alike. Rejection is never deferred to the status
+URL. The status endpoint reflects polling machinery only; it never communicates
+the job's outcome, which is why a finished job returns `303 See Other` whether
+it succeeded or failed.
 
 ##### Common Error Scenarios
 

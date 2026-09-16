@@ -81,9 +81,9 @@ flat tables, and SQLQuery joins and aggregates them using native SQL.
 
 The profile supports multiple dialect-specific SQL variants of the same logical
 query, parameterized queries with safe binding, and table aliases that map to
-ViewDefinition outputs. A query can also declare a ValueSet as a dependency, and
-the runner exposes the value set's membership as a relation the SQL joins to;
-see [Terminology in SQL](terminology-in-sql.html). See the
+ViewDefinition outputs. A query can also declare a ValueSet as a dependency
+whose membership the runner exposes as a relation the SQL joins to
+([Terminology in SQL](terminology-in-sql.html)). See the
 [SQLQuery profile](StructureDefinition-SQLQuery.html) for details.
 
 #### HTTP API

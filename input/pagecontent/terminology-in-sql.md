@@ -85,21 +85,21 @@ is the dependency's `label` and whose columns are:
 
 {:.table-data}
 
-The types are those the
-[default type mappings](StructureDefinition-ViewDefinition.html#default-type-mappings)
-assign to `uri`, `string`, `code` and `boolean`, and a runner without native SQL
-types maps them to the closest equivalent in the same way.
-
 <span class="fhir-conformance" id="term-4">A runner executing a SQLQuery or
 SQLView that declares a value set dependency SHALL make the value set available
 under the dependency's `label` as a relation having at least the columns
-`system`, `version`, `code`, `display` and `inactive`, with the types and
-nullability above.</span>
-<span class="fhir-conformance" id="term-5">A runner MAY add further columns to
+`system`, `version`, `code`, `display` and `inactive`, of which `system` and
+`code` are never null.</span>
+<span class="fhir-conformance" id="term-5">The columns SHOULD carry the types
+above, which are those the
+[default type mappings](StructureDefinition-ViewDefinition.html#default-type-mappings)
+assign to `uri`, `string`, `code` and `boolean`; a runner without native SQL
+types SHOULD map them to the closest equivalent in its output format.</span>
+<span class="fhir-conformance" id="term-6">A runner MAY add further columns to
 the relation; authors SHOULD NOT rely on any column other than these
 five.</span>
 
-<span class="fhir-conformance" id="term-6">Each row of the relation SHALL
+<span class="fhir-conformance" id="term-7">Each row of the relation SHALL
 represent one member of the value set, identified by (`system`, `version`,
 `code`), and the relation SHALL contain no two rows with the same `system`,
 `version` and `code`, two null `version` values counting as equal.</span> A
@@ -107,7 +107,7 @@ value set with no members yields a relation with no rows; that is not an error.
 
 Membership is what a FHIR expansion records, and the relation is its tabular
 form.
-<span class="fhir-conformance" id="term-7">Where the runner holds the value set
+<span class="fhir-conformance" id="term-8">Where the runner holds the value set
 as a `ValueSet.expansion`, the relation SHALL contain one row for each distinct
 (`system`, `version`, `code`) among the `expansion.contains` entries, at any
 depth of nesting, whose `abstract` is not `true`, populated from such an entry's
@@ -123,9 +123,10 @@ expanded, which is outside the scope of this page.
 ## Joining to a value set {#joining}
 
 The examples below select from a `conditions` dependency with columns
-`patient_id`, `system`, `version` and `code`, and a `diabetes_codes` value set
-dependency. Where the source data carries a code system version, the membership
-test is a join on all three identifying columns:
+`patient_id`, `system`, `version` and `code`, and from two value set
+dependencies, `diabetes_codes` and `excluded_codes`. Where the source data
+carries a code system version, the membership test is a join on all three
+identifying columns:
 
 ```sql
 SELECT DISTINCT conditions.patient_id
@@ -154,7 +155,7 @@ WHERE EXISTS (
 )
 ```
 
-<span class="fhir-conformance" id="term-8">Where a query needs only a membership
+<span class="fhir-conformance" id="term-9">Where a query needs only a membership
 test, authors SHOULD express it as a semi-join (`EXISTS`) rather than a
 `JOIN`.</span>
 
@@ -176,13 +177,18 @@ WHERE NOT EXISTS (
 ```
 
 Because the value set is a table, everything SQL does with a table applies. A
-join carries the display text into the output:
+join carries the display text into the output. It is a join rather than a
+semi-join, so it is subject to the multiplication described above: with
+versioned source data the `version` predicate makes each match unique, and with
+unversioned source data a code listed under two versions yields two rows unless
+the query selects one version or applies `DISTINCT`.
 
 ```sql
 SELECT conditions.patient_id, conditions.code, diabetes_codes.display
 FROM conditions
 JOIN diabetes_codes
   ON diabetes_codes.system = conditions.system
+ AND diabetes_codes.version = conditions.version
  AND diabetes_codes.code = conditions.code
 ```
 
@@ -201,7 +207,7 @@ joins.
 
 A job is one `$sql-run` invocation, or one `$sql-export` job across all of its
 subjects.
-<span class="fhir-conformance" id="term-9">Within one job, every value set
+<span class="fhir-conformance" id="term-10">Within one job, every value set
 dependency SHALL be resolved to a single membership before any SQL executes, and
 every reference to that value set within the job SHALL see that same
 membership.</span> This is the terminology counterpart of the data
@@ -212,7 +218,7 @@ see the same relation.
 
 Resolution proceeds from the canonical URL, with its version where pinned, to a
 ValueSet, and from the ValueSet to its membership.
-<span class="fhir-conformance" id="term-10">Where a value set dependency cannot
+<span class="fhir-conformance" id="term-11">Where a value set dependency cannot
 be resolved to a single membership - because the canonical URL cannot be
 resolved, because the runner cannot determine which version to use, or because
 the runner cannot determine the value set's membership - the runner SHALL fail
@@ -222,10 +228,12 @@ rejected. In the [operations](operations.html), a canonical URL that cannot be
 resolved is rejected with `404 Not Found`, as for any other dependency, and a
 value set that resolves but whose membership the server cannot determine is
 rejected with `422 Unprocessable Entity`; see
-[Rejected requests](operations-common.html#context-errors).
+[Rejected requests](operations-common.html#context-errors). On `$sql-export`
+both are kick-off rejections, made before the job is accepted, like every other
+dependency failure.
 
 A membership is reproducible only if what produced it is known.
-<span class="fhir-conformance" id="term-11">For each value set dependency of a
+<span class="fhir-conformance" id="term-12">For each value set dependency of a
 job, a runner SHOULD record the canonical URL and version of the ValueSet
 resolved, the versions of the code systems and of any nested value sets used to
 compute membership, any expansion parameters that affect membership, the
@@ -246,12 +254,12 @@ one, under the rules in
 [Supporting artifacts](operations-common.html#context). A ValueSet is a leaf of
 the dependency graph: it contributes no dependencies of its own.
 
-<span class="fhir-conformance" id="term-12">Where a supplied ValueSet carries an
+<span class="fhir-conformance" id="term-13">Where a supplied ValueSet carries an
 `expansion`, the runner SHALL derive membership from that expansion rather than
 expanding the value set itself.</span> A client that supplies an expansion
 states the membership it intends, in the same way that a supplied ViewDefinition
 states the view it intends.
-<span class="fhir-conformance" id="term-13">An expansion that is incomplete - one
+<span class="fhir-conformance" id="term-14">An expansion that is incomplete - one
 carrying an `offset`, or whose `total` exceeds the number of `contains` entries
 at all depths - does not determine membership, and the request SHALL be rejected
 as a value set whose membership cannot be determined.</span> A supplied ValueSet
@@ -272,15 +280,72 @@ produces:
 
 {:.table-data}
 
-and the runner resolves `http://example.org/ValueSet/diabetes|2026` to an
-expansion of two concepts, which it exposes as the relation `diabetes_codes`:
+and the runner resolves `http://example.org/ValueSet/diabetes|2026` to the
+following ValueSet. This is also what a `context` entry supplying the value set
+inline would carry. The expansion records the code system versions it used as
+`parameter` entries, and lists its two members under an abstract grouping entry:
 
-| system                           | version                                              | code       | display             | inactive |
-| -------------------------------- | ---------------------------------------------------- | ---------- | ------------------- | -------- |
-| `http://snomed.info/sct`         | `http://snomed.info/sct/900000000000207008/version/20260201` | `73211009` | `Diabetes mellitus` | `false`  |
-| `http://hl7.org/fhir/sid/icd-10` | `2026`                                               | `E11`      | `Type 2 diabetes mellitus` | `false`  |
+```json
+{
+  "resourceType": "ValueSet",
+  "url": "http://example.org/ValueSet/diabetes",
+  "version": "2026",
+  "name": "Diabetes",
+  "status": "active",
+  "expansion": {
+    "identifier": "urn:uuid:635ad7e4-4f98-48ef-a3c2-1e3af6cc03ec",
+    "timestamp": "2026-09-16T00:00:00Z",
+    "total": 3,
+    "parameter": [
+      {
+        "name": "version",
+        "valueUri": "http://snomed.info/sct|http://snomed.info/sct/900000000000207008/version/20260201"
+      },
+      {
+        "name": "version",
+        "valueUri": "http://hl7.org/fhir/sid/icd-10|2019"
+      }
+    ],
+    "contains": [
+      {
+        "abstract": true,
+        "display": "Diabetes mellitus",
+        "contains": [
+          {
+            "system": "http://snomed.info/sct",
+            "version": "http://snomed.info/sct/900000000000207008/version/20260201",
+            "code": "73211009",
+            "display": "Diabetes mellitus",
+            "inactive": false
+          },
+          {
+            "system": "http://hl7.org/fhir/sid/icd-10",
+            "version": "2019",
+            "code": "E11",
+            "display": "Type 2 diabetes mellitus",
+            "inactive": false
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+The abstract entry is navigational and contributes no row; the two nested
+entries are members, so the runner exposes the relation `diabetes_codes` with
+two rows:
+
+| system                           | version                                                      | code       | display                    | inactive |
+| -------------------------------- | ------------------------------------------------------------ | ---------- | -------------------------- | -------- |
+| `http://snomed.info/sct`         | `http://snomed.info/sct/900000000000207008/version/20260201` | `73211009` | `Diabetes mellitus`        | `false`  |
+| `http://hl7.org/fhir/sid/icd-10` | `2019`                                                       | `E11`      | `Type 2 diabetes mellitus` | `false`  |
 
 {:.table-data}
+
+The `2026` in the canonical URL is the value set's version; the `2019` in the
+second row is the version of the ICD-10 code system its expansion was computed
+against. The two are independent, which is why the relation records the latter.
 
 The query is the semi-join shown [above](#joining), and returns `p1` and `p2`:
 their codes are members, and `22298006` (myocardial infarction) is not. Had the

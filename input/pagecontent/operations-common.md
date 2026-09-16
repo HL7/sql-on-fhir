@@ -62,7 +62,7 @@ declared type now has to cover both. `subjectResource` therefore declares
 [ViewDefinition](StructureDefinition-ViewDefinition.html),
 [SQLQuery](StructureDefinition-SQLQuery.html) and
 [SQLView](StructureDefinition-SQLView.html); `context` declares the same type
-with a `targetProfile` naming ViewDefinition and SQLView.
+with a `targetProfile` naming ViewDefinition, SQLView and ValueSet.
 
 ## Output Formats (`_format`) {#output-formats}
 
