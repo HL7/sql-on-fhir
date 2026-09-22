@@ -52,10 +52,11 @@ queries access to terminology:
   to be composed rather than duplicated.
 - **A standard API.** `$sql-run` returns rows synchronously and `$sql-export`
   produces files asynchronously, over both views and queries.
-- **Terminology in SQL.** A `SQLQuery` or `SQLView` can declare a `ValueSet` as
-  a dependency in the same way as a view, and the runner exposes the value set's
-  membership to the SQL as a relation with fixed columns, so that code
-  membership is tested with an ordinary join.
+- **Terminology in SQL.** A `SQLQuery` or `SQLView` can declare a `ValueSet` or
+  a `ConceptMap` as a dependency in the same way as a view, and the runner
+  exposes the value set's membership or the concept map's mappings to the SQL
+  as a relation with fixed columns, so that code membership is tested, and
+  codes are translated, with an ordinary join.
 
 These additions separate authoring from implementation and implementation from
 use: one party defines the analytics, any conforming engine evaluates them, any
@@ -239,23 +240,34 @@ SQLQuery: [#293](https://github.com/HL7/sql-on-fhir/pull/293) and
 [#364](https://github.com/HL7/sql-on-fhir/pull/364), requested in
 [#329](https://github.com/HL7/sql-on-fhir/issues/329).
 
-#### Value set dependencies
+#### Value set and concept map dependencies
 
-A `SQLQuery` or `SQLView` can declare a `ValueSet` as a `relatedArtifact`
-dependency alongside its views. The runner resolves the value set to its
-membership before any SQL runs and exposes it under the dependency's `label` as
-a relation with the columns `system`, `version`, `code`, `display` and
-`inactive`, unique on the first three. The SQL tests membership with a join or a
-semi-join and never names a canonical URL or a terminology server. The `context`
-parameter of both operations admits an inline `ValueSet`, matched to a
-dependency by canonical URL like a view. See
+A `SQLQuery` or `SQLView` can declare a `ValueSet` or a `ConceptMap` as a
+`relatedArtifact` dependency alongside its views. The runner resolves the
+artifact before any SQL runs and exposes it under the dependency's `label` as a
+relation. A value set becomes a relation with the columns `system`, `version`,
+`code`, `display` and `inactive`, unique on the first three, and the SQL tests
+membership with a join or a semi-join. A concept map becomes a relation with one
+row per mapping, with the columns `source_system`, `source_version`,
+`source_code`, `source_display`, `target_system`, `target_version`,
+`target_code`, `target_display` and `relationship`, and the SQL translates a
+code with a join; a source code the map states has no mapping is a row with a
+null target. A map whose content no flat row can carry - a conditional
+mapping, a mapping with products, or a value set in place of a code - is
+rejected rather than exposed incompletely, and a group's `unmapped` default is
+not applied. The SQL never names a canonical URL or a terminology server. The
+`context` parameter of both operations admits an inline `ValueSet` or
+`ConceptMap`, matched to a dependency by canonical URL like a view. See
 [Terminology in SQL](terminology-in-sql.html).
 
 **Rationale.** A query over clinical data is very often a question about a
-value set, and SQL has no notion of one. A relation uses standard SQL, so it
-works on every engine and in every tool without a bespoke function vocabulary,
-and it makes membership inspectable and countable. How membership is computed -
-by a terminology server, a local store, a cached expansion or a package - is
+value set, or a report that needs codes in a classification other than the one
+they were recorded in, and SQL has no notion of either. A relation uses
+standard SQL, so it works on every engine and in every tool without a bespoke
+function vocabulary, and it makes membership and mappings inspectable and
+countable; the same map translates in either direction by joining on the other
+side. How membership is computed - by a terminology server, a local store, a
+cached expansion or a package - and where a concept map is obtained from are
 left to the terminology layer.
 
 Proposed in

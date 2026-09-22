@@ -328,3 +328,60 @@ WHERE EXISTS (
     AND cvd_codes.code = conditions.code
 )"""
 * content.data = "U0VMRUNUIGNvbmRpdGlvbnMucGF0aWVudF9pZCwgY29uZGl0aW9ucy5jb2RlCkZST00gY29uZGl0aW9ucwpXSEVSRSBFWElTVFMgKAogIFNFTEVDVCAxCiAgRlJPTSBjdmRfY29kZXMKICBXSEVSRSBjdmRfY29kZXMuc3lzdGVtID0gY29uZGl0aW9ucy5zeXN0ZW0KICAgIEFORCBjdmRfY29kZXMuY29kZSA9IGNvbmRpdGlvbnMuY29kZQop"
+
+
+Instance: ConditionsToIcd10Query
+InstanceOf: SQLQuery
+Description: "Translates each condition's SNOMED CT code to ICD-10 by left-joining a ViewDefinition table to a ConceptMap dependency exposed as a relation, keeping the conditions the map does not translate."
+Usage: #example
+* name = "ConditionsToIcd10Query"
+* status = #active
+* title = "Conditions Translated to ICD-10"
+* description = """
+Returns each condition with the ICD-10 code its SNOMED CT code maps to under
+the `http://example.org/ConceptMap/sct-to-icd10|2026` concept map. The map is
+declared as a dependency and the runner exposes it under the `sct_to_icd10`
+label as a relation with the columns `source_system`, `source_version`,
+`source_code`, `source_display`, `target_system`, `target_version`,
+`target_code`, `target_display` and `relationship` (see
+[Terminology in SQL](terminology-in-sql.html#concept-map-relation)). The
+`LEFT JOIN` keeps conditions the map does not translate, with a null
+`target_code`; the `relationship` predicate excludes rows asserting that a
+target is not related to the source, and admits null so that a `noMap` row is
+kept.
+
+```sql
+SELECT conditions.patient_id,
+       conditions.code,
+       sct_to_icd10.target_code,
+       sct_to_icd10.relationship
+FROM conditions
+LEFT JOIN sct_to_icd10
+  ON sct_to_icd10.source_system = conditions.system
+ AND sct_to_icd10.source_code = conditions.code
+ AND (sct_to_icd10.relationship IS NULL
+      OR sct_to_icd10.relationship <> 'not-related-to')
+```
+"""
+* relatedArtifact[+]
+  * type = #depends-on
+  * resource = "https://example.org/ViewDefinition/conditions"
+  * label = "conditions"
+  * display = "Condition view with patient_id, system, version and code columns"
+* relatedArtifact[+]
+  * type = #depends-on
+  * resource = "http://example.org/ConceptMap/sct-to-icd10|2026"
+  * label = "sct_to_icd10"
+  * display = "SNOMED CT to ICD-10 concept map, exposed as a relation"
+* content.contentType = #application/sql
+* content.extension[sql-text].valueString = """SELECT conditions.patient_id,
+       conditions.code,
+       sct_to_icd10.target_code,
+       sct_to_icd10.relationship
+FROM conditions
+LEFT JOIN sct_to_icd10
+  ON sct_to_icd10.source_system = conditions.system
+ AND sct_to_icd10.source_code = conditions.code
+ AND (sct_to_icd10.relationship IS NULL
+      OR sct_to_icd10.relationship <> 'not-related-to')"""
+* content.data = "U0VMRUNUIGNvbmRpdGlvbnMucGF0aWVudF9pZCwKICAgICAgIGNvbmRpdGlvbnMuY29kZSwKICAgICAgIHNjdF90b19pY2QxMC50YXJnZXRfY29kZSwKICAgICAgIHNjdF90b19pY2QxMC5yZWxhdGlvbnNoaXAKRlJPTSBjb25kaXRpb25zCkxFRlQgSk9JTiBzY3RfdG9faWNkMTAKICBPTiBzY3RfdG9faWNkMTAuc291cmNlX3N5c3RlbSA9IGNvbmRpdGlvbnMuc3lzdGVtCiBBTkQgc2N0X3RvX2ljZDEwLnNvdXJjZV9jb2RlID0gY29uZGl0aW9ucy5jb2RlCiBBTkQgKHNjdF90b19pY2QxMC5yZWxhdGlvbnNoaXAgSVMgTlVMTAogICAgICBPUiBzY3RfdG9faWNkMTAucmVsYXRpb25zaGlwIDw+ICdub3QtcmVsYXRlZC10bycp"

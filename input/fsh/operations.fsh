@@ -64,7 +64,8 @@ Description: "Execute a ViewDefinition, SQLQuery Library or SQLView Library and 
 * parameter[=].targetProfile[0] = Canonical(ViewDefinition)
 * parameter[=].targetProfile[1] = Canonical(SQLView)
 * parameter[=].targetProfile[2] = Canonical(ValueSet)
-* parameter[=].documentation = "Supporting artifacts the server cannot itself resolve, supplied inline and matched by canonical URL against the dependencies in the subject's transitive relatedArtifact graph: a ViewDefinition, a SQLView, or a ValueSet whose membership the SQL reads as a relation (see Terminology in SQL, terminology-in-sql.html). Accepts inline resources only; there is no context by canonical URL, because a URL is exactly what the server has already failed to resolve. Carries a resource, so it requires POST. See Common Operation Behavior (operations-common.html#context)."
+* parameter[=].targetProfile[3] = Canonical(ConceptMap)
+* parameter[=].documentation = "Supporting artifacts the server cannot itself resolve, supplied inline and matched by canonical URL against the dependencies in the subject's transitive relatedArtifact graph: a ViewDefinition, a SQLView, or a ValueSet or ConceptMap whose content the SQL reads as a relation (see Terminology in SQL, terminology-in-sql.html). Accepts inline resources only; there is no context by canonical URL, because a URL is exactly what the server has already failed to resolve. Carries a resource, so it requires POST. See Common Operation Behavior (operations-common.html#context)."
 
 * parameter[+].name = #resource
 * parameter[=].use = #in
@@ -207,7 +208,8 @@ Description: "Export one or more ViewDefinitions, SQLQuery Libraries and SQLView
 * parameter[=].targetProfile[0] = Canonical(ViewDefinition)
 * parameter[=].targetProfile[1] = Canonical(SQLView)
 * parameter[=].targetProfile[2] = Canonical(ValueSet)
-* parameter[=].documentation = "Supporting artifacts the server cannot itself resolve, supplied inline and matched by canonical URL against the dependencies in the subjects' transitive relatedArtifact graphs: a ViewDefinition, a SQLView, or a ValueSet whose membership the SQL reads as a relation (see Terminology in SQL, terminology-in-sql.html). Applies to the job as a whole rather than to one subject, so an artifact several subjects depend on is supplied once. Accepts inline resources only; there is no context by canonical URL, because a URL is exactly what the server has already failed to resolve. A context entry produces no output entry. See Common Operation Behavior (operations-common.html#context)."
+* parameter[=].targetProfile[3] = Canonical(ConceptMap)
+* parameter[=].documentation = "Supporting artifacts the server cannot itself resolve, supplied inline and matched by canonical URL against the dependencies in the subjects' transitive relatedArtifact graphs: a ViewDefinition, a SQLView, or a ValueSet or ConceptMap whose content the SQL reads as a relation (see Terminology in SQL, terminology-in-sql.html). Applies to the job as a whole rather than to one subject, so an artifact several subjects depend on is supplied once. Accepts inline resources only; there is no context by canonical URL, because a URL is exactly what the server has already failed to resolve. A context entry produces no output entry. See Common Operation Behavior (operations-common.html#context)."
 
 // Input parameters - export control
 * parameter[+].name = #clientTrackingId

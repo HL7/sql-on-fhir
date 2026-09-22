@@ -9,12 +9,14 @@ content attachments while keeping parameters and aliases consistent.
 
 SQLQuery does not define table schemas, data extraction, execution behavior, or
 APIs; those belong to ViewDefinition and its operations.
-SQLQuery references ViewDefinitions, SQLViews and ValueSets; execution
-environments resolve these to physical or virtual tables. An SQLView is itself a
-reusable named query that other queries reference as a virtual table source,
-letting queries build on one another like SQL views (see [Query Composition](StructureDefinition-SQLQuery.html#notes)
-in the Notes tab). A ValueSet is exposed to the SQL as a relation of its member
-codes, so that a query tests code membership with an ordinary join (see
+SQLQuery references ViewDefinitions, SQLViews, ValueSets and ConceptMaps;
+execution environments resolve these to physical or virtual tables. An SQLView
+is itself a reusable named query that other queries reference as a virtual
+table source, letting queries build on one another like SQL views (see
+[Query Composition](StructureDefinition-SQLQuery.html#notes) in the Notes tab).
+A ValueSet is exposed to the SQL as a relation of its member codes, so that a
+query tests code membership with an ordinary join, and a ConceptMap as a
+relation of its mappings, so that a query translates codes the same way (see
 [Terminology in SQL](terminology-in-sql.html)).
 
 ### Resource Content
@@ -22,22 +24,27 @@ codes, so that a query tests code membership with an ordinary join (see
 #### Dependencies
 
 Use `relatedArtifact` with `type = "depends-on"` to list required ViewDefinitions,
-SQLViews and ValueSets. Use `label` to define the table name in SQL. Each
-`resource` may be the canonical URL of a ViewDefinition, of an
-[SQLView](StructureDefinition-SQLView.html) or of a ValueSet; the allowed targets
-are recorded as a `targetProfile` on `relatedArtifact.resource`.
+SQLViews, ValueSets and ConceptMaps. Use `label` to define the table name in
+SQL. Each `resource` may be the canonical URL of a ViewDefinition, of an
+[SQLView](StructureDefinition-SQLView.html), of a ValueSet or of a ConceptMap;
+the allowed targets are recorded as a `targetProfile` on
+`relatedArtifact.resource`.
 
 ```json
 "relatedArtifact": [
   { "type": "depends-on", "resource": "https://example.org/ViewDefinition/patient_view", "label": "patient" },
   { "type": "depends-on", "resource": "http://hl7.org/fhir/uv/sql-on-fhir/Library/ActivePatientsView", "label": "active_patients" },
-  { "type": "depends-on", "resource": "http://example.org/ValueSet/cardiovascular-disease|2026", "label": "cvd_codes" }
+  { "type": "depends-on", "resource": "http://example.org/ValueSet/cardiovascular-disease|2026", "label": "cvd_codes" },
+  { "type": "depends-on", "resource": "http://example.org/ConceptMap/sct-to-icd10|2026", "label": "sct_to_icd10" }
 ]
 ```
 
 A ValueSet dependency is read as a relation with the columns `system`,
-`version`, `code`, `display` and `inactive`, as specified in
-[Terminology in SQL](terminology-in-sql.html#relation).
+`version`, `code`, `display` and `inactive`, and a ConceptMap dependency as a
+relation with the columns `source_system`, `source_version`, `source_code`,
+`source_display`, `target_system`, `target_version`, `target_code`,
+`target_display` and `relationship`, as specified in
+[Terminology in SQL](terminology-in-sql.html).
 
 #### Table Aliases
 
@@ -143,7 +150,7 @@ be supplied (subject to the constraint that every `contentType` starts with
   extension MAY carry a plain-text copy</span>
 - <span class="fhir-conformance" id="sqlquery-12">Dependencies SHALL use `relatedArtifact` with
   `type = "depends-on"` and `label`, each `resource` referencing a
-  ViewDefinition, an SQLView or a ValueSet</span>
+  ViewDefinition, an SQLView, a ValueSet or a ConceptMap</span>
 - <span class="fhir-conformance" id="sqlquery-13">Parameters SHALL use `Library.parameter` with
   `use = "in"`</span>
 

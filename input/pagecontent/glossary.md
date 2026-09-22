@@ -36,9 +36,21 @@ A named collection of codes and their meanings, such as SNOMED CT, LOINC or
 ICD-10, identified in FHIR by a canonical URL (for example
 `http://snomed.info/sct`). A code is meaningful only together with the code
 system it belongs to, which is why a coded value in FHIR carries both a `system`
-and a `code`, and why a value set relation identifies a member by both. Code
+and a `code`, and why a terminology relation identifies a code by both. Code
 systems are versioned, and a code's meaning or active status may differ between
 versions.
+
+
+### concept map
+
+A set of assertions about how the codes of one code system relate to those of
+another, such as which ICD-10 code a SNOMED CT diagnosis code maps to; defined
+in FHIR by the `ConceptMap` resource and identified by canonical URL. Each
+assertion names a source code, a target code and a relationship between them,
+or states that a source code has no mapping. Finding the target code that a
+source code maps to is _translation_. A SQLQuery or SQLView declares a concept
+map as a dependency and reads its mappings as a relation; see
+[Terminology in SQL](terminology-in-sql.html).
 
 
 ### data layer
@@ -101,9 +113,9 @@ This specification is distributed as `hl7.fhir.uv.sql-on-fhir`. Published versio
 
 A table in the relational sense: a set of rows sharing one fixed set of typed
 columns, whether the rows are stored or computed on demand. In this
-specification the term names what a runner exposes for a value set dependency,
-because the emphasis is on the shape and invariants of the rows rather than on
-any stored table.
+specification the term names what a runner exposes for a value set or concept
+map dependency, because the emphasis is on the shape and invariants of the rows
+rather than on any stored table.
 
 
 ### snapshot
