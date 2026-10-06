@@ -41,30 +41,38 @@
           "path": "text",
           "name": "item_text",
           "description": "Question text"
-        },
-        {
-          "path": "answer.value.ofType(string)",
-          "name": "answer_value_string",
-          "description": "String answer value"
-        },
-        {
-          "path": "answer.value.ofType(integer)",
-          "name": "answer_value_integer",
-          "description": "Integer answer value"
-        },
-        {
-          "path": "answer.value.ofType(boolean)",
-          "name": "answer_value_boolean",
-          "description": "Boolean answer value"
-        },
-        {
-          "path": "answer.value.ofType(date)",
-          "name": "answer_value_date",
-          "description": "Date answer value"
         }
       ],
       "repeat": [
-        "item"
+        "item",
+        "answer.item"
+      ],
+      "select": [
+        {
+          "column": [
+            {
+              "path": "value.ofType(string)",
+              "name": "answer_value_string",
+              "description": "String answer value"
+            },
+            {
+              "path": "value.ofType(integer)",
+              "name": "answer_value_integer",
+              "description": "Integer answer value"
+            },
+            {
+              "path": "value.ofType(boolean)",
+              "name": "answer_value_boolean",
+              "description": "Boolean answer value"
+            },
+            {
+              "path": "value.ofType(date)",
+              "name": "answer_value_date",
+              "description": "Date answer value"
+            }
+          ],
+          "forEachOrNull": "answer"
+        }
       ]
     }
   ]

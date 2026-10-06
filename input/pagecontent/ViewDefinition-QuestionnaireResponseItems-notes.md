@@ -12,4 +12,6 @@ This will result in a "questionnaire_response_items" table that looks like this:
 | 2   | http://example.org/q/health-history | 102        | 2024-03-16T14:20:00+10:00 | hypertension | Hypertension       | null               | null                | false               | null             |
 {:.table-data}
 
-Note how all items are flattened into a single table regardless of their nesting depth. The "demographics" and "conditions" items are group items (with no answer values), while items like "name", "dob", "diabetes", and "hypertension" are nested within those groups but appear as separate rows in the output.
+Note how all items are flattened into a single table regardless of their nesting depth. The "demographics" and "conditions" items are group items (with no answer values), while items like "name", "dob", "diabetes", and "hypertension" are nested within those groups but appear as separate rows in the output. The `repeat` paths `item` and `answer.item` cover both forms of nesting that QuestionnaireResponse allows: items nested directly under a group, and items nested under an answer.
+
+The answer columns are produced by a nested `forEachOrNull` over `answer`, because an item can have more than one answer. An item with two answers produces two rows, and an item with no answers, such as a group, still produces one row with null answer values.

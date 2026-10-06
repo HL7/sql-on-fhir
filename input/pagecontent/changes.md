@@ -366,6 +366,19 @@ holds the specification alone, and moved to
 
 #### Documentation
 
+#### Example corrections
+
+Two examples could not be run as published. `EncounterFlat` selected the
+repeating `episodeOfCare` in a single-valued column, so an Encounter with two
+episodes of care raised an error; it now iterates with `forEachOrNull`, and the
+column was renamed `episode_of_care_id` to match the other examples.
+`QuestionnaireResponseItems` repeated over `item` only, missing items nested
+under an answer, and selected the repeating `answer` in single-valued columns;
+it now repeats over `item` and `answer.item`, and iterates answers with
+`forEachOrNull`. The explanatory notes for the examples, which had stopped
+being published when the examples became ViewDefinition resources, are
+published again. ([#408](https://github.com/HL7/sql-on-fhir/issues/408))
+
 The introduction was restructured around the three components of the
 specification, and the query and operations sections were added.
 Inconsistencies across the operation definitions were reconciled: return type,

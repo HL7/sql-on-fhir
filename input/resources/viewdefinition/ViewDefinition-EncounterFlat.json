@@ -34,12 +34,17 @@
         {
           "path": "period.end",
           "name": "period_end"
-        },
-        {
-          "path": "episodeOfCare.getReferenceKey(EpisodeOfCare)",
-          "name": "EpisodeOfCareId"
         }
       ]
+    },
+    {
+      "column": [
+        {
+          "path": "getReferenceKey(EpisodeOfCare)",
+          "name": "episode_of_care_id"
+        }
+      ],
+      "forEachOrNull": "episodeOfCare"
     },
     {
       "column": [
