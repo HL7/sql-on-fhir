@@ -54,7 +54,7 @@ inside a `Parameters` resource in the request body on a `POST`.
 | subjectReference | Reference                              | 0¹  | 1   | Literal location of the subject on the server. [Details](#subject-clarification)                  |
 | subjectResource  | ViewDefinition \| SQLQuery \| SQLView² | 0¹  | 1   | Inline subject resource. [Details](#subject-clarification)                                        |
 | parameters       | Parameters                             | 0   | 1   | Parameter values bound by name to those the Library declares; requires a SQL subject. [Details](#parameter-passing) |
-| context          | ViewDefinition \| SQLView²             | 0   | \*  | Inline supporting artifact, matched to a dependency by canonical URL. [Details](#supporting-artifacts) |
+| context          | ViewDefinition \| SQLView \| ValueSet \| ConceptMap² | 0   | \*  | Inline supporting artifact, matched to a dependency by canonical URL. [Details](#supporting-artifacts) |
 | resource         | Resource                               | 0   | \*  | FHIR resources to transform; requires a ViewDefinition subject. [Details](#resource-parameter-clarification) |
 | \_format         | code                                   | 0   | 1   | Output format: `json`, `ndjson`, `csv`, `parquet`, `fhir`. [Details](#format-parameter-clarification) |
 | header           | boolean                                | 0   | 1   | Include CSV headers (default: true). Only applies to `csv` format                                 |
@@ -131,12 +131,13 @@ it supports as described in
 
 ##### Supporting artifacts (`context`) {#supporting-artifacts}
 
-Where the subject is a SQLQuery or SQLView, the tables it selects from are named
-by its `relatedArtifact` entries and are normally resolved by the server. Where
-the server cannot resolve one - typically because the artifact exists only on the
-client - the client supplies it inline with the repeating `context` parameter,
-which accepts a ViewDefinition or a
-[SQLView](StructureDefinition-SQLView.html).
+Where the subject is a SQLQuery or SQLView, the tables, value sets and concept
+maps it reads are named by its `relatedArtifact` entries and are normally
+resolved by the server. Where the server cannot resolve one - typically because
+the artifact exists only on the client - the client supplies it inline with the
+repeating `context` parameter, which accepts a ViewDefinition, a
+[SQLView](StructureDefinition-SQLView.html), a ValueSet or a ConceptMap (see
+[Terminology in SQL](terminology-in-sql.html#inline)).
 
 The matching, precedence and error rules are specified once in
 [Supporting artifacts](operations-common.html#context) and apply identically here
@@ -150,8 +151,8 @@ neither supplied nor resolvable is rejected with `404 Not Found`.
 Supplying every dependency inline alongside an inline `subjectResource` makes a
 fully ad-hoc query possible, with nothing stored on the server.
 
-`context` supplies the _views_ a query reads from, not the FHIR resources those
-views project. The [`resource`](#resource-parameter-clarification) parameter
+`context` supplies the _views, value sets and concept maps_ a query reads from,
+not the FHIR resources those views project. The [`resource`](#resource-parameter-clarification) parameter
 carries the latter, and requires a ViewDefinition subject: extending it to a SQL
 subject would need its own semantics for how supplied resources reach each
 dependency view, which is deliberately deferred. See
@@ -875,6 +876,7 @@ placeholder - a different semantic that deserves its own proposal.
 | `422 Unprocessable Entity`  | `invalid`       | subject       | A resolved artifact conforming to none of ViewDefinition, SQLQuery or SQLView                                                                 |
 | `422 Unprocessable Entity`  | `invalid`       | subject       | A conformant subject that cannot be processed, such as an invalid FHIRPath expression or an SQL syntax error                                  |
 | `422 Unprocessable Entity`  | `invalid`       | -             | A result column of an SQL type with no `value[x]` mapping, where `_format=fhir` (see [type mapping](#sql-to-fhir-type-mapping))               |
+| `422 Unprocessable Entity`  | `invalid`       | -             | A ValueSet dependency that resolves, but whose membership the server cannot determine, or a ConceptMap dependency that resolves, but carries content the relation cannot represent (see [Terminology in SQL](terminology-in-sql.html#membership-snapshot)) |
 | `500 Internal Server Error` | `exception`     | -             | Unexpected server error                                                                                                                       |
 
 {:.table-data}

@@ -71,7 +71,9 @@ under a canonical URL; an SQLQuery composes both as its table sources.
 
 These references form a directed graph of ViewDefinitions, SQLViews, and
 SQLQueries, in which each referenced result acts as a virtual table for the
-referencing query.
+referencing query. A ValueSet or ConceptMap dependency joins the same graph as
+a leaf, exposed as a relation of its member codes or of its mappings (see
+[Terminology in SQL](terminology-in-sql.html)).
 <span class="fhir-conformance" id="sqlquery-notes-1">Authors SHOULD keep this graph acyclic.</span>
 Whether circular dependencies are detected, any limit on dependency depth, and
 whether intermediate results are materialized or inlined (for example as CTEs or

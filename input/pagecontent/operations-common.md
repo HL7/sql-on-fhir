@@ -62,7 +62,7 @@ declared type now has to cover both. `subjectResource` therefore declares
 [ViewDefinition](StructureDefinition-ViewDefinition.html),
 [SQLQuery](StructureDefinition-SQLQuery.html) and
 [SQLView](StructureDefinition-SQLView.html); `context` declares the same type
-with a `targetProfile` naming ViewDefinition and SQLView.
+with a `targetProfile` naming ViewDefinition, SQLView, ValueSet and ConceptMap.
 
 ## Output Formats (`_format`) {#output-formats}
 
@@ -367,27 +367,28 @@ worked example.
 A SQLQuery or SQLView names the tables it selects from through its
 `relatedArtifact` entries: each entry with `type = depends-on` carries the
 dependency's canonical URL in `resource` and the SQL identifier the query selects
-from in `label`. A dependency resolves to either a ViewDefinition, which projects
-FHIR resources into a table, or a
-[SQLView](StructureDefinition-SQLView.html), which wraps a query over other table
-sources and so carries dependencies of its own. The graph is therefore
-transitive, and its leaves are always ViewDefinitions. A ViewDefinition subject
-contributes no dependencies at all.
+from in `label`. A dependency resolves to a ViewDefinition, which projects FHIR
+resources into a table; to a [SQLView](StructureDefinition-SQLView.html), which
+wraps a query over other table sources and so carries dependencies of its own; or
+to a ValueSet or ConceptMap, whose content the SQL reads as a relation (see
+[Terminology in SQL](terminology-in-sql.html)). The graph is therefore
+transitive, and its leaves are ViewDefinitions, ValueSets and ConceptMaps. A
+ViewDefinition subject contributes no dependencies at all.
 
-A server may be unable to resolve every dependency: a client may hold a view that
-exists only locally. The repeating `context` parameter carries such artifacts
-inline.
+A server may be unable to resolve every dependency: a client may hold a view, a
+value set or a concept map that exists only locally. The repeating `context`
+parameter carries such artifacts inline.
 
 `context` applies to the **job as a whole**, not to one subject. Where an export
 names several subjects, one set of entries is matched against every dependency of
 every subject, so an artifact three subjects depend on is supplied once rather
 than three times.
 
-The parameter accepts an inline ViewDefinition or SQLView **today**. It is named
-and shaped so that further artifact kinds - terminology artifacts among them -
-can be admitted later by widening the accepted `targetProfile` list alone,
-without a rename and without a second parameter. Nothing in the name commits it
-to artifacts that play the role of a table.
+The parameter accepts an inline ViewDefinition, SQLView, ValueSet or ConceptMap. It is named
+and shaped so that further artifact kinds can be admitted by widening the
+accepted `targetProfile` list alone, without a rename and without a second
+parameter. Nothing in the name commits it to artifacts that play the role of a
+table.
 
 `context` accepts inline resources only. There is deliberately no
 `contextCanonical` or `contextReference` sibling, even though the parameters
@@ -417,13 +418,14 @@ the whole job as follows:
       `OperationOutcome` naming the unresolved canonical URL.
 3. Record the resolution against that canonical URL for the remainder of the job.
 4. If the resolved artifact is a SQLView, add its own `depends-on` entries to the
-   worklist. If it is a ViewDefinition, it is a leaf.
+   worklist. If it is a ViewDefinition, a ValueSet or a ConceptMap, it is a leaf.
 5. Repeat from step 2 until the worklist is empty.
-6. If any ViewDefinition or SQLView `context` entry was never selected at step
-   2.1, the request fails with `400 Bad Request` and an `OperationOutcome`
-   identifying it.
+6. If any `context` entry was never selected at step 2.1, the request fails with
+   `400 Bad Request` and an `OperationOutcome` identifying it.
 7. Bind each resolved artifact to the SQL identifier in the `label` of the
-   dependency that reached it.
+   dependency that reached it: a ViewDefinition or SQLView as a table, a ValueSet
+   or ConceptMap as the relation described in
+   [Terminology in SQL](terminology-in-sql.html).
 
 Step 2's memoisation is what makes one resolution per job true: a canonical URL
 reached from two subjects is resolved once, and both subjects see the same
@@ -446,26 +448,33 @@ an entry whose `version` agrees.
 
 **Applies to:** both operations.
 
-| Status            | Condition                                                                                              |
-| ----------------- | -------------------------------------------------------------------------------------------------------- |
-| `400 Bad Request` | A `context` entry with no `url`, which cannot be bound to any dependency                               |
-| `400 Bad Request` | Two `context` entries sharing a `url`, which makes the binding ambiguous                               |
-| `400 Bad Request` | A ViewDefinition or SQLView `context` entry matching no dependency of any subject in the job           |
-| `404 Not Found`   | A dependency neither supplied as a `context` entry nor resolvable by the server                        |
+| Status                     | Condition                                                                                                                                 |
+| -------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| `400 Bad Request`          | A `context` entry with no `url`, which cannot be bound to any dependency                                                                  |
+| `400 Bad Request`          | Two `context` entries sharing a `url`, which makes the binding ambiguous                                                                  |
+| `400 Bad Request`          | A `context` entry matching no dependency of any subject in the job                                                                        |
+| `404 Not Found`            | A dependency neither supplied as a `context` entry nor resolvable by the server                                                           |
+| `422 Unprocessable Entity` | A ValueSet dependency that resolves, but whose membership the server cannot determine, or a ConceptMap dependency that resolves, but carries content the relation cannot represent (see [Terminology in SQL](terminology-in-sql.html#membership-snapshot)) |
 
 {:.table-data}
 
 Every such response carries an `OperationOutcome` identifying the offending
 resource or the unresolved canonical URL.
 
-The third rule is stated as governing ViewDefinition and SQLView entries
-specifically. Such an entry is a table source: it exists to satisfy a named
-dependency, so one that matches nothing is almost always a typo in its `url`, and
-rejecting it reports the mistake where it was made rather than letting it
-resurface as a `404` on the dependency or an SQL error naming a table the client
-believes it supplied. Scoping the rule this way means that admitting artifact
-kinds which some subjects may legitimately not use does not require revisiting
-it.
+The third rule holds for every kind of entry the parameter admits, because each
+exists to satisfy a named dependency: a ViewDefinition or SQLView is a table
+source and a ValueSet or ConceptMap is a relation the SQL joins to. An entry
+that matches nothing is almost always a typo in its `url`, and rejecting it
+reports the mistake where it was made rather than letting it resurface as a
+`404` on the dependency or an SQL error naming a table the client believes it
+supplied.
+
+The fifth rule covers an artifact the server can find but cannot turn into a
+relation: a ValueSet with only a `compose` the server cannot expand, or an
+incomplete expansion; or a ConceptMap with a conditional mapping (`dependsOn`),
+a mapping with `product`, a `valueSet` in place of a code, or a group without a
+source system. It is distinct from the `404`, which reports a canonical URL
+that resolves to nothing at all.
 
 ### What remains implementation-defined {#context-undefined}
 
@@ -489,6 +498,12 @@ remain implementation decisions:
 - Whether an artifact resolved once for a job is materialized once or several
   times. Resolution is constrained so that every subject sees the same artifact;
   how many times that artifact is computed is not.
+- How a ValueSet's membership is obtained - from a terminology server, a local
+  terminology store, a cached expansion or a static package - and how a
+  ConceptMap is obtained, and how the resulting relation is materialized. The
+  relation's columns and invariants are fixed by
+  [Terminology in SQL](terminology-in-sql.html); where its rows come from is
+  not.
 
 ### Worked example {#context-example}
 
