@@ -308,6 +308,20 @@ Issues: [#293](https://github.com/HL7/sql-on-fhir/pull/293),
 [#351](https://github.com/HL7/sql-on-fhir/issues/351),
 [#365](https://github.com/HL7/sql-on-fhir/pull/365).
 
+### Clarifications
+
+#### `getReferenceKey` over a collection of References
+
+The 2.0.0 text described `getReferenceKey` on a single Reference and did not
+say what happens when it is invoked on a repeating element such as
+`Encounter.episodeOfCare`. It now states that each Reference is evaluated
+independently, returning one key per Reference that yields one. A column
+applying it to a repeating element therefore needs `collection: true`, or
+iteration with `forEach` or `forEachOrNull`, like any other multi-valued path.
+This matches the behavior of the reference implementation and is not a breaking
+change.
+([#408](https://github.com/HL7/sql-on-fhir/issues/408))
+
 ### Editorial and process changes
 
 #### ViewDefinition is authored in XML, not FSH
@@ -352,18 +366,6 @@ required by the HL7 Governance and Operations Manual was added
 ([ff21894](https://github.com/HL7/sql-on-fhir/commit/ff21894),
 [3093259](https://github.com/HL7/sql-on-fhir/commit/3093259)).
 
-#### Reference implementation moved to its own repository
-
-The JavaScript reference implementation, the shared test suite and the test
-report site now reside in
-[FHIR/sql-on-fhir.js](https://github.com/FHIR/sql-on-fhir.js). This repository
-holds the specification alone, and moved to
-[HL7/sql-on-fhir](https://github.com/HL7/sql-on-fhir).
-([48f3607](https://github.com/HL7/sql-on-fhir/commit/48f3607),
-[8a9c98f](https://github.com/HL7/sql-on-fhir/commit/8a9c98f))
-
-#### Documentation
-
 #### Example corrections
 
 Two examples could not be run as published. `EncounterFlat` selected the
@@ -377,8 +379,6 @@ it now repeats over `item` and `answer.item`, and iterates answers with
 being published when the examples became ViewDefinition resources, are
 published again. ([#408](https://github.com/HL7/sql-on-fhir/issues/408))
 
-The introduction was restructured around the three components of the
-specification, and the query and operations sections were added.
 #### Reference implementation moved to its own repository
 
 The JavaScript reference implementation, the shared test suite and the test
@@ -391,6 +391,8 @@ holds the specification alone, and moved to
 
 #### Documentation
 
+The introduction was restructured around the three components of the
+specification, and the query and operations sections were added.
 Inconsistencies across the operation definitions were reconciled: return type,
 Bundle unwrapping, `Accept` semantics, supported `_format` values, streaming
 guidance and the completion status code.
@@ -447,3 +449,11 @@ shadows the other**. A deployment can retain 2.0.0 tooling over views that are
 already valid against both versions, and move when its stack reads R6
 structure definitions. R6 is itself still in ballot, and this specification
 tracks its progress rather than anticipating it.
+
+Instances of ViewDefinition carry a `resourceDefinition` property, as R6
+requires of every additional resource in
+[JSON](https://hl7.org/fhir/6.0.0-ballot5/json.html#additional) and
+[XML](https://hl7.org/fhir/6.0.0-ballot5/xml.html#additional). It is a feature
+of the format rather than an element of ViewDefinition, so a parser or
+validator built from the ViewDefinition StructureDefinition alone needs to
+accept it. See [Serialized Form](StructureDefinition-ViewDefinition.html#serialized-form).
