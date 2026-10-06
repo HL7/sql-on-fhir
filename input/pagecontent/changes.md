@@ -308,6 +308,20 @@ Issues: [#293](https://github.com/HL7/sql-on-fhir/pull/293),
 [#351](https://github.com/HL7/sql-on-fhir/issues/351),
 [#365](https://github.com/HL7/sql-on-fhir/pull/365).
 
+### Clarifications
+
+#### `getReferenceKey` over a collection of References
+
+The 2.0.0 text described `getReferenceKey` on a single Reference and did not
+say what happens when it is invoked on a repeating element such as
+`Encounter.episodeOfCare`. It now states that each Reference is evaluated
+independently, returning one key per Reference that yields one. A column
+applying it to a repeating element therefore needs `collection: true`, or
+iteration with `forEach` or `forEachOrNull`, like any other multi-valued path.
+This matches the behavior of the reference implementation and is not a breaking
+change.
+([#408](https://github.com/HL7/sql-on-fhir/issues/408))
+
 ### Editorial and process changes
 
 #### ViewDefinition is authored in XML, not FSH
@@ -328,11 +342,9 @@ messages follows that no change to this repository can remove.
 contain a type defined outside core; a `StructureDefinition.type` of
 `ViewDefinition` is rejected as not defined in FHIR;
 `Library.relatedArtifact.resource` does not recognize an additional resource as
-canonical; the inherited `cnl-1` invariant carries `MetadataResource` as its
-source; and every instance is asked for a `resourceDefinition` property that
-would place tooling metadata in the published examples. In addition, the
-publisher's generic FHIRPath evaluator cannot resolve `%rowIndex` or names
-evaluated inside a `forEach` scope, and no R6 build of
+canonical; and the inherited `cnl-1` invariant carries `MetadataResource` as its
+source. In addition, the publisher's generic FHIRPath evaluator cannot resolve
+`%rowIndex` or names evaluated inside a `forEach` scope, and no R6 build of
 `hl7.fhir.uv.extensions`, `hl7.terminology` or `hl7.fhir.uv.tools` exists, so
 the publisher reports a package-version mismatch that this repository cannot
 resolve.
@@ -353,6 +365,19 @@ text was replaced with the verbatim CC0 1.0 Universal dedication, matching the
 required by the HL7 Governance and Operations Manual was added
 ([ff21894](https://github.com/HL7/sql-on-fhir/commit/ff21894),
 [3093259](https://github.com/HL7/sql-on-fhir/commit/3093259)).
+
+#### Example corrections
+
+Two examples could not be run as published. `EncounterFlat` selected the
+repeating `episodeOfCare` in a single-valued column, so an Encounter with two
+episodes of care raised an error; it now iterates with `forEachOrNull`, and the
+column was renamed `episode_of_care_id` to match the other examples.
+`QuestionnaireResponseItems` repeated over `item` only, missing items nested
+under an answer, and selected the repeating `answer` in single-valued columns;
+it now repeats over `item` and `answer.item`, and iterates answers with
+`forEachOrNull`. The explanatory notes for the examples, which had stopped
+being published when the examples became ViewDefinition resources, are
+published again. ([#408](https://github.com/HL7/sql-on-fhir/issues/408))
 
 #### Reference implementation moved to its own repository
 
@@ -424,3 +449,11 @@ shadows the other**. A deployment can retain 2.0.0 tooling over views that are
 already valid against both versions, and move when its stack reads R6
 structure definitions. R6 is itself still in ballot, and this specification
 tracks its progress rather than anticipating it.
+
+Instances of ViewDefinition carry a `resourceDefinition` property, as R6
+requires of every additional resource in
+[JSON](https://hl7.org/fhir/6.0.0-ballot5/json.html#additional) and
+[XML](https://hl7.org/fhir/6.0.0-ballot5/xml.html#additional). It is a feature
+of the format rather than an element of ViewDefinition, so a parser or
+validator built from the ViewDefinition StructureDefinition alone needs to
+accept it. See [Serialized Form](StructureDefinition-ViewDefinition.html#serialized-form).

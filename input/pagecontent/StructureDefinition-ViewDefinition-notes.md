@@ -54,6 +54,27 @@ expected type. For example, `Observation.subject.getReferenceKey(Patient)` would
 return a row key if the subject is a Patient, or the empty collection (
 i.e., `{}`) if it is not.
 
+<span class="fhir-conformance" id="viewdef-25">When invoked on a collection of
+References, getReferenceKey SHALL evaluate each Reference independently and
+return the keys of those that yield one.</span> An empty input returns the empty
+collection, and a Reference that is not of the expected type, or that cannot be
+resolved, contributes nothing to the result.
+
+A column that applies getReferenceKey to a repeating element can therefore
+produce more than one value, and is subject to the same rule as any other
+column path: it must set
+[collection](StructureDefinition-ViewDefinition-definitions.html#diff_ViewDefinition.select.column.collection)
+to `true`, or iterate over the element with `forEach` or `forEachOrNull`.
+For example, `Encounter.episodeOfCare` is 0..\*, so an Encounter that
+references two episodes of care gives:
+
+| Path                                                                       | Result                                           |
+| -------------------------------------------------------------------------- | ------------------------------------------------ |
+| `episodeOfCare.getReferenceKey(EpisodeOfCare)`                             | two keys; an error unless `collection` is `true` |
+| `getReferenceKey(EpisodeOfCare)` within `"forEachOrNull": "episodeOfCare"` | one key per row, on two rows                     |
+
+{:.table-data}
+
 <span class="fhir-conformance" id="viewdef-12">The returned _KeyType_ is implementation
 dependent, but SHALL be a FHIR primitive type that can be used for efficient
 joins in the systems underlying data storage.</span> Integers, strings, UUIDs, and other primitive types may be appropriate.

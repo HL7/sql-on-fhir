@@ -43,6 +43,32 @@ A *View Runner* implementation can execute a ViewDefinition and return the
 results as a table that can be used for further processing using the user's
 chosen tech stack. See [System Layers](index.html#system-layers) for details.
 
+## Serialized Form
+
+ViewDefinition is an additional resource, so its JSON and XML representations
+follow the FHIR rules for additional resources
+([JSON](https://hl7.org/fhir/6.0.0-ballot5/json.html#additional),
+[XML](https://hl7.org/fhir/6.0.0-ballot5/xml.html#additional)). An instance
+carries a `resourceDefinition` property (an attribute in XML) naming the
+versioned canonical of its definition, as every example ViewDefinition
+published with this guide does:
+
+```js
+{
+  "resourceType": "ViewDefinition",
+  "resourceDefinition": "http://hl7.org/fhir/StructureDefinition/ViewDefinition|3.0.0-ballot",
+  "name": "patient_demographics",
+  // other elements
+}
+```
+
+Like `resourceType`, `resourceDefinition` is part of the serialization format
+rather than an element of ViewDefinition, so it does not appear in the element
+tables. A parser or validator built from the ViewDefinition StructureDefinition
+alone will not find it among the elements, and should accept it as format
+metadata rather than reject the instance. It has no effect on the rows a view
+produces.
+
 ## Profiling
 
 ViewDefinitions may be profiled to meet specific needs. For instance,
