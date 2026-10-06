@@ -6,9 +6,6 @@
 %was not found in the value set 'Version Independent Resource Types (All)'%
 %The System URI could not be determined for the code 'ViewDefinition'%
 
-# 03. The publisher requires every instance of an additional resource to carry a resourceDefinition property naming the versioned canonical of its definition. Adding it would put FHIR tooling metadata into the published ViewDefinition examples and pin the IG version in each of them, so the examples are left as authored; see https://chat.fhir.org/#narrow/channel/179219-analytics-on-FHIR/topic/Validation.20errors.20for.20additional.20resources/with/615144653.
-%so must have a resourceDefinition of%
-
 # 04. ViewDefinition is an additional resource rather than a core FHIR type, so the publisher rejects its use as a StructureDefinition type. Inherent to the additional-resource design; see https://chat.fhir.org/#narrow/channel/179219-analytics-on-FHIR/topic/Validation.20errors.20for.20additional.20resources/with/615144653.
 %is not legal because it is not defined in the FHIR specification%
 

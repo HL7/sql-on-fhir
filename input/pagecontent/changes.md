@@ -328,11 +328,9 @@ messages follows that no change to this repository can remove.
 contain a type defined outside core; a `StructureDefinition.type` of
 `ViewDefinition` is rejected as not defined in FHIR;
 `Library.relatedArtifact.resource` does not recognize an additional resource as
-canonical; the inherited `cnl-1` invariant carries `MetadataResource` as its
-source; and every instance is asked for a `resourceDefinition` property that
-would place tooling metadata in the published examples. In addition, the
-publisher's generic FHIRPath evaluator cannot resolve `%rowIndex` or names
-evaluated inside a `forEach` scope, and no R6 build of
+canonical; and the inherited `cnl-1` invariant carries `MetadataResource` as its
+source. In addition, the publisher's generic FHIRPath evaluator cannot resolve
+`%rowIndex` or names evaluated inside a `forEach` scope, and no R6 build of
 `hl7.fhir.uv.extensions`, `hl7.terminology` or `hl7.fhir.uv.tools` exists, so
 the publisher reports a package-version mismatch that this repository cannot
 resolve.
@@ -381,6 +379,18 @@ published again. ([#408](https://github.com/HL7/sql-on-fhir/issues/408))
 
 The introduction was restructured around the three components of the
 specification, and the query and operations sections were added.
+#### Reference implementation moved to its own repository
+
+The JavaScript reference implementation, the shared test suite and the test
+report site now reside in
+[FHIR/sql-on-fhir.js](https://github.com/FHIR/sql-on-fhir.js). This repository
+holds the specification alone, and moved to
+[HL7/sql-on-fhir](https://github.com/HL7/sql-on-fhir).
+([48f3607](https://github.com/HL7/sql-on-fhir/commit/48f3607),
+[8a9c98f](https://github.com/HL7/sql-on-fhir/commit/8a9c98f))
+
+#### Documentation
+
 Inconsistencies across the operation definitions were reconciled: return type,
 Bundle unwrapping, `Accept` semantics, supported `_format` values, streaming
 guidance and the completion status code.
