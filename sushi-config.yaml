@@ -10,7 +10,7 @@ title: SQL on FHIR
 description: A specification for defining portable views of FHIR data that can be easily queried using tools such as SQL.
 status: active # draft | active | retired | unknown
 version: 3.0.0-ballot
-fhirVersion: 6.0.0-ballot5 # https://www.hl7.org/fhir/valueset-FHIR-version.html
+fhirVersion: 6.0.0-snapshot1 # https://www.hl7.org/fhir/valueset-FHIR-version.html
 copyrightYear: 2023+
 releaseLabel: STU 3 Ballot # free text shown in the publish box, e.g. "CI Build", "STU 3 Ballot", "STU 3"
 license: CC0-1.0 # https://www.hl7.org/fhir/valueset-spdx-license.html
@@ -29,18 +29,6 @@ publisher:
   name: HL7 International / FHIR Infrastructure
   url: http://www.hl7.org/Special/committees/fiwg
 
-# The dependencies property corresponds to IG.dependsOn. The key is the
-# package id and the value is the version (or dev/current). For advanced
-# use cases, the value can be an object with keys for id, uri, and version.
-#
-dependencies:
-  # Depend on the base extensions package (native R5) rather than the .r5
-  # repackaging. In HL7 publication mode the publisher rejects the .r5
-  # variant because the shared canonical http://hl7.org/fhir/extensions
-  # resolves to the .r4 package, which is inconsistent with the stated
-  # packageId. The base package is the conventional dependency for an R5 IG.
-  hl7.fhir.uv.extensions: 5.3.0
-#
 # The pages property corresponds to IG.definition.page. SUSHI can
 # auto-generate the page list, but if the author includes pages in
 # this file, it is assumed that the author will fully manage the

@@ -15,24 +15,20 @@
 # 05. ViewDefinition is a canonical resource, but the publisher does not recognize additional resources as canonical when checking Library.relatedArtifact.resource targetProfiles. Inherent to the additional-resource design; see https://chat.fhir.org/#narrow/channel/179219-analytics-on-FHIR/topic/Validation.20errors.20for.20additional.20resources/with/615144653.
 %which is not a Canonical Resource (which is required because the Library.relatedArtifact.resource element has the type canonical)%
 
-# 06. ViewDefinition derives from MetadataResource, so the inherited cnl-1 invariant carries MetadataResource as its source and the publisher reports a mismatch against the deriving profile. Inherent to the additional-resource design; see https://chat.fhir.org/#narrow/channel/179219-analytics-on-FHIR/topic/Validation.20errors.20for.20additional.20resources/with/615144653.
-%The invariant cnl-1 defined in the differential must have no source%
-ED_INVARIANT_DIFF_NO_SOURCE
-
 # 07. These are valid ViewDefinition FHIRPath expressions that the publisher's generic FHIRPath evaluator cannot resolve: %rowIndex is a ViewDefinition constant, and linkId, answer and code are evaluated inside a forEach scope that the evaluator does not apply. See https://chat.fhir.org/#narrow/channel/179219-analytics-on-FHIR/topic/Validation.20errors.20for.20additional.20resources/with/615144653.
 %Error evaluating FHIRPath expression: Invalid FHIRPath Constant %rowIndex%
 %Error evaluating FHIRPath expression: The name 'answer' is not valid%
 %Error evaluating FHIRPath expression: The name 'linkId' is not valid%
 %Error evaluating FHIRPath expression: The name 'code' is not valid%
 
-# 08. This IG targets FHIR 6.0.0-ballot5, but no R6 build of hl7.fhir.uv.extensions, hl7.terminology or hl7.fhir.uv.tools has been released; the registry serves only R5-based versions, so the publisher auto-selects the .r5 variants. Nothing in this repository can resolve the mismatch; see https://chat.fhir.org/#narrow/channel/179219-analytics-on-FHIR/topic/R6.20IGs.20depending.20on.20R5-only.20packages/with/615144821.
+# 08. This IG targets FHIR 6.0.0-snapshot1, but no R6 build of hl7.fhir.uv.extensions, hl7.terminology or hl7.fhir.uv.tools has been released; the registry serves only R5-based versions, so the publisher auto-loads the .r5 variants. Nothing in this repository can resolve the mismatch; see https://chat.fhir.org/#narrow/channel/179219-analytics-on-FHIR/topic/R6.20IGs.20depending.20on.20R5-only.20packages/with/615144821.
 This IG is version%
 This IG is for FHIR version%
 IG_DEPENDENCY_VERSION_ERROR
 IG_DEPENDENCY_VERSION_WARNING
 
-# 09. The jurisdiction value set is deprecated in the core specification and this message originates there; the jurisdiction values are inherited from the HL7 universal realm conventions and cannot be changed in this IG.
-%Reference to deprecated ValueSet http://hl7.org/fhir/ValueSet/jurisdiction%
+# 09. ViewDefinition.jurisdiction is copied from MetadataResource with the core binding to the jurisdiction value set, which the core specification marks as experimental; the binding follows the core canonical resource pattern and is not defined by this IG.
+%binds to the value set 'http://hl7.org/fhir/ValueSet/jurisdiction' which is experimental, but this structure is not labeled as experimental%
 
 # 10. These code systems are defined in this IG rather than in THO. A TSMG exemption will be sought in the future (first publication).
 %will need to move to THO later during the process%
@@ -53,14 +49,12 @@ IG_DEPENDENCY_VERSION_WARNING
 %is not included anywhere in the produced implementation guide%
 
 # 16. The CodeSystem fhirpath-types was incorrectly tagged as experimental: https://jira.hl7.org/browse/FHIR-58168
-%Reference to experimental CodeSystem http://hl7.org/fhir/CodeSystem/fhirpath-types|6.0.0-ballot5
+%Reference to experimental CodeSystem http://hl7.org/fhir/CodeSystem/fhirpath-types%
 MSG_EXPERIMENTAL
 
 # 17. FHIR R6 Additional Resource mechanisms are still WIP
 UNABLE_TO_INFER_CODESYSTEM
 Terminology_TX_NoValid_16
-%The value provided ('ViewDefinition') was not found in the value set 'Version Independent Resource Types (All)' (http://hl7.org/fhir/ValueSet/version-independent-all-resource-types|6.0.0-ballot5), and a code is required from this value set  (error message = The System URI could not be determined for the code 'ViewDefinition' in the ValueSet 'http://hl7.org/fhir/ValueSet/version-independent-all-resource-types|6.0.0-ballot5'; The provided code '#ViewDefinition' was not found in the value set 'http://hl7.org/fhir/ValueSet/version-independent-all-resource-types|6.0.0-ballot5')
-%The System URI could not be determined for the code 'ViewDefinition' in the ValueSet 'http://hl7.org/fhir/ValueSet/version-independent-all-resource-types|6.0.0-ballot5'
 
 # 18. This is a combinations of bugs - Resource definitions must be namespaced in hl7.org/fhir, and publisher is not processing the JSON version of the example additional resource correctly.
 VALIDATION_ADDITIONAL_RESOURCE_NO_WRONG
@@ -77,3 +71,6 @@ SD_ED_BIND_MULTIPLE_TYPES
 
 # 22. The ViewDefinition instances in this IG are examples of an additional resource, which the publisher does not associate with the ViewDefinition StructureDefinition as linked examples.
 %contains no explicitly linked examples for this profile%
+
+# 23. The JIRA specification artifact for this IG is maintained in https://github.com/HL7/JIRA-Spec-Artifacts and is updated through a pull request to that repository at publication time, using the template/jira-new.xml proposal generated by the publisher.
+%The jira specification file appears to be out of date%
