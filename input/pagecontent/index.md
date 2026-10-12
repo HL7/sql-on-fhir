@@ -177,7 +177,7 @@ Let's start with a simple example, defining "patient_demographics" and
 
 
 Such tabular views can be created for any FHIR resource,
-with [more examples here](artifacts.html#example-example-instances). See
+with [more examples here](artifacts.html). See
 the [View Definition page](StructureDefinition-ViewDefinition.html) for the
 full definition of the above structure.
 
