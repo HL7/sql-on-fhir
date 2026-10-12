@@ -1,4 +1,4 @@
-## FHIRPath Functionality
+### FHIRPath Functionality
 
 Columns within a view are defined using the [FHIRPath](https://hl7.org/fhirpath/) language. FHIRPath contains a large number of functions and syntax constructs - not all of these are required to be implemented within a SQL on FHIR view runner.
 
@@ -8,7 +8,7 @@ addition to this, <span class="fhir-conformance" id="viewdef-1">runners SHOULD i
 [Shareable View Definition](StructureDefinition-ShareableViewDefinition.html) profile if the intent is for the runner to be able to
 execute shared view definitions.</span>
 
-### Required Additional Functions
+#### Required Additional Functions
 
 <span class="fhir-conformance" id="viewdef-9">All View Runners SHALL implement these functions
 that extend the FHIRPath specification.</span> Despite not being in the
@@ -18,7 +18,7 @@ context of defining views:
 - [getResourceKey](#getresourcekey--keytype) function
 - [getReferenceKey](#getreferencekeyresource-type-specifier--keytype) function
 
-#### getResourceKey() : _KeyType_
+##### getResourceKey() : _KeyType_
 
 This is invoked at the root of a FHIR Resource and returns an opaque value to be
 used as the primary key for the row associated with the resource. In many cases
@@ -38,7 +38,7 @@ See
 the [Joins with Resource and Reference Keys](#joins-with-resource-and-reference-keys)
 section below for details.
 
-#### getReferenceKey([resource: type specifier]) : _KeyType_
+##### getReferenceKey([resource: type specifier]) : _KeyType_
 
 This is invoked on [Reference](https://hl7.org/fhir/references.html#Reference)
 elements and returns an opaque value that represents the database key of the row
@@ -72,7 +72,7 @@ The getReferenceKey function has both required and optional functionality:
 
 See the [Joins with Resource and Reference Keys](#joins-with-resource-and-reference-keys) section below for details.
 
-## Specifying a Select
+### Specifying a Select
 
 A [select](StructureDefinition-ViewDefinition-definitions.html#diff_ViewDefinition.select)
 specifies the content and names for the columns in the view. The content for
@@ -82,7 +82,7 @@ can be specified to create resource or reference keys, unnest a collection of
 items returned by a FHIRPath expression, nest or concatenate the results from
 multiple selects, and so on.
 
-## Unnesting Semantics
+### Unnesting Semantics
 
 It is often desirable to unroll the collection returned from
 a [FHIRPath](https://hl7.org/fhirpath/) expression into a separate row for each
@@ -167,7 +167,7 @@ or more `Patient.address`, the result will be identical to the expression above.
 ]
 ```
 
-## Multiple Select Expressions
+### Multiple Select Expressions
 
 A ViewDefinition may have multiple `select`s, which can be organized as siblings
 or in parent/child relationships. This is typically done as different `select`s
@@ -185,7 +185,7 @@ joined to others with the following rules:
 The [examples](StructureDefinition-ViewDefinition-examples.html) illustrate this
 behavior.
 
-## Recursive Traversal with Repeat
+### Recursive Traversal with Repeat
 
 The `repeat` directive enables recursive traversal of nested structures, automatically
 flattening hierarchical data to any depth. This is particularly useful for resources
@@ -201,7 +201,7 @@ expressions that define paths to recursively traverse. The view runner will:
 4. Continue until no more matches are found at any depth
 5. Union all results from all levels and all paths together
 
-### Example: Flattening QuestionnaireResponse Items
+#### Example: Flattening QuestionnaireResponse Items
 
 Consider a QuestionnaireResponse with nested groups and questions:
 
@@ -292,7 +292,7 @@ This would produce a flat table with all items regardless of nesting depth:
 
 {:.table-data}
 
-## Unions
+### Unions
 
 A `select` can have an optional `unionAll`, which contains a list of `select`s
 that are used to create a union. `unionAll` effectively concatenates the results
@@ -344,7 +344,7 @@ since these items are combined in a single, logical `UNION ALL`.
 Nested `select`s can be used when multiple `unionAll`s are needed within a
 single view.
 
-## Composing Multiple Selects and Unions
+### Composing Multiple Selects and Unions
 
 `unionAll` produces rows that can be used just like a `select` expression. These
 rows can be used by containing `select`s or `unionAll`s without needing any
@@ -405,7 +405,7 @@ And, the equivalent with a nested structure:
 Note the former example is preferred due to its simplicity and the latter is
 included purely for illustrative purposes.
 
-## Column Ordering
+### Column Ordering
 
 <span class="fhir-conformance" id="viewdef-17">View Runners that support column ordering in
 their output format SHALL order the columns of the result according to the rules
@@ -496,7 +496,7 @@ order:
 }
 ```
 
-## Column Types
+### Column Types
 
 <span class="fhir-conformance" id="viewdef-18">All values in a given column SHALL be of a single
 data type.</span> The data type can be explicitly specified with
@@ -540,7 +540,7 @@ simply produce a string, as would be done in a CSV-based implementation. See
 the [database type hints](#type-hinting-with-tags) section below if finer
 database-specific type control is needed.
 
-## Using Constants
+### Using Constants
 
 A ViewDefinition may include one or more constants, which are simply values that
 can be reused in [FHIRPath](https://hl7.org/fhirpath/) expressions. This can
@@ -565,13 +565,13 @@ This is an example of a constant used in the `where` constraint of a view:
 }
 ```
 
-## Environment Variables
+### Environment Variables
 
 In addition to user-defined constants, SQL on FHIR provides built-in environment
 variables that can be referenced in [FHIRPath](https://hl7.org/fhirpath/)
 expressions using the `%name` syntax.
 
-### %rowIndex
+#### %rowIndex
 
 The `%rowIndex` environment variable returns the 0-based index of the current
 element within the collection being iterated. This is useful for:
@@ -584,7 +584,7 @@ element within the collection being iterated. This is useful for:
 - **Surrogate keys**: Combining the resource ID with the element index creates
   a unique identifier for each row.
 
-#### Behaviour
+##### Behaviour
 
 - Within `forEach`, `forEachOrNull`, and `repeat` contexts, `%rowIndex`
   returns the position of the current element in the collection (starting
@@ -601,7 +601,7 @@ element within the collection being iterated. This is useful for:
   establishes its own independent `%rowIndex` sequence, starting from 0.
 - The type of `%rowIndex` is `integer`.
 
-#### Example: Capturing element position
+##### Example: Capturing element position
 
 ```json
 {
@@ -634,7 +634,7 @@ For a Patient with two names, this would produce:
 
 {:.table-data}
 
-#### Example: Nested iteration with independent indices
+##### Example: Nested iteration with independent indices
 
 ```json
 {
@@ -686,7 +686,7 @@ In this example, `contact_index` captures the position in the outer `contact`
 collection, while `telecom_index` captures the position in the inner `telecom`
 collection. Each iteration level maintains its own independent index.
 
-#### Example: Row index with unionAll
+##### Example: Row index with unionAll
 
 When `unionAll` appears inside an iteration, branches with their own `forEach`
 get an independent `%rowIndex` sequence, while branches without iteration
@@ -762,7 +762,7 @@ In the first branch, `forEach: "given"` creates its own `%rowIndex` sequence
 branch, there is no iteration expression, so `%rowIndex` inherits from the
 enclosing `forEach: "name"` context (0 for Smith, 1 for Jones).
 
-## Joins with Resource and Reference Keys
+### Joins with Resource and Reference Keys
 
 While ViewDefinitions do not directly implement joins across resources, the
 views produced can be easily joined by the database or analytic tools of the
@@ -825,7 +825,7 @@ key to easily join to the view of Patient resources, like this:
 Users of the views could then join `simple_obs.patient_id`
 to `active_patients.id` using common join semantics.
 
-### Suggested Implementations for getResourceKey() and getReferenceKey()
+#### Suggested Implementations for getResourceKey() and getReferenceKey()
 
 <span class="fhir-conformance" id="viewdef-21">While [getResourceKey](#getresourcekey--keytype)
 and [getReferenceKey](#getreferencekeyresource-type-specifier--keytype) SHALL
@@ -864,7 +864,7 @@ simply asserts that implementations SHALL be able to produce a row key for each
 resource and a matching key for references pointing at that resource</span>, and
 intentionally leaves the specific mechanism to the implementation.
 
-## Contained Resources
+### Contained Resources
 
 This specification requires implementers to extract contained resources that
 need to be included in views into independent resources that can then be
@@ -891,7 +891,7 @@ contained resources. For instance, a view of Practitioner resources will include
 top-level Practitioner resources but not contained Practitioner resources from
 inside the Patient resources.
 
-## Generating Schemas
+### Generating Schemas
 
 The output format produced by a View Runner will be technology-specific, such as
 a SQL database query or a structured file like Parquet.
@@ -906,13 +906,13 @@ views over data.
 This would not apply to outputs that do not have a way of specifying their
 schema, like CSV files.
 
-## Type Hinting with Tags
+### Type Hinting with Tags
 
 Since these analytic views are often used as SQL tables, it can be useful to
 provide database type information to ensure the desired tables or views are
 created. This is done by tagging fields with database-specific type information.
 
-### Default Type Mappings
+#### Default Type Mappings
 
 <span class="fhir-conformance" id="viewdef-6">To maximize consistency across different view
 runners, implementations SHOULD align their output types to the following
@@ -922,7 +922,7 @@ default type mappings from FHIR and FHIRPath types to
 types, they SHOULD map each of these types to the closest equivalent in their
 output format.</span>
 
-#### FHIR Type to SQL Type Mapping
+##### FHIR Type to SQL Type Mapping
 
 | FHIR type    | ISO/IEC 9075 SQL type    |
 | ------------ | ------------------------ |
@@ -949,7 +949,7 @@ output format.</span>
 
 {:.table-data}
 
-#### FHIRPath Type to SQL Type Mapping
+##### FHIRPath Type to SQL Type Mapping
 
 | FHIRPath type | ISO/IEC 9075 SQL type |
 | ------------- | --------------------- |
@@ -970,7 +970,7 @@ the format SHALL comply with the string representation of that type within the
 Where a path has both a FHIR type and a FHIRPath type, the FHIR type mapping
 will take precedence.
 
-### Overriding Default Type Mappings
+#### Overriding Default Type Mappings
 
 The default type hints can be overridden for individual columns within view
 definitions using tags. The tag name is `ansi/type`, and the value is the
@@ -1016,14 +1016,14 @@ Another use case may be for users to select database-specific numeric types.
 Implementations can define a tag name and use it to enable users to specify
 the desired implementation-specific type for a column.
 
-## Processing Algorithm
+### Processing Algorithm
 
 The following description provides an algorithm for how to process a FHIR
 resource as input for a ViewDefinition. <span class="fhir-conformance" id="viewdef-24">Implementations do not need to
 follow this algorithm directly, but their outputs SHOULD be consistent with what
 this model produces.</span>
 
-### Validate Columns (entry point)
+#### Validate Columns (entry point)
 
 **Purpose**: This step ensures that a ViewDefinition's columns are valid, by setting up a recursive call.
 
@@ -1033,7 +1033,7 @@ this model produces.</span>
 
 1. Call `ValidateColumns(V, C)` according to the recursive step below.
 
-### `ValidateColumns(S, C)` (recursive step)
+#### `ValidateColumns(S, C)` (recursive step)
 
 **Purpose:** This step ensures that column names are unique across `S` and disjoint from `C`
 
@@ -1073,7 +1073,7 @@ this model produces.</span>
 
 4. Return `Ret`
 
-### Process a Resource (entry point)
+#### Process a Resource (entry point)
 
 **Purpose:** This step emits all rows produced by a ViewDefinition on an input
 Resource, by setting up a recursive call.
@@ -1099,7 +1099,7 @@ Resource, by setting up a recursive call.
 4. Emit all rows from `Process(S, V)` with `%rowIndex` available in the
    evaluation context
 
-### `Process(S, N)` (recursive step)
+#### `Process(S, N)` (recursive step)
 
 **Purpose:** This step emits all rows for a given Selection Structure and Node.
 We first generate sets of "partial rows" (i.e., sets of incomplete column
@@ -1201,7 +1201,7 @@ Then the Cartesian product of these sets consists of four complete rows:
           with path `%rowIndex`, which are bound to `0`)
     4. Emit the row `r`
 
-## Functional Model
+### Functional Model
 
 ViewDefinitions can be modeled and implemented using the functional paradigm. In
 fact, the [JavaScript reference implementation](https://github.com/FHIR/sql-on-fhir.js)

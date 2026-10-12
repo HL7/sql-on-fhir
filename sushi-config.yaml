@@ -55,11 +55,11 @@ pages:
   glossary.md:
     title: Glossary
   operations.md:
-    title: Operations
+    title: SQL on FHIR API
   operations-capability.md:
-    title: Operations Capability
+    title: CapabilityStatement for SQL-on-FHIR API
   operations-common.md:
-    title: Operations Common
+    title: Common Operation Behavior
   changes.md:
     title: Changes
     extension:

@@ -1,5 +1,3 @@
-## Glossary
-
 ### analytic tools
 
 The broad ecosystem of tools used for data analysis, not specific to any

@@ -1,5 +1,3 @@
-# Common Operation Behavior
-
 This page defines behavior that is **shared by both SQL on FHIR data
 operations** so that it is specified once and applied identically across them:
 
@@ -14,7 +12,7 @@ Every section below opens with an **Applies to** line naming the operations it
 governs: both operations, the run operation only, or the export operation only.
 A section without such a line is a defect in this page.
 
-## Parameters that do not apply to every operation {#parameter-asymmetries}
+### Parameters that do not apply to every operation {#parameter-asymmetries}
 
 **Applies to:** both operations.
 
@@ -36,7 +34,7 @@ appears in this table.
 Extending `resource` to a SQLQuery or SQLView subject is a new capability rather
 than an alignment fix, and is left to a separate proposal.
 
-### Why the declared type is `CanonicalResource` {#declared-type}
+#### Why the declared type is `CanonicalResource` {#declared-type}
 
 **Applies to:** both operations.
 
@@ -64,7 +62,7 @@ declared type now has to cover both. `subjectResource` therefore declares
 [SQLView](StructureDefinition-SQLView.html); `context` declares the same type
 with a `targetProfile` naming ViewDefinition and SQLView.
 
-## Output Formats (`_format`) {#output-formats}
+### Output Formats (`_format`) {#output-formats}
 
 **Applies to:** both operations, except where a rule below names a subset.
 
@@ -113,7 +111,7 @@ identical on both operations. The two delivery models differ only in **how** the
 bytes reach the client - synchronously in the operation response (the run
 operation) or asynchronously as downloadable files (the export operation).
 
-### FHIR Format (`_format=fhir`) {#fhir-format}
+#### FHIR Format (`_format=fhir`) {#fhir-format}
 
 **Applies to:** the run operation only.
 
@@ -129,7 +127,7 @@ elements. SQL `NULL` is represented by omitting the corresponding `part`. The
 column-type-to-`value[x]` mapping is defined in
 [SQL to FHIR type mapping](OperationDefinition-SQLRun.html#sql-to-fhir-type-mapping).
 
-## Return Representation and the `Binary` Parameter {#return-representation}
+### Return Representation and the `Binary` Parameter {#return-representation}
 
 **Applies to:** the run operation only. The export operation returns no result
 payload in the operation response; see
@@ -158,7 +156,7 @@ arise.
 The worked examples on the run operation page are normative for the default
 (raw-payload) case.
 
-## Content Negotiation {#content-negotiation}
+### Content Negotiation {#content-negotiation}
 
 **Applies to:** the run operation only. Both axes below concern the response
 body that carries the result payload, which on the export operation is not the
@@ -203,7 +201,7 @@ the CapabilityStatement.</span>
 These two axes are distinct: Axis 1 decides _what_ is encoded, Axis 2 decides
 _how_ it is wrapped.
 
-## Streaming and Transfer Encoding {#streaming}
+### Streaming and Transfer Encoding {#streaming}
 
 **Applies to:** the run operation only, whose response carries the result
 payload. The export operation follows the
@@ -231,7 +229,7 @@ Two further concepts are independent of each other and of the format:
    neither required nor implied by chunked transfer encoding, and chunked
    transfer encoding is not reserved for "streamable" formats.
 
-## Filtering {#filtering}
+### Filtering {#filtering}
 
 **Applies to:** both operations.
 
@@ -258,7 +256,7 @@ client rather than constraining the data feeding a view, which is also why it is
 offered on the run operation only (see
 [Parameters that do not apply to every operation](#parameter-asymmetries)).
 
-### `patient` {#patient-filter}
+#### `patient` {#patient-filter}
 
 **Applies to:** both operations.
 
@@ -271,7 +269,7 @@ resource the server cannot find, the server SHALL respond `400 Bad Request` with
 an `OperationOutcome` whose `expression` names the `patient` parameter</span>
 (see [Status code for a value that cannot be resolved](#filter-resolution-errors)).
 
-### `group` {#group-filter}
+#### `group` {#group-filter}
 
 **Applies to:** both operations.
 
@@ -283,7 +281,7 @@ the server cannot find, the server SHALL respond `400 Bad Request` with an
 `OperationOutcome` whose `expression` names the `group` parameter</span>
 (see [Status code for a value that cannot be resolved](#filter-resolution-errors)).
 
-### `_since` {#since-filter}
+#### `_since` {#since-filter}
 
 **Applies to:** both operations.
 
@@ -304,7 +302,7 @@ regardless of when the referenced resources were last updated.</span>
 last updated time, the server MAY include these resources in a response
 irrespective of the `_since` value supplied by a client.</span>
 
-### Status code for a value that cannot be resolved {#filter-resolution-errors}
+#### Status code for a value that cannot be resolved {#filter-resolution-errors}
 
 **Applies to:** both operations.
 
@@ -339,7 +337,7 @@ The complete set of rejection conditions is stated on each operation page:
 [`$sql-run`](OperationDefinition-SQLRun.html#error-handling) and
 [`$sql-export`](OperationDefinition-SQLExport.html#rejected-requests).
 
-## Row limit (`_limit`) {#row-limit}
+### Row limit (`_limit`) {#row-limit}
 
 **Applies to:** the run operation only. The export operation does not offer
 `_limit`, and supplying it there is rejected with `400 Bad Request`; see
@@ -360,7 +358,7 @@ client.
 The [run operation page](OperationDefinition-SQLRun.html#limit-example) shows a
 worked example.
 
-## Supporting artifacts (`context`) {#context}
+### Supporting artifacts (`context`) {#context}
 
 **Applies to:** both operations.
 
@@ -397,7 +395,7 @@ dependencies the server cannot resolve, so naming one by canonical URL would han
 the server the same URL it has already failed to resolve. The absence is a
 consequence of what the parameter is for, not an oversight.
 
-### Matching supplied artifacts to dependencies {#context-matching}
+#### Matching supplied artifacts to dependencies {#context-matching}
 
 **Applies to:** both operations.
 
@@ -442,7 +440,7 @@ a dependency reached only through a supplied SQLView.
 A dependency whose `relatedArtifact.resource` carries a version is matched only by
 an entry whose `version` agrees.
 
-### Rejected requests {#context-errors}
+#### Rejected requests {#context-errors}
 
 **Applies to:** both operations.
 
@@ -467,7 +465,7 @@ believes it supplied. Scoping the rule this way means that admitting artifact
 kinds which some subjects may legitimately not use does not require revisiting
 it.
 
-### What remains implementation-defined {#context-undefined}
+#### What remains implementation-defined {#context-undefined}
 
 **Applies to:** both operations.
 
@@ -490,7 +488,7 @@ remain implementation decisions:
   times. Resolution is constrained so that every subject sees the same artifact;
   how many times that artifact is computed is not.
 
-### Worked example {#context-example}
+#### Worked example {#context-example}
 
 **Applies to:** both operations. The example below invokes `$sql-export`, because
 sharing a dependency between subjects needs more than one subject.
@@ -542,7 +540,7 @@ carries two `output` entries - `cohort_bp` and `cohort_labs` - and none for it.
 Had the server been able to resolve `local_cohort` itself, step 2.1 would still
 have selected the supplied entry.
 
-## Asynchronous Delivery {#asynchronous-delivery}
+### Asynchronous Delivery {#asynchronous-delivery}
 
 **Applies to:** the export operation only.
 
