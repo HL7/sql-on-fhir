@@ -996,7 +996,7 @@ which is not guaranteed but is common and can simplify analysis in some systems.
                 {
                     "name": "birth_date",
                     "path": "birthDate",
-                    "tags": [
+                    "tag": [
                         {
                             "name": "ansi/type",
                             "value": "DATE"
