@@ -25,9 +25,11 @@ terminology server, a local terminology store, a cached expansion or a static
 package, and a ConceptMap from any of the same sources. Evaluation of
 `ValueSet.compose`, execution of expression languages such as ECL or VCL,
 post-coordination and terminology authoring remain responsibilities of the
-terminology layer, which prepares the content before any SQL runs. The FHIRPath
-subset available to ViewDefinition is unchanged; this page concerns the SQL
-layer only.
+terminology layer, which prepares the content before any SQL runs. This page
+concerns the SQL layer only. Value set membership tests within a ViewDefinition
+are defined by the
+[Terminology Dependent View Definition](StructureDefinition-TerminologyDependentViewDefinition.html)
+profile.
 
 ### Declaring a terminology dependency {#dependency}
 

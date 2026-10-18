@@ -8,6 +8,12 @@ addition to this, <span class="fhir-conformance" id="viewdef-1">runners SHOULD i
 [Shareable View Definition](StructureDefinition-ShareableViewDefinition.html) profile if the intent is for the runner to be able to
 execute shared view definitions.</span>
 
+Views that test value set membership use the `memberOf` function, which is not
+part of that subset. The requirements for runners that execute these views are
+defined in the
+[Terminology Dependent View Definition](StructureDefinition-TerminologyDependentViewDefinition.html)
+profile.
+
 #### Required Additional Functions
 
 <span class="fhir-conformance" id="viewdef-9">All View Runners SHALL implement these functions
