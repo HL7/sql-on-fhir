@@ -42,11 +42,6 @@ supplied through a [constant](StructureDefinition-ViewDefinition.html#constants)
 "where": [{"path": "code.memberOf(%vital_signs)"}]
 ```
 
-<span class="fhir-conformance" id="termview-3">Authors SHOULD pin the version of
-each value set passed to `memberOf`.</span> The membership of an unpinned value
-set changes each time the value set is republished, so two evaluations of the
-same view may return different rows for reasons that the view does not record.
-
 ### Authoring considerations
 
 Two parts of the FHIR definition of
@@ -69,12 +64,12 @@ through logging or other means; how it does so is implementation specific.
 
 ### One membership per evaluation {#membership-snapshot}
 
-<span class="fhir-conformance" id="termview-4">Within one evaluation of a view,
+<span class="fhir-conformance" id="termview-3">Within one evaluation of a view,
 every call to `memberOf` naming the same value set SHALL see the same
 membership.</span> A runner that consults a terminology server for each call
 must therefore not allow a change to the value set on the server partway through
 an evaluation to be seen by some calls and not by others.
-<span class="fhir-conformance" id="termview-5">Where the view is evaluated as
+<span class="fhir-conformance" id="termview-4">Where the view is evaluated as
 part of a [`$sql-run`](OperationDefinition-SQLRun.html) or
 [`$sql-export`](OperationDefinition-SQLExport.html) job, every call to
 `memberOf` naming the same value set within the job SHALL see the same
@@ -94,7 +89,7 @@ query runs, exposes the membership as a relation with the columns described in
 each call into a semi-join on `system` and `code`, as described in
 [Joining to a value set](terminology-in-sql.html#joining). This requires nothing
 beyond standard SQL. Resolving each value set once before the query runs also
-satisfies [termview-4](#termview-4).
+satisfies [termview-3](#termview-3).
 
 ### Combining with other profiles
 
