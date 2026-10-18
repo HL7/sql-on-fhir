@@ -47,38 +47,25 @@ each value set passed to `memberOf`.</span> The membership of an unpinned value
 set changes each time the value set is republished, so two evaluations of the
 same view may return different rows for reasons that the view does not record.
 
-### Results
+### Authoring considerations
 
-The table summarises the result of `memberOf` for each kind of input, as defined
-by FHIR. Input that is a `Coding` or a `CodeableConcept` is the common case in
-views.
+Two parts of the FHIR definition of
+[memberOf](https://hl7.org/fhir/fhirpath.html#functions) affect how a view is
+written.
 
-| Input                          | Result                                                                                                       |
-| ------------------------------ | ------------------------------------------------------------------------------------------------------------ |
-| A single `code` element        | `true` if the code is a member of the value set, otherwise `false`                                           |
-| A single `Coding`              | `true` if the coding's code is a member of the value set, otherwise `false`                                  |
-| A single `CodeableConcept`     | `true` if any coding in the concept is a member of the value set, otherwise `false`                          |
-| A single `string`              | `true` if the string equals a code in the value set, otherwise `false`; empty if the value set's members are drawn from more than one code system |
-| Empty, or more than one item   | Empty                                                                                                        |
-| A value set that cannot be resolved | Empty                                                                                                   |
-
-{:.table-data}
-
-Two rows of the table have consequences for authors.
-
-A collection of more than one item yields an empty result rather than `true` or
-`false`. `code.coding.memberOf(...)` is therefore empty for any resource whose
-`code` carries more than one coding. To ask whether any coding is a member, pass
-the `CodeableConcept` itself, as in `code.memberOf(...)`, or filter the codings,
-as in `code.coding.where(memberOf(...)).exists()`. Within a `forEach` over
+FHIR defines the result as empty where the input has more than one value.
+`code.coding.memberOf(...)` is therefore empty for any resource whose `code`
+carries more than one coding. To ask whether any coding is a member, pass the
+`CodeableConcept` itself, as in `code.memberOf(...)`, or filter the codings, as
+in `code.coding.where(memberOf(...)).exists()`. Within a `forEach` over
 `code.coding`, each coding is a single item and `memberOf(...)` applies to it
 alone.
 
-A value set that cannot be resolved also yields an empty result. In a `where`
-clause, an empty result excludes the resource, so a view whose value set cannot
-be resolved returns no rows rather than reporting an error. In a column, it
-produces a null value. A runner may report unresolved value sets through logging
-or other means; how it does so is implementation specific.
+FHIR also defines the result as empty where the value set cannot be resolved.
+In a `where` clause, an empty result excludes the resource, so a view whose
+value set cannot be resolved returns no rows rather than reporting an error. In
+a column, it produces a null value. A runner may report unresolved value sets
+through logging or other means; how it does so is implementation specific.
 
 ### One membership per evaluation {#membership-snapshot}
 
