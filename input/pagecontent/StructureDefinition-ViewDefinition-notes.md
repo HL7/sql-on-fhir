@@ -906,6 +906,131 @@ views over data.
 This would not apply to outputs that do not have a way of specifying their
 schema, like CSV files.
 
+#### Steps to Derive a Schema
+
+The schema of a view can be derived from the ViewDefinition alone, without
+reading any FHIR data. The steps below are informative. They introduce no new
+requirements, and bring together rules that are defined in other sections of
+this page.
+
+1. Validate the ViewDefinition and obtain its ordered list of columns. The
+   `ValidateColumns` step of the [processing algorithm](#processing-algorithm)
+   returns this list, following the rules in the
+   [column ordering](#column-ordering) section. The columns of a `unionAll`
+   are taken from its first branch, since all branches have the same column
+   names in the same order. `forEach`, `forEachOrNull`, `repeat` and `where`
+   affect the rows of the view but not its columns.
+2. For each column in the list, use its `name` as the name of the column in the
+   schema.
+3. Determine the FHIR type of each column as described in the
+   [column types](#column-types) section. This is the `type` of the column if
+   it is present. Otherwise it is the type inferred from the `path`, if the
+   implementation supports type inference.
+4. Map the FHIR type of each column to a type in the output format. For SQL
+   outputs, the [default type mappings](#default-type-mappings) give the
+   recommended type. If the column has a type hint that the implementation
+   supports, such as the `ansi/type` tag, the type hint takes the place of the
+   default (see
+   [overriding default type mappings](#overriding-default-type-mappings)). The
+   behavior for a type hint that is unknown or incompatible is left to the
+   implementation.
+5. Note which columns have `collection` set to `true`. These columns can hold
+   multiple values, and need a type in the output format that is capable of
+   this, such as an array.
+6. Express the resulting list of column names and types in the form used by the
+   output format, such as a "CREATE TABLE" statement or a Parquet schema. The
+   `name` of the ViewDefinition can be used as the name of the table or view.
+
+This specification does not define the following, which are left to the
+implementation:
+
+- The type of a column that has no `type`, where the implementation does not
+  support type inference. The [column types](#column-types) section notes that
+  it is reasonable to treat these columns as strings.
+- The representation of columns that have `collection` set to `true`, and of
+  columns with non-primitive types. Not all implementations or output formats
+  support these.
+- Whether columns are declared as nullable. Any column can be null in a given
+  row, for example when its `path` returns an empty collection.
+
+#### Example: Deriving a Schema
+
+Consider the following ViewDefinition:
+
+```json
+{
+    "resourceType": "ViewDefinition",
+    "status": "active",
+    "name": "patient_names",
+    "resource": "Patient",
+    "select": [
+        {
+            "column": [
+                {
+                    "name": "id",
+                    "path": "id",
+                    "type": "id"
+                },
+                {
+                    "name": "active",
+                    "path": "active",
+                    "type": "boolean"
+                },
+                {
+                    "name": "birth_date",
+                    "path": "birthDate",
+                    "type": "date",
+                    "tag": [
+                        {
+                            "name": "ansi/type",
+                            "value": "DATE"
+                        }
+                    ]
+                }
+            ],
+            "select": [
+                {
+                    "forEach": "name",
+                    "column": [
+                        {
+                            "name": "family",
+                            "path": "family",
+                            "type": "string"
+                        },
+                        {
+                            "name": "given",
+                            "path": "given",
+                            "type": "string",
+                            "collection": true
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
+```
+
+Following the steps above gives a schema named `patient_names` with these
+columns, in this order:
+
+| Column name  | FHIR type | Collection | ISO/IEC 9075 SQL type | Source of SQL type   |
+| ------------ | --------- | ---------- | --------------------- | -------------------- |
+| `id`         | id        | No         | CHARACTER VARYING     | Default type mapping |
+| `active`     | boolean   | No         | BOOLEAN               | Default type mapping |
+| `birth_date` | date      | No         | DATE                  | `ansi/type` tag      |
+| `family`     | string    | No         | CHARACTER VARYING     | Default type mapping |
+| `given`      | string    | Yes        | CHARACTER VARYING     | Default type mapping |
+{:.table-data}
+
+The columns of the parent `select` come before the columns of the nested
+`select`. The `forEach` on `name` does not add a column. The `birth_date` column
+would have been `CHARACTER VARYING` under the default mapping for the `date`
+type, but the `ansi/type` tag overrides this. As noted in the section on
+overriding default type mappings, this relies on the birth dates being full
+dates. The `given` column holds a collection of `CHARACTER VARYING` values, and
+how it is represented depends on the implementation.
+
 ### Type Hinting with Tags
 
 Since these analytic views are often used as SQL tables, it can be useful to
