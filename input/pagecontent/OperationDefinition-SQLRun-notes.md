@@ -222,7 +222,7 @@ specified once in
 
 Where the subject is a SQLQuery or SQLView, "after the subject has been
 evaluated" includes any in-query `LIMIT`: implementations are free to push the
-cap down into the SQL as an optimization, but the observable behaviour is
+cap down into the SQL as an optimization, but the observable behavior is
 post-evaluation. A worked example is given under
 [Capping result rows with `_limit`](#limit-example).
 

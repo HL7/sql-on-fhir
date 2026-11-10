@@ -3,7 +3,7 @@
 The broad ecosystem of tools used for data analysis, not specific to any
 technology stack, programming language, or use case. Applies equally to such
 diverse systems as Microsoft Excel, a PostgreSQL database, Tableau or Python
-code in a Juypter notebook.
+code in a Jupyter notebook.
 
 
 ### analytic layer
@@ -178,7 +178,7 @@ resource type's elements, possibly from multiple levels of its hierarchy. They
 are the primary artifacts of this specification. 
 
 A naive tabular representation of FHIR resources would create a
-difficult-to-comprehend, and poorly performing database and world require an
+difficult-to-comprehend, and poorly performing database and would require an
 impractical number of  joins for even simple queries. Therefore, to support
 both performant access and simplified query creation, View Definitions are a
 satisfying solution.

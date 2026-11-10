@@ -56,7 +56,7 @@ This is a Sushi project and can use HL7 IG Publisher to build locally:
 
 ### Manual build process
 
-1. Clone this respository
+1. Clone this repository
 1. Run `./scripts/_updatePublisher.sh` to get the latest IG publisher
 1. Install `sushi` if you don't have it already with: `npm i fsh-sushi`
 1. Run `./scripts/_genonce.sh` to generate the IG

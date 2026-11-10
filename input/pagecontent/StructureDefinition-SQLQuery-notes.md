@@ -92,7 +92,7 @@ in
 ### Parameter Types
 
 <span class="fhir-conformance" id="sqlquery-notes-5">Each `Library.parameter` declares a `type` that
-callers SHALL honour when supplying values.</span>
+callers SHALL honor when supplying values.</span>
 <span class="fhir-conformance" id="sqlquery-notes-6">When parameters are passed at invocation time
 via a `Parameters` resource (for example to [`$sql-run`](OperationDefinition-SQLRun.html)
 or [`$sql-export`](OperationDefinition-SQLExport.html)), each entry

@@ -413,6 +413,11 @@ guidance and the completion status code.
 [#365](https://github.com/HL7/sql-on-fhir/pull/365) closing
 [#358](https://github.com/HL7/sql-on-fhir/issues/358)-[#363](https://github.com/HL7/sql-on-fhir/issues/363))
 
+Spelling was standardized on US English, and typographical errors were
+corrected. The `cancelled` export status code and the prose that refers to it
+are unchanged, as the code is a wire value.
+([FHIR-59162](https://jira.hl7.org/browse/FHIR-59162))
+
 ### Migrating from 2.0.0
 
 #### Existing ViewDefinitions
