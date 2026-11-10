@@ -136,7 +136,7 @@ Let's start with a simple example, defining "patient_demographics" and
 ```
 
 
-| id            | gender | dob        | given_name    | family_name |
+| patient_id    | gender | dob        | given_name    | family_name |
 |---------------|--------|------------|---------------|-------------|
 | 5e23837b-.... | female | 1952-03-08 | Malvina Gerda | Vicario     |
 | 93f09189-.... | male   | 1981-08-08 | Yolotzin Adel | Bristow     |
@@ -167,14 +167,14 @@ Let's start with a simple example, defining "patient_demographics" and
 
 ```
 
-| condition_id | onset                     | status   | code      | display                                   | patient_id    |
-|--------------|---------------------------|----------|-----------|-------------------------------------------|---------------|
-| 011b6e34-... | 2016-08-06T02:13:33+03:00 | resolved | 444814009 | Viral sinusitis (disorder)                | 5e23837b-.... |
-| 014774ea-... | 2016-05-27T13:44:17+03:00 | resolved | 195662009 | Acute viral pharyngitis (disorder)        | 93f09189-.... |
-| 02116b05-... | 2003-02-14T18:25:00+03:00 | resolved | 195662009 | Acute viral pharyngitis (disorder)        | 44d86263-.... |
-| 0287a9bc-... | 2019-03-30T08:53:34+03:00 | resolved | 10509002  | Acute bronchitis (disorder)               | 41907da4-.... |
-| 02a79009-... | 2013-07-04T14:17:52+04:00 | resolved | 43878008  | Streptococcal sore throat (disorder)      | 5bad6369-.... |
-| 02bfc9af-... | 2016-10-06T05:24:13+03:00 | resolved | 195662009 | Acute viral pharyngitis (disorder)        | 8742d4ba-.... |
+| condition_id | onset                     | abatement                 | status   | code      | display                                   | patient_id    |
+|--------------|---------------------------|---------------------------|----------|-----------|-------------------------------------------|---------------|
+| 011b6e34-... | 2016-08-06T02:13:33+03:00 | 2016-08-13T02:13:33+03:00 | resolved | 444814009 | Viral sinusitis (disorder)                | 5e23837b-.... |
+| 014774ea-... | 2016-05-27T13:44:17+03:00 | 2016-06-07T13:44:17+03:00 | resolved | 195662009 | Acute viral pharyngitis (disorder)        | 93f09189-.... |
+| 02116b05-... | 2003-02-14T18:25:00+03:00 | 2003-02-23T18:25:00+03:00 | resolved | 195662009 | Acute viral pharyngitis (disorder)        | 44d86263-.... |
+| 0287a9bc-... | 2019-03-30T08:53:34+03:00 | 2019-04-06T08:53:34+03:00 | resolved | 10509002  | Acute bronchitis (disorder)               | 41907da4-.... |
+| 02a79009-... | 2013-07-04T14:17:52+04:00 | 2013-07-15T14:17:52+04:00 | resolved | 43878008  | Streptococcal sore throat (disorder)      | 5bad6369-.... |
+| 02bfc9af-... | 2016-10-06T05:24:13+03:00 | 2016-10-18T05:24:13+03:00 | resolved | 195662009 | Acute viral pharyngitis (disorder)        | 8742d4ba-.... |
 {:.table-data}
 
 
