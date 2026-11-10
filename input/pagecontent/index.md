@@ -86,14 +86,21 @@ a dependency whose membership or mappings the runner exposes as a relation the
 SQL joins to ([Terminology in SQL](terminology-in-sql.html)). See the
 [SQLQuery profile](StructureDefinition-SQLQuery.html) for details.
 
+A query that other queries build upon is represented with the companion
+[SQLView](StructureDefinition-SQLView.html) profile, which is also a profile on
+the FHIR Library resource. A SQLView is a named SQL query that other queries
+reference as a table, in the same way as a SQL view. It carries its SQL and its
+dependencies in the same way as a SQLQuery, but it does not declare parameters.
+See the [SQLView profile](StructureDefinition-SQLView.html) for details.
+
 #### HTTP API
 
 The specification defines a standard [HTTP API](operations.html) as FHIR
 OperationDefinitions for interacting with SQL on FHIR systems:
 
 * [`$sql-run`](OperationDefinition-SQLRun.html) — Synchronous evaluation of a
-  single subject, whether a ViewDefinition, a SQLQuery Library or a SQLView
-  Library, with streamed results.
+  single subject, whether a ViewDefinition, a SQLQuery Library or a
+  [SQLView](StructureDefinition-SQLView.html) Library, with streamed results.
 * [`$sql-export`](OperationDefinition-SQLExport.html) — Asynchronous bulk export
   of one or more subjects, in any mixture, into formats like CSV, NDJSON or
   Parquet, as a single job against a single snapshot.
