@@ -166,5 +166,5 @@ Annotation reference:
 1. Infer `name` from filename if `@name` not provided
 2. Default `status` to `draft` if not specified
 3. Validate parameter types against allowed FHIR types
-4. Validate labels as SQL identifiers (`^[a-zA-Z_][a-zA-Z0-9_]*$`)
+4. Validate labels as SQL identifiers (`^[A-Za-z][A-Za-z0-9_]*$`)
 5. Warn on unrecognized annotations

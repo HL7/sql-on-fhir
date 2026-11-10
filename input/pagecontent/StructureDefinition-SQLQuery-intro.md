@@ -50,7 +50,7 @@ relation with the columns `source_system`, `source_version`, `source_code`,
 
 Each dependency requires a `label` that defines the table name used in SQL.
 <span class="fhir-conformance" id="sqlquery-14">Labels SHALL be unique within the Library and
-valid SQL identifiers (start with letter or underscore, contain only
+valid SQL identifiers (start with a letter, contain only
 letters/digits/underscores, avoid reserved words).</span>
 
 #### Parameters
