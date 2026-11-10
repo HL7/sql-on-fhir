@@ -53,7 +53,7 @@ inside a `Parameters` resource in the request body on a `POST`.
 | subjectCanonical | canonical                              | 0¹  | 1   | Canonical URL of the subject. [Details](#subject-clarification)                                   |
 | subjectReference | Reference                              | 0¹  | 1   | Literal location of the subject on the server. [Details](#subject-clarification)                  |
 | subjectResource  | ViewDefinition \| SQLQuery \| SQLView² | 0¹  | 1   | Inline subject resource. [Details](#subject-clarification)                                        |
-| parameters       | Parameters                             | 0   | 1   | Parameter values bound by name to those the Library declares; requires a SQL subject. [Details](#parameter-passing) |
+| parameters       | Parameters                             | 0   | 1   | Parameter values bound by name to those the Library declares; requires a SQLQuery subject. [Details](#parameter-passing) |
 | context          | ViewDefinition \| SQLView \| ValueSet \| ConceptMap² | 0   | \*  | Inline supporting artifact, matched to a dependency by canonical URL. [Details](#supporting-artifacts) |
 | resource         | Resource                               | 0   | \*  | FHIR resources to transform; requires a ViewDefinition subject. [Details](#resource-parameter-clarification) |
 | \_format         | code                                   | 0   | 1   | Output format: `json`, `ndjson`, `csv`, `parquet`, `fhir`. [Details](#format-parameter-clarification) |
@@ -120,8 +120,8 @@ none of the three profiles is rejected with `422 Unprocessable Entity`.
 What the subject resolves to determines how it is processed, and which of the
 conditional parameters apply: a ViewDefinition is evaluated directly and may be
 fed inline resources through [`resource`](#resource-parameter-clarification); a
-SQLQuery or SQLView has its dependency graph resolved first and may have values
-bound through [`parameters`](#parameter-passing).
+SQLQuery or SQLView has its dependency graph resolved first, and a SQLQuery may
+have values bound through [`parameters`](#parameter-passing).
 
 How a server resolves a canonical URL or an absolute reference - from a local
 artifact registry, by dereferencing the URL, or not at all - is an implementation
@@ -327,7 +327,7 @@ Content-Type: application/x-ndjson
 ```
 
 The values are bound by name to the parameters the Library declares. Supplying
-`parameters` where the subject is a ViewDefinition is rejected with
+`parameters` where the subject is a ViewDefinition or SQLView is rejected with
 `400 Bad Request`.
 
 ##### Naming the subject by literal reference
@@ -845,10 +845,12 @@ SQLQuery profile for the binding rules and the mapping from
 `Library.parameter.type` to the `value[x]` element to use.
 
 `parameters` binds by name to the parameters the subject declares in
-`Library.parameter`, so it requires a SQLQuery or SQLView subject. A
-ViewDefinition declares no `Library.parameter`, so there is nothing for a value
-to bind to, and supplying `parameters` alongside a ViewDefinition subject is
-rejected with `400 Bad Request` and an `OperationOutcome` naming `parameters`.
+`Library.parameter`, so it requires a SQLQuery subject. A ViewDefinition has no
+`Library.parameter`, and an SQLView
+[SHALL NOT declare one](StructureDefinition-SQLView.html#no-parameters), so in
+either case there is nothing for a value to bind to. Supplying `parameters`
+alongside a ViewDefinition or SQLView subject is rejected with
+`400 Bad Request` and an `OperationOutcome` naming `parameters`.
 
 Binding values to a ViewDefinition's `constant` elements is deliberately out of
 scope. A `ViewDefinition.constant` already carries a value, so supplying one
@@ -861,7 +863,7 @@ placeholder - a different semantic that deserves its own proposal.
 | --------------------------- | --------------- | ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
 | `400 Bad Request`           | `required`      | subject       | No subject supplied                                                                                                                           |
 | `400 Bad Request`           | `invalid`       | subject       | More than one of `subjectCanonical`, `subjectReference` and `subjectResource` supplied                                                        |
-| `400 Bad Request`           | `invalid`       | `parameters`  | Supplied where the subject is a ViewDefinition                                                                                                |
+| `400 Bad Request`           | `invalid`       | `parameters`  | Supplied where the subject is a ViewDefinition or SQLView                                                                                     |
 | `400 Bad Request`           | `invalid`       | `parameters`  | A parameter name the subject does not declare, or a value whose type does not match the declared type                                         |
 | `400 Bad Request`           | `invalid`       | `resource`    | Supplied where the subject is a SQLQuery or SQLView                                                                                           |
 | `400 Bad Request`           | `invalid`       | `context`     | An entry with no `url`, two entries sharing a `url`, or an entry matching no dependency of the subject                                        |
