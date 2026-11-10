@@ -48,8 +48,8 @@ ViewDefinition is an additional resource, and SQLQuery and SQLView are profiles
 of `Library`. `OperationDefinition.parameter.type` holds a single type, so the
 type declared for an inline subject has to admit both a ViewDefinition and a
 Library. `ViewDefinition` would exclude the two Library profiles, and `Library`
-would exclude a ViewDefinition. `CanonicalResource` is the narrowest FHIR-defined
-type that admits all three subject kinds.
+would exclude a ViewDefinition. `CanonicalResource` is a FHIR-defined type that
+admits all three subject kinds.
 
 The actual constraint is carried by `parameter.targetProfile`. `subjectResource`
 declares `CanonicalResource` with a `targetProfile` naming
