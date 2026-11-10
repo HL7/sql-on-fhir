@@ -386,8 +386,9 @@ The SQL on FHIR specification was developed externally to HL7 by the FHIR
 Analytics Collaborative, and adopted into the HL7 balloting process under the
 sponsorship of the FHIR Infrastructure Work Group (HL7 project
 [PSS-2716](https://jira.hl7.org/browse/PSS-2716)). The community continues to
-maintain reference implementations, a test report and a playground at
-[sql-on-fhir.org](https://sql-on-fhir.org).
+maintain [reference implementations](https://github.com/FHIR/sql-on-fhir.js), a
+[test report](https://sql-on-fhir.org/extra/impls.html) and a
+[playground](https://sql-on-fhir.org/extra/playground.html).
 
 The contributors identified in PSS-2716 as the developers of this externally
 developed content contribute it to HL7 under section 09.01.02 (Commitment) of
