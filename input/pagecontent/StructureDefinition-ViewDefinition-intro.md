@@ -1,7 +1,7 @@
 It is the central piece of the [View Layer](index.html#system-layers) and
 represents a tabular projection of FHIR resources with the columns and filtering
 criteria defined by [FHIRPath](https://hl7.org/fhirpath/) expressions. The
-logical model is described below.
+resource is described below.
 
 ### Key Elements
 
