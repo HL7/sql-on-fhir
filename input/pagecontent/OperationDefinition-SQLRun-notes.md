@@ -105,7 +105,7 @@ independently of the subject's kind:
 ² `subjectResource` is declared as `CanonicalResource` in the
 OperationDefinition. ViewDefinition is an additional resource, and SQLQuery and
 SQLView are profiles of `Library`, so one declared type has to admit both;
-`CanonicalResource` is the narrowest declared type admitting all three kinds, and
+`CanonicalResource` admits all three kinds, and
 the real constraint is carried by `targetProfile`. See
 [Why the declared type is `CanonicalResource`](operations-common.html#declared-type).
 
