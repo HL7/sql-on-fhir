@@ -927,10 +927,13 @@ this page.
    it is present. Otherwise it is the type inferred from the `path`, if the
    implementation supports type inference.
 4. Map the FHIR type of each column to a type in the output format. For SQL
-   outputs, this is the type in the
-   [default type mappings](#default-type-mappings), unless the column has a
-   type hint such as the `ansi/type` tag, in which case the type hint is used
-   (see [overriding default type mappings](#overriding-default-type-mappings)).
+   outputs, the [default type mappings](#default-type-mappings) give the
+   recommended type. If the column has a type hint that the implementation
+   supports, such as the `ansi/type` tag, the type hint takes the place of the
+   default (see
+   [overriding default type mappings](#overriding-default-type-mappings)). The
+   behavior for a type hint that is unknown or incompatible is left to the
+   implementation.
 5. Note which columns have `collection` set to `true`. These columns can hold
    multiple values, and need a type in the output format that is capable of
    this, such as an array.
@@ -957,6 +960,7 @@ Consider the following ViewDefinition:
 ```json
 {
     "resourceType": "ViewDefinition",
+    "status": "active",
     "name": "patient_names",
     "resource": "Patient",
     "select": [
@@ -1017,15 +1021,15 @@ columns, in this order:
 | `birth_date` | date      | No         | DATE                  | `ansi/type` tag      |
 | `family`     | string    | No         | CHARACTER VARYING     | Default type mapping |
 | `given`      | string    | Yes        | CHARACTER VARYING     | Default type mapping |
-
 {:.table-data}
 
 The columns of the parent `select` come before the columns of the nested
 `select`. The `forEach` on `name` does not add a column. The `birth_date` column
 would have been `CHARACTER VARYING` under the default mapping for the `date`
-type, but the `ansi/type` tag overrides this. The `given` column holds a
-collection of `CHARACTER VARYING` values, and how it is represented depends on
-the implementation.
+type, but the `ansi/type` tag overrides this. As noted in the section on
+overriding default type mappings, this relies on the birth dates being full
+dates. The `given` column holds a collection of `CHARACTER VARYING` values, and
+how it is represented depends on the implementation.
 
 ### Type Hinting with Tags
 
