@@ -9,9 +9,10 @@ logical model is described below.
 
 Each ViewDefinition instance is tied to a single
 FHIR [resource type](StructureDefinition-ViewDefinition-definitions.html#diff_ViewDefinition.resource),
-such as Patient or Observation. It will then create zero or more rows for
-each resource
-instance. [Examples](StructureDefinition-ViewDefinition-examples.html) include
+such as Patient or Observation. When a [view runner](#view-runner) processes
+the ViewDefinition, it produces zero or more rows for each resource instance of
+that type, depending on the `select` and `where` elements of the
+ViewDefinition. [Examples](StructureDefinition-ViewDefinition-examples.html) include
 simple tabular views of patients, unrolling patient addresses into an address
 table, views of certain types of observations, and so on.
 
