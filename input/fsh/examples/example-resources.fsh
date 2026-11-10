@@ -319,7 +319,7 @@ Usage: #example
 
 Instance: ExampleOrganization1
 InstanceOf: Organization
-Description: "The organisation that provided the example encounters."
+Description: "The organization that provided the example encounters."
 Usage: #example
 * id = "1"
 * name = "Example Health Service"

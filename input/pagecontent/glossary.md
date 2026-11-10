@@ -3,7 +3,7 @@
 The broad ecosystem of tools used for data analysis, not specific to any
 technology stack, programming language, or use case. Applies equally to such
 diverse systems as Microsoft Excel, a PostgreSQL database, Tableau or Python
-code in a Juypter notebook.
+code in a Jupyter notebook.
 
 
 ### analytic layer
