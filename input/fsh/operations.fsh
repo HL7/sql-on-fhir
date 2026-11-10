@@ -54,7 +54,7 @@ Description: "Execute a ViewDefinition, SQLQuery Library or SQLView Library and 
 * parameter[=].min = 0
 * parameter[=].max = "1"
 * parameter[=].type = #Parameters
-* parameter[=].documentation = "Input parameter values for the subject, bound by name to the parameters the Library declares (Library.parameter.name), using the value[x] type matching each declared type. Permitted only where the subject is a SQLQuery or SQLView; supplying it where the subject is a ViewDefinition is rejected with 400 Bad Request, because a ViewDefinition declares no parameters. Carries a resource, so it requires POST."
+* parameter[=].documentation = "Input parameter values for the subject, bound by name to the parameters the Library declares (Library.parameter.name), using the value[x] type matching each declared type. Permitted only where the subject is a SQLQuery; supplying it where the subject is a ViewDefinition or SQLView is rejected with 400 Bad Request, because neither declares parameters. Carries a resource, so it requires POST."
 
 * parameter[+].name = #context
 * parameter[=].use = #in
@@ -197,7 +197,7 @@ Description: "Export one or more ViewDefinitions, SQLQuery Libraries and SQLView
 * parameter[=].part[=].min = 0
 * parameter[=].part[=].max = "1"
 * parameter[=].part[=].type = #Parameters
-* parameter[=].part[=].documentation = "Input parameter values for this subject, bound by name to the parameters the Library declares (Library.parameter.name). Permitted only where this repetition's subject is a SQLQuery or SQLView; supplying it where the subject is a ViewDefinition is rejected with 400 Bad Request, because a ViewDefinition declares no parameters."
+* parameter[=].part[=].documentation = "Input parameter values for this subject, bound by name to the parameters the Library declares (Library.parameter.name). Permitted only where this repetition's subject is a SQLQuery; supplying it where the subject is a ViewDefinition or SQLView is rejected with 400 Bad Request, because neither declares parameters."
 
 // Input parameters - supporting artifacts, supplied once for the whole job
 * parameter[+].name = #context

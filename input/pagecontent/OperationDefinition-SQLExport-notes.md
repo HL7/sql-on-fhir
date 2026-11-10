@@ -189,9 +189,9 @@ required per `subject` repetition. See
 [Why the declared type is `CanonicalResource`](operations-common.html#declared-type).
 
 `parameters` binds to the parameters the subject's Library declares, so it is
-permitted only where that repetition's subject is a SQLQuery or SQLView.
-Supplying it where the subject is a ViewDefinition is rejected with
-`400 Bad Request`, because a ViewDefinition declares no parameters.
+permitted only where that repetition's subject is a SQLQuery. Supplying it where
+the subject is a ViewDefinition or SQLView is rejected with `400 Bad Request`,
+because neither declares parameters.
 
 ###### Supporting artifacts - `context` Parameter
 
@@ -466,7 +466,7 @@ either resolves it.
 | `400 Bad Request`           | `required`      | `subject`     | No `subject` supplied                                                                                                                                        |
 | `400 Bad Request`           | `invalid`       | `subject`     | A repetition supplying none of the three naming forms, or more than one                                                                                      |
 | `400 Bad Request`           | `invalid`       | `subject`     | Two repetitions that would produce the same `output.name`                                                                                                    |
-| `400 Bad Request`           | `invalid`       | `parameters`  | Supplied where that repetition's subject is a ViewDefinition                                                                                                 |
+| `400 Bad Request`           | `invalid`       | `parameters`  | Supplied where that repetition's subject is a ViewDefinition or SQLView                                                                                      |
 | `400 Bad Request`           | `invalid`       | `parameters`  | A parameter name the subject does not declare, or a value whose type does not match the declared type                                                        |
 | `400 Bad Request`           | `invalid`       | `context`     | An entry with no `url`, two entries sharing a `url`, or an entry matching no dependency of any subject                                                       |
 | `400 Bad Request`           | `not-found`     | `patient`     | A `patient` naming a resource the server cannot find (see [Status code for a value that cannot be resolved](operations-common.html#filter-resolution-errors)) |
