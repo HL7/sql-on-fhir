@@ -53,7 +53,7 @@ inside a `Parameters` resource in the request body on a `POST`.
 | subjectCanonical | canonical                              | 0¹  | 1   | Canonical URL of the subject. [Details](#subject-clarification)                                   |
 | subjectReference | Reference                              | 0¹  | 1   | Literal location of the subject on the server. [Details](#subject-clarification)                  |
 | subjectResource  | ViewDefinition \| SQLQuery \| SQLView² | 0¹  | 1   | Inline subject resource. [Details](#subject-clarification)                                        |
-| parameters       | Parameters                             | 0   | 1   | Parameter values bound by name to those the Library declares; requires a SQL subject. [Details](#parameter-passing) |
+| parameters       | Parameters                             | 0   | 1   | Parameter values bound by name to those the Library declares; requires a SQLQuery subject. [Details](#parameter-passing) |
 | context          | ViewDefinition \| SQLView \| ValueSet \| ConceptMap² | 0   | \*  | Inline supporting artifact, matched to a dependency by canonical URL. [Details](#supporting-artifacts) |
 | resource         | Resource                               | 0   | \*  | FHIR resources to transform; requires a ViewDefinition subject. [Details](#resource-parameter-clarification) |
 | \_format         | code                                   | 0   | 1   | Output format: `json`, `ndjson`, `csv`, `parquet`, `fhir`. [Details](#format-parameter-clarification) |
@@ -327,7 +327,7 @@ Content-Type: application/x-ndjson
 ```
 
 The values are bound by name to the parameters the Library declares. Supplying
-`parameters` where the subject is a ViewDefinition is rejected with
+`parameters` where the subject is a ViewDefinition or SQLView is rejected with
 `400 Bad Request`.
 
 ##### Naming the subject by literal reference

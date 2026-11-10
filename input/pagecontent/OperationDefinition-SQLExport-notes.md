@@ -337,6 +337,9 @@ Parameter values are passed as a nested `Parameters` resource within each
 [CQL `$evaluate` operation](https://hl7.org/fhir/uv/cql/OperationDefinition-cql-library-evaluate.html).
 Binding is per subject because one job may carry several subjects, each declaring
 its own parameters, so a single top-level set would be ambiguous across them.
+`parameters` is permitted only where the repetition's subject is a SQLQuery;
+supplying it where the subject is a ViewDefinition or SQLView is rejected with
+`400 Bad Request`.
 
 See [Parameter Types](StructureDefinition-SQLQuery.html#parameter-types) on the
 SQLQuery profile for the binding rules and the mapping from
