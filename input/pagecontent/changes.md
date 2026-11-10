@@ -315,6 +315,19 @@ two runners evaluating the same view produce comparable column types when no
 type hint is present.
 ([#290](https://github.com/HL7/sql-on-fhir/pull/290))
 
+##### `date` and `uri` columns in tabular views
+
+The `primitives-only` invariant on the `TabularViewDefinition` profile omitted
+`date` and `uri`, so a tabular view could not declare a column for an element
+such as `Patient.birthDate`. The invariant now accepts both types, and matches
+the
+[FHIR type to SQL type mapping](StructureDefinition-ViewDefinition.html#fhir-type-to-sql-type-mapping).
+Views that conformed to the profile before this change still conform. The
+`ShareablePatientDemographics` example gains a `birth_date` column of type
+`date`.
+([FHIR-59164](https://jira.hl7.org/browse/FHIR-59164),
+[#406](https://github.com/HL7/sql-on-fhir/pull/406))
+
 ##### Publication metadata on ViewDefinition
 
 Adoption of the standard metadata occurred in two steps. Deriving from
