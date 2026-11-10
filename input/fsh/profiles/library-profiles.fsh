@@ -48,14 +48,16 @@ versioning.
 * content.data 1..1 MS
 * content.data ^short = "SQL query (base64-encoded)"
 
-// ViewDefinition and SQLView dependencies
+// ViewDefinition, SQLView, ValueSet and ConceptMap dependencies. A ValueSet or
+// ConceptMap dependency is exposed to the SQL as a relation; see
+// input/pagecontent/terminology-in-sql.md.
 * relatedArtifact MS
 * relatedArtifact.type 1..1 MS
 * relatedArtifact.type = #depends-on
-* relatedArtifact.type ^short = "depends-on for ViewDefinition or SQLView references"
+* relatedArtifact.type ^short = "depends-on for ViewDefinition, SQLView, ValueSet or ConceptMap references"
 * relatedArtifact.resource 1..1 MS
-* relatedArtifact.resource only Canonical(ViewDefinition or SQLView)
-* relatedArtifact.resource ^short = "Canonical URL of a ViewDefinition or SQLView"
+* relatedArtifact.resource only Canonical(ViewDefinition or SQLView or ValueSet or ConceptMap)
+* relatedArtifact.resource ^short = "Canonical URL of a ViewDefinition, SQLView, ValueSet or ConceptMap"
 * relatedArtifact.label 1..1 MS
 * relatedArtifact.label ^short = "Table name used in SQL query"
 * relatedArtifact.label obeys sql-name
@@ -96,14 +98,14 @@ SQLView cannot declare parameters.
 * content.data 1..1 MS
 * content.data ^short = "SQL view (base64-encoded)"
 
-// ViewDefinition and SQLView dependencies
+// ViewDefinition, SQLView, ValueSet and ConceptMap dependencies
 * relatedArtifact MS
 * relatedArtifact.type 1..1 MS
 * relatedArtifact.type = #depends-on
-* relatedArtifact.type ^short = "depends-on for ViewDefinition or SQLView references"
+* relatedArtifact.type ^short = "depends-on for ViewDefinition, SQLView, ValueSet or ConceptMap references"
 * relatedArtifact.resource 1..1 MS
-* relatedArtifact.resource only Canonical(ViewDefinition or SQLView)
-* relatedArtifact.resource ^short = "Canonical URL of a ViewDefinition or SQLView"
+* relatedArtifact.resource only Canonical(ViewDefinition or SQLView or ValueSet or ConceptMap)
+* relatedArtifact.resource ^short = "Canonical URL of a ViewDefinition, SQLView, ValueSet or ConceptMap"
 * relatedArtifact.label 1..1 MS
 * relatedArtifact.label ^short = "Table name used in SQL view"
 * relatedArtifact.label obeys sql-name

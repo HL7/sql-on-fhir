@@ -1,5 +1,3 @@
-# CapabilityStatement for SQL-on-FHIR API
-
 <span class="fhir-conformance" id="cap-1">The server SHALL support the CapabilityStatement resource to allow clients to discover supported operations.</span>
 
 Both data operations are invoked at the system level, so they are declared in
@@ -37,7 +35,7 @@ The same applies to the Library resource type, of which
 an `operation` element, because the data operations no longer hang off a resource
 type.
 
-## Declaring partial operation support {#partial-operation-support}
+### Declaring partial operation support {#partial-operation-support}
 
 A server need not support every parameter of an operation.
 <span class="fhir-conformance" id="cap-4">Which subset it does support SHALL be
@@ -119,7 +117,7 @@ not support:
 
 A client reading that definition knows not to send `subjectReference`.
 
-## Example
+### Example
 
 ```http
 GET /metadata HTTP/1.1

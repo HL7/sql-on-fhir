@@ -1,6 +1,4 @@
-# SQL on FHIR API
-
-## Overview
+### Overview
 
 This document defines a standard HTTP API for interacting with SQL on FHIR systems,
 including FHIR servers and ViewDefinition runners.
@@ -20,9 +18,9 @@ Both data operations act on a **subject**: a ViewDefinition, a
 parameter rather than by the request path, so one operation serves all three
 artifact kinds.
 
-## Use Cases
+### Use Cases
 
-### Use Case 1: Discovery
+#### Use Case 1: Discovery
 
 Clients can discover supported capabilities of the server by requesting the CapabilityStatement resource
 on standard FHIR server endpoint - `/metadata`.
@@ -33,7 +31,7 @@ on standard FHIR server endpoint - `/metadata`.
 
 [See CapabilityStatement](#capabilitystatement)
 
-### Use Case 2: Exporting a Mixed Analytics Bundle
+#### Use Case 2: Exporting a Mixed Analytics Bundle
 
 An analytics team maintains a reporting bundle of ViewDefinitions that flatten
 FHIR resources into tables, and SQLQuery Libraries that join and aggregate those
@@ -60,7 +58,7 @@ manifest.
 
 [See Async Bulk Export](OperationDefinition-SQLExport.html)
 
-### Use Case 3: Bulk Export for Reporting and Analysis
+#### Use Case 3: Bulk Export for Reporting and Analysis
 
 Clients can efficiently transform and export FHIR data in flattened format (csv, parquet, ndjson)
 described in ViewDefinitions into file storage (like S3, GCS, Azure Blob Storage, etc).
@@ -82,7 +80,7 @@ And use standard tools like Apache Spark, AWS Athena or other tools to analyze d
 
 [See Async Bulk Export](OperationDefinition-SQLExport.html)
 
-### Use Case 4: Real-time Evaluation of ViewDefinition
+#### Use Case 4: Real-time Evaluation of ViewDefinition
 
 Client can request real-time evaluation of ViewDefinition and process streamed results. For example,
 AI applications can use this to process patient data in real-time by requesting flat conditions,
@@ -98,7 +96,7 @@ observations and medications as they are recorded.
 
 [See Run](OperationDefinition-SQLRun.html)
 
-### Use Case 5: Authoring & Debugging ViewDefinition
+#### Use Case 5: Authoring & Debugging ViewDefinition
 
 Developers or developer tools can test and refine ViewDefinitions interactively by evaluating them in real-time.
 
@@ -111,7 +109,7 @@ Developers or developer tools can test and refine ViewDefinitions interactively 
 
 [See Run](OperationDefinition-SQLRun.html)
 
-### Use Case 6: Bulk Reports and Analytics
+#### Use Case 6: Bulk Reports and Analytics
 
 Client can submit an asynchronous job to the server to build views and run queries to
 produce reports, quality dashboards and analytics. What's going on server is abstracted from the client.
@@ -128,7 +126,7 @@ Administrative bodies can request bulk reports for different populations and met
 
 [See Async Bulk Export](OperationDefinition-SQLExport.html)
 
-## API
+### API
 
 Behavior shared by the two data operations (`$sql-run` and `$sql-export`) - the
 output format set, subject naming, filtering, `context` matching, return
@@ -137,14 +135,14 @@ the asynchronous delivery flow - is specified once in
 [Common Operation Behavior](operations-common.html). The operation pages below
 reference it rather than restating it.
 
-### CapabilityStatement
+#### CapabilityStatement
 
 <span class="fhir-conformance" id="ops-2">Server SHALL support CapabilityStatement API for
 discovery of supported operations.</span>
 
 See [CapabilityStatement for SQL-on-FHIR API](operations-capability.html)
 
-### Operation $sql-run
+#### Operation $sql-run
 
 The `$sql-run` operation provides real-time, synchronous evaluation of a single
 subject, returning the result in the requested output format. Where the subject
@@ -164,7 +162,7 @@ It can process either resources provided directly in the request or resources av
 
 See [Operation $sql-run](OperationDefinition-SQLRun.html) and the shared [Common Operation Behavior](operations-common.html).
 
-### Operation $sql-export
+#### Operation $sql-export
 
 The `$sql-export` operation is the asynchronous counterpart to `$sql-run`,
 exporting the results of one or more subjects into formats such as CSV, NDJSON or

@@ -110,7 +110,7 @@ The resulting output:
 | pt2 | s2  | t22   |
 | pt2 | s2  | t23   |
 
-## The FHIRPath Subset
+### The FHIRPath Subset
 
 ViewDefinitions
 use [minimal subset of FHIRPath](StructureDefinition-ViewDefinition.html#fhirpath-functionality)
@@ -124,11 +124,11 @@ The specification also introduces two special functions:
 - `getReferenceKey(resourceType)` - A similar function to get an id from a
   reference
 
-## The Functions in Detail
+### The Functions in Detail
 
 Let’s walk through every function in detail with examples:
 
-### The `column` Function
+#### The `column` Function
 
 `column` extracts elements into tabular columns using FHIRPath expressions. The
 algorithm for this function begins by receiving a list of {name, path} pairs.
@@ -168,7 +168,7 @@ function column(cols, rows) {
 }
 ```
 
-### The `where` Function
+#### The `where` Function
 
 `where` retains only those records for which it FHIRPath expression returns
 true.
@@ -196,7 +196,7 @@ function where(exprs, rows) {
 }
 ```
 
-### The `forEach` & `forEachOrNull` Functions
+#### The `forEach` & `forEachOrNull` Functions
 
 `forEach` and `forEachOrNull` are intended for flattening nested collections by
 applying a transformation to each element. It consists of FHIRPath expression
@@ -244,7 +244,7 @@ function forEach(path, expr, rows, envVars = {}) {
 }
 ```
 
-### The `select` Function
+#### The `select` Function
 
 `select` is used in combination with `forEach` or `forEachOrNull` to cross-join
 parent elements with unnested collection elements. For example, `Patient.id`
@@ -290,7 +290,7 @@ select([{ a: 1 }, { a: 2 }], [{ b: 1 }, { b: 2 }])[
 ];
 ```
 
-### The `unionAll` Function
+#### The `unionAll` Function
 
 `unionAll` combines rows from different branches of a resource tree by
 concatenating multiple record sets. Essentially a concatenation of several
@@ -341,7 +341,7 @@ inherits `%rowIndex` from the enclosing context. If a branch contains its own
 iteration expression (`forEach`, `forEachOrNull`, or `repeat`), that expression
 establishes an independent `%rowIndex` sequence starting from 0.
 
-### Function Precedence
+#### Function Precedence
 
 To interpret such nodes, you have to re-order keywords (functions) according to
 precedence (higher bubble up):
@@ -380,7 +380,7 @@ as shown in the output.
 }
 ```
 
-### Reference Implementation
+#### Reference Implementation
 
 The [JavaScript reference implementation](https://github.com/FHIR/sql-on-fhir.js)
 implements the functional model described here. It is very concise at roughly

@@ -81,7 +81,9 @@ flat tables, and SQLQuery joins and aggregates them using native SQL.
 
 The profile supports multiple dialect-specific SQL variants of the same logical
 query, parameterized queries with safe binding, and table aliases that map to
-ViewDefinition outputs. See the
+ViewDefinition outputs. A query can also declare a ValueSet or a ConceptMap as
+a dependency whose membership or mappings the runner exposes as a relation the
+SQL joins to ([Terminology in SQL](terminology-in-sql.html)). See the
 [SQLQuery profile](StructureDefinition-SQLQuery.html) for details.
 
 #### HTTP API
@@ -177,7 +179,7 @@ Let's start with a simple example, defining "patient_demographics" and
 
 
 Such tabular views can be created for any FHIR resource,
-with [more examples here](artifacts.html#example-example-instances). See
+with [more examples here](artifacts.html). See
 the [View Definition page](StructureDefinition-ViewDefinition.html) for the
 full definition of the above structure.
 
