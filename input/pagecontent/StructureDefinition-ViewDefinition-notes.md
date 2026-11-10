@@ -540,6 +540,50 @@ simply produce a string, as would be done in a CSV-based implementation. See
 the [database type hints](#type-hinting-with-tags) section below if finer
 database-specific type control is needed.
 
+#### Columns with Multiple Values
+
+The `path` of a column can produce more than one value for a row. For example,
+`name.given` on a Patient produces every given name in every name. A column that
+may produce multiple values needs
+its [collection](StructureDefinition-ViewDefinition-definitions.html#diff_ViewDefinition.select.column.collection)
+set to `true`. <span class="fhir-conformance" id="viewdef-25">If the `path` of a
+column produces more than one value and
+the [collection](StructureDefinition-ViewDefinition-definitions.html#diff_ViewDefinition.select.column.collection)
+is not set to `true`, the View Runner SHALL report an error.</span>
+
+In the following view, `given_names` sets `collection` to `true`, so a Patient
+with the given names "Malcolm" and "Robert" produces one row in which
+`given_names` holds both values:
+
+```json
+{
+    "resourceType": "ViewDefinition",
+    "resource": "Patient",
+    "status": "active",
+    "select": [
+        {
+            "column": [
+                {
+                    "name": "id",
+                    "path": "getResourceKey()"
+                },
+                {
+                    "name": "given_names",
+                    "path": "name.given",
+                    "collection": true
+                }
+            ]
+        }
+    ]
+}
+```
+
+If `collection` were omitted from `given_names`, or set to `false`, a View Runner
+would report an error when it processed that Patient. A view that needs one row
+per value instead can use
+[forEach](StructureDefinition-ViewDefinition-definitions.html#diff_ViewDefinition.select.forEach),
+as described in [Unnesting Semantics](#unnesting-semantics).
+
 ### Using Constants
 
 A ViewDefinition may include one or more constants, which are simply values that
