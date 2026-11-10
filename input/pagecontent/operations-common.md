@@ -425,7 +425,7 @@ the whole job as follows:
    or ConceptMap as the relation described in
    [Terminology in SQL](terminology-in-sql.html).
 
-Step 2's memoisation is what makes one resolution per job true: a canonical URL
+Step 2's memoization is what makes one resolution per job true: a canonical URL
 reached from two subjects is resolved once, and both subjects see the same
 artifact. What is constrained is the resolution, not the execution - whether the
 resolved artifact is then materialized once or several times is left to the
@@ -547,7 +547,7 @@ with label `c`. The traversal resolves:
 {:.table-data}
 
 The second subject reaches an already-resolved canonical URL, so step 2's
-memoisation returns the recorded resolution rather than resolving again: both
+memoization returns the recorded resolution rather than resolving again: both
 subjects see the same ViewDefinition. The entry was selected, so it is not
 unmatched. It is a supporting artifact rather than a subject, so the manifest
 carries two `output` entries - `cohort_bp` and `cohort_labs` - and none for it.
