@@ -146,7 +146,7 @@ menu:
     $sql-run: OperationDefinition-SQLRun.html
     $sql-export: OperationDefinition-SQLExport.html
   Contributing: contributing.html
-  # extra/playground.html does not work - TODO: use relative ulrs
+  # extra/playground.html does not work - TODO: use relative urls
   Playground: http://sql-on-fhir.org/extra/playground.html
   Tests: http://sql-on-fhir.org/extra/tests.html
   Implementations: http://sql-on-fhir.org/extra/impls.html
@@ -237,7 +237,7 @@ resources:
   ViewDefinition/PatientAndContactAddressUnion:
     name: Patient and Contact Address Union
     description: >-
-      An example of unnesting patient addresses and contact addresss into multiple
+      An example of unnesting patient addresses and contact addresses into multiple
       rows, which are unioned together into a single table.
     exampleBoolean: true
   ViewDefinition/PatientNamesWithIndex:
@@ -275,7 +275,7 @@ resources:
       Demonstrates using the `repeat` directive to recursively flatten nested
       QuestionnaireResponse items. Unlike `forEach`, which only unnests a single
       level, `repeat` traverses all levels of nesting to produce one row per item
-      regardless of depth. This is useful for analysing survey responses where
+      regardless of depth. This is useful for analyzing survey responses where
       questions may be grouped into nested sections.
     exampleBoolean: true
   ViewDefinition/CodeSystemHierarchy:
@@ -284,7 +284,7 @@ resources:
       Demonstrates using `repeat` with nested `select` to traverse a CodeSystem
       concept hierarchy. This produces parent-child code pairs by using `repeat` to
       walk down the concept tree and a nested `forEach` to extract each child
-      concept at every level. Useful for building concept maps or analysing
+      concept at every level. Useful for building concept maps or analyzing
       hierarchical terminologies.
     exampleBoolean: true
 

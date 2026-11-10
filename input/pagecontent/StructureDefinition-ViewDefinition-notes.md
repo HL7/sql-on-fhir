@@ -584,7 +584,7 @@ element within the collection being iterated. This is useful for:
 - **Surrogate keys**: Combining the resource ID with the element index creates
   a unique identifier for each row.
 
-##### Behaviour
+##### Behavior
 
 - Within `forEach`, `forEachOrNull`, and `repeat` contexts, `%rowIndex`
   returns the position of the current element in the collection (starting
