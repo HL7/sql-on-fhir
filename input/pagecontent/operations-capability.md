@@ -24,7 +24,7 @@ interaction array includes the appropriate codes:</span>
 
 - read
 - search-type
-- write
+- update
 - patch
 - delete
 - create
@@ -153,7 +153,7 @@ Content-Type: application/fhir+json
       "interaction": [
         { "code": "read" },
         { "code": "search-type" },
-        { "code": "write" },
+        { "code": "update" },
         { "code": "patch" },
         { "code": "delete" },
         { "code": "create" }
@@ -164,7 +164,7 @@ Content-Type: application/fhir+json
       "interaction": [
         { "code": "read" },
         { "code": "search-type" },
-        { "code": "write" },
+        { "code": "update" },
         { "code": "patch" },
         { "code": "delete" },
         { "code": "create" }
