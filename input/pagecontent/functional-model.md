@@ -19,9 +19,8 @@ of functions:
   case is combining rows from different branches of a resource (for example,
   `telecom` and `contact.telecom`)
 
-A ViewDefinition is represented as a FHIR logical model (in this case as a JSON
-document) where the keywords of the ViewDefinition correspond to the functions
-described above.
+A ViewDefinition is a FHIR resource (shown here as a JSON document) where the
+keywords of the ViewDefinition correspond to the functions described above.
 
 ### An Example ViewDefinition
 

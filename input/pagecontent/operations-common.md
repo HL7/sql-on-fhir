@@ -41,26 +41,24 @@ than an alignment fix, and is left to a separate proposal.
 The parameter tables on the operation pages give the type of an inline subject
 as the artifact kinds a client may send - a ViewDefinition, a SQLQuery Library or
 a SQLView Library. The generated OperationDefinitions declare it as
-`CanonicalResource`, which is a consequence of how this guide models
-ViewDefinition rather than a difference in meaning.
+`CanonicalResource`, which is a consequence of one parameter admitting more than
+one resource type rather than a difference in meaning.
 
-ViewDefinition is defined here as a FHIR **logical model**, not as a resource in
-the FHIR specification, so `ViewDefinition` is not a value `parameter.type`
-accepts: that element is bound to the list of FHIR-defined types.
-`CanonicalResource` is the narrowest of those that admits a ViewDefinition, and
-the actual constraint is carried by `parameter.targetProfile`, which names this
-guide's [ViewDefinition](StructureDefinition-ViewDefinition.html) profile. A
-validator therefore enforces exactly what the prose says; only the type code
-reads more loosely.
+ViewDefinition is an additional resource, and SQLQuery and SQLView are profiles
+of `Library`. `OperationDefinition.parameter.type` holds a single type, so the
+type declared for an inline subject has to admit both a ViewDefinition and a
+Library. `ViewDefinition` would exclude the two Library profiles, and `Library`
+would exclude a ViewDefinition. `CanonicalResource` is a FHIR-defined type that
+admits all three subject kinds.
 
-`CanonicalResource` is also the narrowest FHIR-defined type that admits all
-three subject kinds at once: `Library` would exclude a ViewDefinition, and one
-declared type now has to cover both. `subjectResource` therefore declares
-`CanonicalResource` with a `targetProfile` naming
+The actual constraint is carried by `parameter.targetProfile`. `subjectResource`
+declares `CanonicalResource` with a `targetProfile` naming
 [ViewDefinition](StructureDefinition-ViewDefinition.html),
 [SQLQuery](StructureDefinition-SQLQuery.html) and
 [SQLView](StructureDefinition-SQLView.html); `context` declares the same type
 with a `targetProfile` naming ViewDefinition, SQLView, ValueSet and ConceptMap.
+A validator therefore enforces exactly what the prose says; only the type code
+reads more loosely.
 
 ### Output Formats (`_format`) {#output-formats}
 

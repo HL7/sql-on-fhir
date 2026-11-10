@@ -47,7 +47,7 @@ Description: "Execute a ViewDefinition, SQLQuery Library or SQLView Library and 
 * parameter[=].targetProfile[0] = Canonical(ViewDefinition)
 * parameter[=].targetProfile[1] = Canonical(SQLQuery)
 * parameter[=].targetProfile[2] = Canonical(SQLView)
-* parameter[=].documentation = "Inline ViewDefinition, SQLQuery Library or SQLView Library to execute. Exactly one of subjectCanonical, subjectReference and subjectResource is supplied; supplying none, or more than one, is rejected with 400 Bad Request. Carries a resource, so it requires POST. The declared type is CanonicalResource because ViewDefinition is a logical model rather than a FHIR resource; see Common Operation Behavior (operations-common.html#declared-type)."
+* parameter[=].documentation = "Inline ViewDefinition, SQLQuery Library or SQLView Library to execute. Exactly one of subjectCanonical, subjectReference and subjectResource is supplied; supplying none, or more than one, is rejected with 400 Bad Request. Carries a resource, so it requires POST. The declared type is CanonicalResource because one type has to admit both a ViewDefinition and a Library; see Common Operation Behavior (operations-common.html#declared-type)."
 
 * parameter[+].name = #parameters
 * parameter[=].use = #in
@@ -191,7 +191,7 @@ Description: "Export one or more ViewDefinitions, SQLQuery Libraries and SQLView
 * parameter[=].part[=].targetProfile[0] = Canonical(ViewDefinition)
 * parameter[=].part[=].targetProfile[1] = Canonical(SQLQuery)
 * parameter[=].part[=].targetProfile[2] = Canonical(SQLView)
-* parameter[=].part[=].documentation = "Inline ViewDefinition, SQLQuery Library or SQLView Library to export. Exactly one of subjectCanonical, subjectReference and subjectResource is supplied in each repetition. The declared type is CanonicalResource because ViewDefinition is a logical model rather than a FHIR resource; see Common Operation Behavior (operations-common.html#declared-type)."
+* parameter[=].part[=].documentation = "Inline ViewDefinition, SQLQuery Library or SQLView Library to export. Exactly one of subjectCanonical, subjectReference and subjectResource is supplied in each repetition. The declared type is CanonicalResource because one type has to admit both a ViewDefinition and a Library; see Common Operation Behavior (operations-common.html#declared-type)."
 * parameter[=].part[+].name = #parameters
 * parameter[=].part[=].use = #in
 * parameter[=].part[=].min = 0
