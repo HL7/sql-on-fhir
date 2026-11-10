@@ -30,7 +30,7 @@
         <key value="primitives-only"/>
         <severity value="error"/>
         <human value="Tabular view columns only contain primitive values."/>
-        <expression value="type in ('base64Binary' | 'boolean' | 'canonical' | 'code' | 'dateTime' | 'decimal' | 'id' | 'instant' | 'integer' | 'integer64' | 'markdown' | 'oid' | 'string' | 'positiveInt' | 'time' | 'unsignedInt' | 'url' | 'uuid')"/>
+        <expression value="type in ('base64Binary' | 'boolean' | 'canonical' | 'code' | 'date' | 'dateTime' | 'decimal' | 'id' | 'instant' | 'integer' | 'integer64' | 'markdown' | 'oid' | 'string' | 'positiveInt' | 'time' | 'unsignedInt' | 'uri' | 'url' | 'uuid')"/>
         <source value="http://hl7.org/fhir/uv/sql-on-fhir/StructureDefinition/TabularViewDefinition"/>
       </constraint>
     </element>
