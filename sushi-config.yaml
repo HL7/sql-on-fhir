@@ -133,7 +133,9 @@ parameters:
 # ╰────────────────────────────────────────────────────────────────────────────────────────────────╯
 menu:
   Overview: index.html
-  View Definition: StructureDefinition-ViewDefinition.html
+  View Definition:
+    Resource: StructureDefinition-ViewDefinition.html
+    Functional Model: functional-model.html
   SQL:
     SQL Query: StructureDefinition-SQLQuery.html
     SQL View: StructureDefinition-SQLView.html
@@ -150,6 +152,7 @@ menu:
   Playground: http://sql-on-fhir.org/extra/playground.html
   Tests: http://sql-on-fhir.org/extra/tests.html
   Implementations: http://sql-on-fhir.org/extra/impls.html
+  Glossary: glossary.html
   Changes: changes.html
 
 # ╭───────────────────────────Less Common Implementation Guide Properties──────────────────────────╮
