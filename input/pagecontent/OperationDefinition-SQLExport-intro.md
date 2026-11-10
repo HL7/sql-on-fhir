@@ -32,7 +32,7 @@ repeating `subject` parameter rather than by the request path.
 - **One snapshot** - every subject in the job is computed against a single consistent view of the data, so two outputs of one job can be joined without a skew window
 - **One set of filters** - `patient`, `group` and `_since` are stated once and apply to every subject
 - **Job-wide supporting artifacts** - the repeating `context` parameter supplies artifacts the server cannot itself resolve, once for the whole job however many subjects depend on them
-- **Per-subject parameters** - each `subject` repetition carries its own `parameters` resource
+- **Per-subject parameters** - each `subject` repetition naming a SQLQuery carries its own `parameters` resource
 - **Client tracking** - `clientTrackingId` is echoed in the manifest, correlating the job with the client's own records
 
 Where the exported files are delivered is not constrained by this

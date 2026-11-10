@@ -29,7 +29,7 @@ and so require `POST`.
 2. Branch on what it resolves to:
    - A **ViewDefinition** is evaluated directly, against the supplied `resource` values where present and otherwise against server data
    - A **SQLQuery** or **SQLView** Library has each `relatedArtifact` dependency resolved first, preferring an artifact supplied inline via `context` over one the server can itself resolve, and each resolved artifact bound to the SQL identifier in the dependency's `label`
-3. Bind `parameters` values to the SQL placeholders the Library declares (SQL subjects only)
+3. Bind `parameters` values to the SQL placeholders the Library declares (SQLQuery subjects only)
 4. Evaluate the view, or execute the SQL
 5. Return results in the requested format (a raw stream for flat formats, a `Parameters` resource for `_format=fhir`)
 
