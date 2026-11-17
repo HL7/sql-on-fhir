@@ -5,9 +5,6 @@
   "name": "encounter_flat",
   "status": "draft",
   "resource": "Encounter",
-  "fhirVersion": [
-    "4.0"
-  ],
   "select": [
     {
       "column": [
@@ -28,11 +25,11 @@
           "name": "service_org_id"
         },
         {
-          "path": "period.start",
+          "path": "actualPeriod.start",
           "name": "period_start"
         },
         {
-          "path": "period.end",
+          "path": "actualPeriod.end",
           "name": "period_end"
         },
         {
@@ -57,7 +54,7 @@
     {
       "column": [
         {
-          "path": "individual.getReferenceKey(Practitioner)",
+          "path": "actor.getReferenceKey(Practitioner)",
           "name": "practitioner_id"
         }
       ],

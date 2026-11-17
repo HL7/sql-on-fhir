@@ -100,6 +100,21 @@ parameters:
   # ElementDefinition.base.path with http://hl7.org/fhir/StructureDefinition/, so
   # profiles of ViewDefinition cannot be rendered unless it lives in that namespace.
   special-url-base: http://hl7.org/fhir
+  # Register ViewDefinitions for SQL on FHIR integration.
+  # This enables the IG Publisher to process example resources through these
+  # views and populate an SQLite database for {% sql %} queries in notes pages.
+  # See: https://build.fhir.org/ig/FHIR/ig-guidance/sql.html
+  viewDefinition:
+    - input/resources/viewdefinition/ViewDefinition-PatientDemographics.json
+    - input/resources/viewdefinition/ViewDefinition-ShareablePatientDemographics.json
+    - input/resources/viewdefinition/ViewDefinition-PatientAddresses.json
+    - input/resources/viewdefinition/ViewDefinition-PatientAndContactAddressUnion.json
+    - input/resources/viewdefinition/ViewDefinition-UsCoreBloodPressures.json
+    - input/resources/viewdefinition/ViewDefinition-ConditionFlat.json
+    - input/resources/viewdefinition/ViewDefinition-EncounterFlat.json
+    - input/resources/viewdefinition/ViewDefinition-PatientNamesWithIndex.json
+    - input/resources/viewdefinition/ViewDefinition-QuestionnaireResponseItems.json
+    - input/resources/viewdefinition/ViewDefinition-CodeSystemHierarchy.json
 
 #   validation: [allow-any-extensions, no-broken-links]
 #

@@ -9,7 +9,7 @@
     ]
   },
   "url": "http://hl7.org/fhir/uv/sql-on-fhir/ViewDefinition/ShareablePatientDemographics",
-  "name": "patient_demographics",
+  "name": "shareable_patient_demographics",
   "status": "draft",
   "resource": "Patient",
   "fhirVersion": [
