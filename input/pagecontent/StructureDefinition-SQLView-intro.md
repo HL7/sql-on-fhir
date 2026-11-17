@@ -10,7 +10,7 @@ The key differences from SQLQuery are:
 
 - The Library `type` is fixed to `LibraryTypesCodes#sql-view`.
 - <span class="fhir-conformance" id="sqlview-1">An SQLView SHALL NOT declare parameters.</span>
-  Dependent views cannot be parameterised in this iteration of the
+  Dependent views cannot be parameterized in this iteration of the
   specification.
 
 ### Boundaries and Relationships
