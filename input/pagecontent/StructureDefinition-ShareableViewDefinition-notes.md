@@ -1,3 +1,53 @@
+### Publication metadata
+
+A view that is distributed between systems needs to be identified, versioned
+and attributed independently of the system that holds it. In addition to
+`status`, which every ViewDefinition carries, this profile requires the
+following elements:
+
+| Element       | Purpose                                                                               |
+| ------------- | ------------------------------------------------------------------------------------- |
+| `url`         | Canonical identifier of the view, which stays the same on every system that holds it. |
+| `version`     | Business version of the view, which distinguishes versions that share a `url`.        |
+| `name`        | Computer-friendly name, usable as a table name.                                       |
+| `title`       | Human-friendly name.                                                                  |
+| `publisher`   | Organization or individual responsible for publishing the view.                       |
+| `description` | Natural language description of the rows that the view produces.                      |
+
+These requirements follow the
+[CRMI Shareable Library](https://hl7.org/fhir/uv/crmi/StructureDefinition-crmi-shareablelibrary.html)
+profile, except that `name` and `publisher` are required here, where CRMI marks
+them as Must Support only. `name` was already required by this profile.
+
+The [Shareable Patient Demographics](ViewDefinition-ShareablePatientDemographics.html)
+example conforms to this profile.
+
+### Must Support
+
+The elements `url`, `version`, `versionAlgorithm[x]`, `name`, `title`,
+`status`, `experimental`, `publisher` and `description` are marked as
+[Must Support](glossary.html#must-support). For a ViewDefinition claiming
+conformance to this profile, Must Support is interpreted as follows, adapted
+from [CRMI](https://hl7.org/fhir/uv/crmi/conformance.html):
+
+- <span class="fhir-conformance" id="shareable-2">Systems that author or
+  store ViewDefinitions SHALL be capable of populating all Must Support
+  elements.</span>
+- <span class="fhir-conformance" id="shareable-3">Systems that distribute
+  ViewDefinitions SHOULD populate all Must Support elements when
+  transmitting a view.</span>
+- <span class="fhir-conformance" id="shareable-4">Where the value of an
+  optional Must Support element is not known, systems SHALL omit the element
+  rather than populate it with a placeholder value.</span>
+- <span class="fhir-conformance" id="shareable-5">Systems consuming a
+  ViewDefinition SHALL NOT infer a value for a missing Must Support element,
+  other than the meaning that the element defines for its absence.</span> For
+  example, a missing `experimental` means that the view is not experimental.
+
+These elements describe the view and do not affect the rows it produces. A
+view runner therefore processes a view that carries them in the same way as any
+other ViewDefinition.
+
 ### Required FHIRPath Expressions/Functions
 
 <span class="fhir-conformance" id="shareable-1">All View Runners claiming conformance to the

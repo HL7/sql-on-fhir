@@ -6,7 +6,7 @@
   <name value="ShareableViewDefinition"/>
   <title value="Shareable View Definition"/>
   <status value="active"/>
-  <description value="A profile for View Definitions intended to be shared between multiple systems. This requires that &#xA;the View Definition have a defined URL and name. It also requires declaration of the FHIR version &#xA;that the view is intended to be executed over, and the FHIR type of each column. This ensures &#xA;consistent interpretation of the view across different view runner implementations."/>
+  <description value="A profile for View Definitions intended to be shared between multiple systems. This requires &#xA;the publication metadata needed to identify, version and attribute a View Definition when it is &#xA;distributed: a URL, version, name, title, publisher and description. It also requires declaration &#xA;of the FHIR version that the view is intended to be executed over, and the FHIR type of each column. &#xA;This ensures consistent interpretation of the view across different view runner implementations. &#xA;The metadata requirements follow the CRMI Shareable Library profile."/>
   <fhirVersion value="5.0.0"/>
   <kind value="resource"/>
   <abstract value="false"/>
@@ -20,10 +20,44 @@
     <element id="ViewDefinition.url">
       <path value="ViewDefinition.url"/>
       <min value="1"/>
+      <mustSupport value="true"/>
+    </element>
+    <element id="ViewDefinition.version">
+      <path value="ViewDefinition.version"/>
+      <min value="1"/>
+      <mustSupport value="true"/>
+    </element>
+    <element id="ViewDefinition.versionAlgorithm[x]">
+      <path value="ViewDefinition.versionAlgorithm[x]"/>
+      <mustSupport value="true"/>
     </element>
     <element id="ViewDefinition.name">
       <path value="ViewDefinition.name"/>
       <min value="1"/>
+      <mustSupport value="true"/>
+    </element>
+    <element id="ViewDefinition.title">
+      <path value="ViewDefinition.title"/>
+      <min value="1"/>
+      <mustSupport value="true"/>
+    </element>
+    <element id="ViewDefinition.status">
+      <path value="ViewDefinition.status"/>
+      <mustSupport value="true"/>
+    </element>
+    <element id="ViewDefinition.experimental">
+      <path value="ViewDefinition.experimental"/>
+      <mustSupport value="true"/>
+    </element>
+    <element id="ViewDefinition.publisher">
+      <path value="ViewDefinition.publisher"/>
+      <min value="1"/>
+      <mustSupport value="true"/>
+    </element>
+    <element id="ViewDefinition.description">
+      <path value="ViewDefinition.description"/>
+      <min value="1"/>
+      <mustSupport value="true"/>
     </element>
     <element id="ViewDefinition.fhirVersion">
       <path value="ViewDefinition.fhirVersion"/>

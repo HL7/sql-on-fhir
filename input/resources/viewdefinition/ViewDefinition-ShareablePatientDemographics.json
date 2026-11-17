@@ -9,8 +9,13 @@
     ]
   },
   "url": "http://hl7.org/fhir/uv/sql-on-fhir/ViewDefinition/ShareablePatientDemographics",
+  "version": "1.0.0",
   "name": "shareable_patient_demographics",
+  "title": "Shareable Patient Demographics",
   "status": "draft",
+  "experimental": true,
+  "publisher": "HL7 International / FHIR Infrastructure",
+  "description": "The gender of each patient, with the given and family names from the first official name. A patient without an official name produces no row.",
   "resource": "Patient",
   "fhirVersion": [
     "4.0",

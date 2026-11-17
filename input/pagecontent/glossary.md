@@ -64,6 +64,16 @@ Because the manifest states no ordering, a client correlates an entry with the
 subject it requested by that name.
 
 
+### Must Support
+
+A flag that a profile sets on an element to mark it as one that systems need to
+handle. FHIR leaves the obligations to each implementation guide, so a guide
+that uses the flag states what it requires of the systems that populate,
+distribute and consume the element. This guide uses it in the
+[Shareable View Definition](StructureDefinition-ShareableViewDefinition.html#must-support)
+profile.
+
+
 ### package identifier
 
 The name under which a FHIR implementation guide is distributed and installed,
