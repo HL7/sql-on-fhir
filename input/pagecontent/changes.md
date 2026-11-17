@@ -273,6 +273,23 @@ left to the terminology layer.
 Proposed in
 [ValueSet abstraction for SQL on FHIR](https://gist.github.com/niquola/0bc5f4c852cbe4a0194a84d1019a9361).
 
+##### Terminology Dependent View Definition profile
+
+The
+[Terminology Dependent View Definition](StructureDefinition-TerminologyDependentViewDefinition.html)
+profile identifies views whose FHIRPath expressions call `memberOf`, the
+function FHIR defines for testing whether a code, `Coding`, `CodeableConcept`
+or string is a member of a value set. A runner conforming to the profile
+resolves the value set from the canonical URL passed to the function, and every
+call naming the same value set within one evaluation, or one `$sql-run` or
+`$sql-export` job, sees the same membership. A value set that cannot be
+resolved yields an empty result, as FHIR defines.
+
+**Rationale.** A filter on value set membership is common in views, for example
+to keep the Observations that record vital signs. No runner was previously
+required to implement `memberOf`, so a portable view had to list the codes
+itself or leave the filter to SQL over its output.
+
 ##### `repeat`
 
 `select.repeat` traverses arbitrarily nested structures, such as

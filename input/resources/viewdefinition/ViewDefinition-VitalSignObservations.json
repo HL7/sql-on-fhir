@@ -1,0 +1,62 @@
+{
+  "resourceType": "ViewDefinition",
+  "resourceDefinition" : "http://hl7.org/fhir/StructureDefinition/ViewDefinition|3.0.0-ballot",
+  "id": "VitalSignObservations",
+  "meta": {
+    "profile": [
+      "http://hl7.org/fhir/uv/sql-on-fhir/StructureDefinition/TerminologyDependentViewDefinition"
+    ]
+  },
+  "url": "http://hl7.org/fhir/uv/sql-on-fhir/ViewDefinition/VitalSignObservations",
+  "name": "vital_sign_observations",
+  "status": "draft",
+  "resource": "Observation",
+  "constant": [
+    {
+      "name": "vital_signs",
+      "valueCanonical": "http://hl7.org/fhir/ValueSet/observation-vitalsignresult|5.0.0"
+    }
+  ],
+  "select": [
+    {
+      "column": [
+        {
+          "name": "id",
+          "path": "getResourceKey()"
+        },
+        {
+          "name": "patient_id",
+          "path": "subject.getReferenceKey(Patient)"
+        },
+        {
+          "name": "effective_date_time",
+          "path": "effective.ofType(dateTime)"
+        }
+      ]
+    },
+    {
+      "forEach": "code.coding",
+      "column": [
+        {
+          "name": "system",
+          "path": "system"
+        },
+        {
+          "name": "code",
+          "path": "code"
+        },
+        {
+          "name": "is_vital_sign",
+          "path": "memberOf(%vital_signs)",
+          "description": "Whether this coding is a member of the vital sign result value set."
+        }
+      ]
+    }
+  ],
+  "where": [
+    {
+      "path": "code.memberOf(%vital_signs)",
+      "description": "Keeps observations with at least one coding in the vital sign result value set."
+    }
+  ]
+}

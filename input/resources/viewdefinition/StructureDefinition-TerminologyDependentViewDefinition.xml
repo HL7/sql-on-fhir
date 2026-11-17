@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Author: John Grimes -->
+<StructureDefinition xmlns="http://hl7.org/fhir">
+  <id value="TerminologyDependentViewDefinition"/>
+  <url value="http://hl7.org/fhir/uv/sql-on-fhir/StructureDefinition/TerminologyDependentViewDefinition"/>
+  <name value="TerminologyDependentViewDefinition"/>
+  <title value="Terminology Dependent View Definition"/>
+  <status value="active"/>
+  <description value="A profile for View Definitions whose FHIRPath expressions test value set membership using the &#xA;memberOf function defined by FHIR. A View Runner that executes these views must be able to resolve &#xA;a value set from its canonical URL and determine whether a code, Coding, CodeableConcept or string &#xA;is a member of it."/>
+  <fhirVersion value="5.0.0"/>
+  <kind value="resource"/>
+  <abstract value="false"/>
+  <type value="ViewDefinition"/>
+  <baseDefinition value="http://hl7.org/fhir/StructureDefinition/ViewDefinition|3.0.0-ballot"/>
+  <derivation value="constraint"/>
+  <differential>
+    <element id="ViewDefinition">
+      <path value="ViewDefinition"/>
+    </element>
+  </differential>
+</StructureDefinition>
