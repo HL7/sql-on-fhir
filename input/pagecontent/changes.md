@@ -308,6 +308,21 @@ Issues: [#293](https://github.com/HL7/sql-on-fhir/pull/293),
 [#351](https://github.com/HL7/sql-on-fhir/issues/351),
 [#365](https://github.com/HL7/sql-on-fhir/pull/365).
 
+#### Clarifications
+
+##### `getReferenceKey` over a collection of References
+
+The 2.0.0 text described `getReferenceKey` on a single Reference and did not
+say what happens when it is invoked on a repeating element such as
+`Encounter.episodeOfCare`. It now states that each Reference is evaluated
+independently, returning one key per Reference that yields one. A column
+applying it to a repeating element therefore needs `collection: true`, or
+iteration with `forEach` or `forEachOrNull`, like any other multi-valued path.
+This matches the behavior of the reference implementation and is not a breaking
+change.
+([#408](https://github.com/HL7/sql-on-fhir/issues/408),
+[#409](https://github.com/HL7/sql-on-fhir/pull/409))
+
 #### Editorial and process changes
 
 ##### ViewDefinition is authored in XML, not FSH
@@ -431,4 +446,5 @@ resource instance. It is not an element of the ViewDefinition
 StructureDefinition, so a structural validator built only from that definition
 will reject it as an unknown element. A processor that validates
 ViewDefinitions against that StructureDefinition alone therefore needs to allow
-for this property.
+for this property. See
+[Serialized Form](StructureDefinition-ViewDefinition.html#serialized-form).
