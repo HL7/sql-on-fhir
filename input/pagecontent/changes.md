@@ -328,14 +328,12 @@ messages follows that no change to this repository can remove.
 contain a type defined outside core; a `StructureDefinition.type` of
 `ViewDefinition` is rejected as not defined in FHIR;
 `Library.relatedArtifact.resource` does not recognize an additional resource as
-canonical; the inherited `cnl-1` invariant carries `MetadataResource` as its
-source; and every instance is asked for a `resourceDefinition` property that
-would place tooling metadata in the published examples. In addition, the
-publisher's generic FHIRPath evaluator cannot resolve `%rowIndex` or names
-evaluated inside a `forEach` scope, and no R6 build of
-`hl7.fhir.uv.extensions`, `hl7.terminology` or `hl7.fhir.uv.tools` exists, so
-the publisher reports a package-version mismatch that this repository cannot
-resolve.
+canonical; and the inherited `cnl-1` invariant carries `MetadataResource` as
+its source. In addition, the publisher's generic FHIRPath evaluator cannot
+resolve `%rowIndex` or names evaluated inside a `forEach` scope, and no R6
+build of `hl7.fhir.uv.extensions`, `hl7.terminology` or `hl7.fhir.uv.tools`
+exists, so the publisher reports a package-version mismatch that this
+repository cannot resolve.
 
 None of these messages reflects a conformance change. Each is suppressed in
 `input/ignoreWarnings.txt` with a written justification and a link to the
@@ -424,3 +422,13 @@ shadows the other**. A deployment can retain 2.0.0 tooling over views that are
 already valid against both versions, and move when its stack reads R6
 structure definitions. R6 is itself still in ballot, and this specification
 tracks its progress rather than anticipating it.
+
+The published ViewDefinition examples carry a `resourceDefinition` property
+naming the versioned canonical of the ViewDefinition definition, for example
+`"resourceDefinition": "http://hl7.org/fhir/StructureDefinition/ViewDefinition|3.0.0-ballot"`.
+This is the mechanism FHIR R6 uses to identify the definition of an additional
+resource instance. It is not an element of the ViewDefinition
+StructureDefinition, so a structural validator built only from that definition
+will reject it as an unknown element. A processor that validates
+ViewDefinitions against that StructureDefinition alone therefore needs to allow
+for this property.

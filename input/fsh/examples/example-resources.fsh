@@ -451,6 +451,11 @@ Usage: #example
     * text = "Diabetes"
     * answer[+]
       * valueBoolean = true
+      * item[+]
+        * linkId = "diabetes-type"
+        * text = "Diabetes type"
+        * answer[+]
+          * valueString = "Type 2"
   * item[+]
     * linkId = "hypertension"
     * text = "Hypertension"
