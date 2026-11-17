@@ -343,7 +343,7 @@ There are two popular categories of runners:
 * **In-memory runners** consume resources, flatten, and output results into a
   stream, a file or a table. You can imagine the ETL pipeline from FHIR Bulk
   export ndjson files transformed into parquet files.
-* **In-database runners** translate ViewDefinition into SQL query over an
+* **In-database runners** translate ViewDefinition into SQL query over a
   FHIR-native database. In that case the view can be a real database view or
   table. In-database runners could be far more efficient than in-memory in
   speed and storage resources but are much more complex for implementers.
