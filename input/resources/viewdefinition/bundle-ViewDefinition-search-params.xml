@@ -232,7 +232,7 @@
         <url value="http://hl7.org/fhir/uv/sql-on-fhir/SearchParameter/ViewDefinition-resource"/>
         <name value="ViewDefinitionResource"/>
         <status value="active"/>
-        <description value="The FHIR resource type the view definition is based upon"/>
+        <description value="The type of resource the view definition is based upon"/>
         <code value="resource"/>
         <base value="ViewDefinition"/>
         <type value="token"/>

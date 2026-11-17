@@ -57,7 +57,8 @@ use: one party defines the analytics, any conforming engine evaluates them, any
 tool consumes the result, and the complete set is distributable as an
 implementation guide in the same manner as any other FHIR artifact. The
 expressive part of the model gains two optional additions, `select.repeat` and
-the `%rowIndex` environment variable.
+the `%rowIndex` environment variable, and `resource` can name a wider set of
+types.
 
 **Coexistence of 2.0.0 and 3.0.0.** The two releases have different package
 identifiers and different canonical URLs, so they install side by side and
@@ -258,6 +259,21 @@ so a runner that ignores it produces the same rows.
 ([#267](https://github.com/HL7/sql-on-fhir/pull/267), requested in
 [#265](https://github.com/HL7/sql-on-fhir/issues/265))
 
+##### `ViewDefinition.resource` becomes a `uri`
+
+In 2.0.0, `resource` was a `code` with a required binding to the resource types
+of the FHIR version the guide was built against. A view based upon any other
+type, such as a resource type removed or renamed in that version, one added
+later, an additional resource or a logical model, was therefore invalid.
+`resource` is now a `uri` with an extensible binding to
+`http://hl7.org/fhir/ValueSet/extended-resource-types`, following
+`StructureDefinition.type`. A resource defined by FHIR or an additional
+resource is still named by its type, as in `"Patient"`. Any other type is named
+by the canonical URL of the StructureDefinition that defines it. A `code` and a
+`uri` have the same JSON and XML representation, so existing views are
+unaffected.
+([FHIR-58968](https://jira.hl7.org/browse/FHIR-58968))
+
 ##### Search parameters for ViewDefinition
 
 Becoming a resource brings the standard FHIR read and search machinery with it.
@@ -381,9 +397,9 @@ guidance and the completion status code.
 **The expressive part is unchanged.** `resource`, `select`, `column`, `path`,
 `forEach`, `forEachOrNull`, `where`, `constant` and `unionAll` retain their
 2.0.0 semantics, and a 2.0.0 view produces the same rows on a 3.0.0 runner. The
-only additions to that part are `select.repeat` and `%rowIndex`. Every other
-addition to ViewDefinition describes the view rather than what it computes, and
-none is required.
+only additions to that part are `select.repeat`, `%rowIndex` and the wider set
+of types that `resource` can name. Every other addition to ViewDefinition
+describes the view rather than what it computes, and none is required.
 
 What requires editing is the surrounding structure. One change applies to every
 view; three more apply only where a view uses the affected element.
