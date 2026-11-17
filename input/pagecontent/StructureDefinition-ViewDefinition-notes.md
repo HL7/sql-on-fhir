@@ -866,30 +866,60 @@ intentionally leaves the specific mechanism to the implementation.
 
 ### Contained Resources
 
-This specification requires implementers to extract contained resources that
-need to be included in views into independent resources that can then be
-accessed via [getReferenceKey](#getreferencekeyresource-type-specifier--keytype)
-like any
-other resource. <span class="fhir-conformance" id="viewdef-4">Implementations SHOULD normalize
-these resources appropriately whenever possible, such as eliminating duplicate
-resources contained in many parent resources.</span> Note that this may change in
-a later version of this specification, allowing users to explicitly create
-separate views for contained resources that could be distinct from top-level
-resource views.
-
 Contained resources have different semantics than other resources since they
 don't have an independent identity, and the same logical record may be
-duplicated across many containing resources. This makes SQL best practices
-difficult since the data is denormalized and ambiguous. For
-instance, `Patient.generalPractitioner` may be a contained resource that may or
-may not be the same practitioner seen in other Patient resources. Therefore, the
-approach in this specification requires systems to pre-process the data into
-normalized, independent resources if needed.
+duplicated across many containing resources. For instance,
+`Patient.generalPractitioner` may reference a contained Practitioner that may or
+may not be the same practitioner seen in other Patient resources.
 
-For the same reason, the output from running a ViewDefinition will not include
-contained resources. For instance, a view of Practitioner resources will include
-top-level Practitioner resources but not contained Practitioner resources from
-inside the Patient resources.
+For this reason, the output from running a ViewDefinition will not include
+contained resources as rows. For instance, a view of Practitioner resources will
+include top-level Practitioner resources but not contained Practitioner
+resources from inside the Patient resources.
+
+The data within contained resources can still be accessed from the containing
+resource using FHIRPath, without any pre-processing. The
+[ofType](https://hl7.org/fhirpath/#oftypetype-type-specifier-collection)
+function selects the contained resources of a given type. For example, this view
+produces a row for each Endpoint contained within an Organization:
+
+```js
+{
+  "name": "organization_endpoints",
+  "resource": "Organization",
+  "status": "active",
+  "select": [
+    {
+      "column": [
+        {
+          "path": "getResourceKey()",
+          "name": "organization_id"
+        }
+      ]
+    },
+    {
+      "forEach": "contained.ofType(Endpoint)",
+      "column": [
+        {
+          "path": "id",
+          "name": "endpoint_id"
+        },
+        {
+          "path": "address",
+          "name": "address"
+        }
+      ]
+    }
+  ]
+}
+```
+
+Support for local references to contained resources (e.g., `#ep1`) in
+[getReferenceKey](#getreferencekeyresource-type-specifier--keytype) is optional
+([viewdef-2](#viewdef-2)), and implementations that do not support them return
+the empty collection ([viewdef-14](#viewdef-14)). Views that need to be portable
+across implementations should therefore access contained data through FHIRPath
+rather than joining to it.
 
 ### Generating Schemas
 
