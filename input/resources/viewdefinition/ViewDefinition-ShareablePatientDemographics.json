@@ -28,6 +28,11 @@
           "path": "gender",
           "name": "gender",
           "type": "code"
+        },
+        {
+          "path": "birthDate",
+          "name": "birth_date",
+          "type": "date"
         }
       ]
     },
