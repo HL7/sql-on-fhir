@@ -13,15 +13,16 @@ of functions:
   pressure into a simple table
 - `forEach(expr, transform)` - This function unnests collection elements into
   separate rows
+- `repeat(exprs, transform)` - This function recursively traverses nested
+  elements and unnests the elements found at every depth into separate rows
 - `select(rows1, rows2)` - This function cross-joins `rows1` and `rows2`, and is
   mostly used to join results of `forEach` with top-level columns
-- `union(rows, rows)` - This function concatenates sets of rows. It's main use
-  case is combining rows from different branches of a resource (for example,
-  `telecom` and `contact.telecom`)
+- `unionAll(rows, rows)` - This function concatenates sets of rows. Its main
+  use case is combining rows from different branches of a resource (for
+  example, `telecom` and `contact.telecom`)
 
-A ViewDefinition is represented as a FHIR logical model (in this case as a JSON
-document) where the keywords of the ViewDefinition correspond to the functions
-described above.
+A ViewDefinition is a FHIR resource (shown here as a JSON document) where the
+keywords of the ViewDefinition correspond to the functions described above.
 
 ### An Example ViewDefinition
 
@@ -37,7 +38,7 @@ described above.
           // Step 5
           "column": [
              {"path": "getResourceKey()", "name": "id"},
-             {"path": "identifier.where(system='ssn')", "name": "ssn"},
+             {"path": "identifier.where(system='ssn').value", "name": "ssn"},
           ]
         },
         {
@@ -63,7 +64,7 @@ described above.
 The application of this ViewDefinition produces a table of contacts with one row
 per telecom from two different locations in a FHIR Patient resource.
 
-Algorithmically the application can be though of in the following steps:
+Algorithmically the application can be thought of in the following steps:
 
 1.  "where": filter data to only the active patients
 2.  "forEach": unnest `Patient.telecom` and select "phone"
@@ -79,8 +80,9 @@ Here is example input and output for this ViewDefinition:
     {
         "resourceType": "Patient",
         "id": "pt1",
+        "active": true,
         "identifier": [{ "system": "ssn", "value": "s1" }],
-        "telecom": [{ "system": "phone", "value": "tt1" }],
+        "telecom": [{ "system": "phone", "value": "t11" }],
         "contact": [
             { "telecom": [{ "system": "phone", "value": "t12" }] },
             { "telecom": [{ "system": "phone", "value": "t13" }] }
@@ -89,6 +91,7 @@ Here is example input and output for this ViewDefinition:
     {
         "resourceType": "Patient",
         "id": "pt2",
+        "active": true,
         "identifier": [{ "system": "ssn", "value": "s2" }],
         "telecom": [{ "system": "phone", "value": "t21" }],
         "contact": [
@@ -118,7 +121,7 @@ to make implementation as simple as possible.
 
 The specification also introduces two special functions:
 
-- `getResourceKey` - Indirectly get a resource's id. Since it my not be
+- `getResourceKey` - Indirectly get a resource's id. Since it may not be
   straightforward to access a resource's id, this layer of indirection is
   useful
 - `getReferenceKey(resourceType)` - A similar function to get an id from a
@@ -140,7 +143,7 @@ the output row.
 {
     "column": [
         { "name": "id", "path": "getResourceKey()" },
-        { "name": "bod", "path": "birthDate" },
+        { "name": "dob", "path": "birthDate" },
         { "name": "first_name", "path": "name.first().given.join(' ')" },
         { "name": "last_name", "path": "name.first().family" },
         {
@@ -170,7 +173,7 @@ function column(cols, rows) {
 
 #### The `where` Function
 
-`where` retains only those records for which it FHIRPath expression returns
+`where` retains only those records for which its FHIRPath expression returns
 true.
 
 ```json
@@ -179,7 +182,7 @@ true.
     "resource": "Patient",
     "where": [
         { "path": "meta.profile.where($this = 'myprofile').exists()" },
-        { "path": "active = 'true'" }
+        { "path": "active = true" }
     ]
 }
 ```
@@ -190,7 +193,7 @@ Basic JavaScript implementation:
 function where(exprs, rows) {
     return rows.filter((row) => {
         return exprs.every((expr) => {
-            return fhirpath(expr, row) == true;
+            return fhirpath(expr.path, row)[0] === true;
         });
     });
 }
@@ -234,7 +237,67 @@ Basic JavaScript implementation:
 ```javascript
 function forEach(path, expr, rows, envVars = {}) {
     return rows.flatMap((row) => {
-        return fhirpath(expr, row).map((item, index) => {
+        return fhirpath(path, row).flatMap((item, index) => {
+            // Set %rowIndex for this iteration level.
+            const childEnvVars = { ...envVars, rowIndex: index };
+            // evalKeyword will call column, select or other functions.
+            return evalKeyword(expr, item, childEnvVars);
+        });
+    });
+}
+```
+
+#### The `repeat` Function
+
+`repeat` flattens structures that are nested to an unknown depth, such as the
+items of a QuestionnaireResponse. It takes a list of FHIRPath expressions.
+Starting from the current element, it evaluates each expression, then evaluates
+the same expressions against each result, and continues until no more elements
+are found. The transformation is then applied to every element found, at every
+depth.
+
+```json
+{
+    "resourceType": "ViewDefinition",
+    "resource": "QuestionnaireResponse",
+    "select": [
+        {
+            "repeat": ["item", "answer.item"],
+            "column": [
+                { "path": "linkId", "name": "item_id" },
+                { "path": "text", "name": "question_text" }
+            ]
+        }
+    ]
+}
+```
+
+This view produces one row for each item in the QuestionnaireResponse, whether
+the item is at the top level, nested within a group or nested within an answer.
+
+`repeat` sets the `%rowIndex` environment variable to the 0-based index of the
+current element within the flattened list of elements found by the traversal.
+
+A `select` can have at most one of `forEach`, `forEachOrNull` and `repeat`.
+
+Basic JavaScript implementation:
+
+```javascript
+function repeat(paths, expr, rows, envVars = {}) {
+    return rows.flatMap((row) => {
+        // Collect the elements found at every depth, excluding the starting
+        // element itself.
+        const items = [];
+        const traverse = (node) => {
+            paths.forEach((path) => {
+                fhirpath(path, node).forEach((child) => {
+                    items.push(child);
+                    traverse(child);
+                });
+            });
+        };
+        traverse(row);
+        return items.flatMap((item, index) => {
             // Set %rowIndex for this iteration level.
             const childEnvVars = { ...envVars, rowIndex: index };
             // evalKeyword will call column, select or other functions.
@@ -284,10 +347,8 @@ function select(rows1, rows2) {
     });
 }
 
-select([{ a: 1 }, { a: 2 }], [{ b: 1 }, { b: 2 }])[
-    //=>
-    ({ a: 1, b: 1 }, { a: 1, b: 2 }, { a: 2, b: 1 }, { a: 2, b: 2 })
-];
+select([{ a: 1 }, { a: 2 }], [{ b: 1 }, { b: 2 }]);
+//=> [{ a: 1, b: 1 }, { a: 1, b: 2 }, { a: 2, b: 1 }, { a: 2, b: 2 }]
 ```
 
 #### The `unionAll` Function
@@ -325,15 +386,16 @@ In JavaScript this is just a simple concatenation:
 
 ```javascript
 function unionAll(rowSets) {
-    return rowSet.flatMap((rows) => {
+    return rowSets.flatMap((rows) => {
         return rows;
     });
 }
 
-unionAll([1, 2, 3], [3, 4, 5])[
-    //=>
-    (1, 2, 3, 3, 4, 5)
-];
+unionAll([
+    [1, 2, 3],
+    [3, 4, 5],
+]);
+//=> [1, 2, 3, 3, 4, 5]
 ```
 
 Note that `unionAll` does not create a new `%rowIndex` scope. Each branch
@@ -342,9 +404,6 @@ iteration expression (`forEach`, `forEachOrNull`, or `repeat`), that expression
 establishes an independent `%rowIndex` sequence starting from 0.
 
 #### Function Precedence
-
-To interpret such nodes, you have to re-order keywords (functions) according to
-precedence (higher bubble up):
 
 In a ViewDefinition, different keywords/functions can appear at the same level.
 <span class="fhir-conformance" id="fm-1">To interpret such node in a ViewDefinition, an
@@ -366,7 +425,7 @@ as shown in the output.
 {
     "forEach":   FOREACH,
     "column":    [COLUMNS], // reorder to be nested under select
-    "unionALL":  [UNIONS],  // reorder to be nested under select
+    "unionAll":  [UNIONS],  // reorder to be nested under select
     "select":    [SELECTS]
 }
 //=>
