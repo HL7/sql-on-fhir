@@ -345,8 +345,9 @@ There are two popular categories of runners:
   export ndjson files transformed into parquet files.
 * **In-database runners** translate ViewDefinition into SQL query over an
   FHIR-native database. In that case the view can be a real database view or
-  table. In-database runners could be far more efficient than in-memory in
-  speed and storage resources but are much more complex for implementers.
+  table. In-database runners could be far more efficient than in-memory
+  runners in terms of speed and storage utilization but are much more complex
+  for implementers.
 
 <img src="viewdef-runners.jpeg" alt="Diagram comparing in-memory and in-database runners" style="float: none; width: 100%">
 
