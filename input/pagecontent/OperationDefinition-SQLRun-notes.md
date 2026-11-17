@@ -103,9 +103,9 @@ independently of the subject's kind:
 {:.table-data}
 
 ² `subjectResource` is declared as `CanonicalResource` in the
-OperationDefinition. ViewDefinition is a logical model in this guide rather than
-a FHIR resource, so `ViewDefinition` is not a value `parameter.type` accepts;
-`CanonicalResource` is the narrowest declared type admitting all three kinds, and
+OperationDefinition. ViewDefinition is an additional resource, and SQLQuery and
+SQLView are profiles of `Library`, so one declared type has to admit both;
+`CanonicalResource` admits all three kinds, and
 the real constraint is carried by `targetProfile`. See
 [Why the declared type is `CanonicalResource`](operations-common.html#declared-type).
 
