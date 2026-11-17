@@ -289,6 +289,18 @@ additive.
 ([#268](https://github.com/HL7/sql-on-fhir/pull/268),
 [#397](https://github.com/HL7/sql-on-fhir/pull/397))
 
+##### Publication metadata in ShareableViewDefinition
+
+The ShareableViewDefinition profile now requires `version`, `title`,
+`publisher` and `description`, in addition to the `url` and `name` it already
+required, so that a distributed view can be identified, versioned and
+attributed. It also marks `url`, `version`, `versionAlgorithm[x]`, `name`,
+`title`, `status`, `experimental`, `publisher` and `description` as Must
+Support, and defines how Must Support is interpreted. Both follow the
+[CRMI Shareable Library](https://hl7.org/fhir/uv/crmi/StructureDefinition-crmi-shareablelibrary.html)
+profile, except that `publisher` is required rather than Must Support only.
+([FHIR-58974](https://jira.hl7.org/browse/FHIR-58974))
+
 ##### Code systems and value sets
 
 `LibraryTypesCodes` identifies a Library as a SQL query or a reusable SQL view.
@@ -402,7 +414,9 @@ view; three more apply only where a view uses the affected element.
 - **`meta.profile` requires rewriting.** A view claiming
   `https://sql-on-fhir.org/ig/StructureDefinition/ShareableViewDefinition` or
   `.../TabularViewDefinition` must name the profile's new canonical instead. A
-  view that claims no profile requires no change.
+  view that claims ShareableViewDefinition must also carry `version`, `title`,
+  `publisher` and `description`. A view that claims no profile requires no
+  change.
 
 All remaining changes are string replacements rather than changes to views:
 `https://sql-on-fhir.org/ig` becomes the new canonical base, and the package
