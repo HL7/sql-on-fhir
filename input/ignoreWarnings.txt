@@ -55,7 +55,7 @@ Terminology_TX_NoValid_16
 
 # 18. This is a combinations of bugs - Resource definitions must be namespaced in hl7.org/fhir, and publisher is not processing the JSON version of the example additional resource correctly.
 VALIDATION_ADDITIONAL_RESOURCE_NO_WRONG
-% ViewDefinition: The value for resourceDefinition of 'http://hl7.org/fhir/StructureDefinition/ViewDefinition|3.0.0-ballot' does not match the required value of 'http://hl7.org/fhir/uv/sql-on-fhir/StructureDefinition/ShareableViewDefinition|3.0.0-ballot'. In addition, this is not an additional resource, and shouldn't have a resourceDefinition at all
+% ViewDefinition: The value for resourceDefinition of 'http://hl7.org/fhir/StructureDefinition/ViewDefinition|3.1.0-draft' does not match the required value of 'http://hl7.org/fhir/uv/sql-on-fhir/StructureDefinition/ShareableViewDefinition|3.1.0-draft'. In addition, this is not an additional resource, and shouldn't have a resourceDefinition at all
 
 # 19. The publisher's built-in ViewDefinition validator does not apply the forEach/forEachOrNull scope when checking column path cardinality, so columns that are single-valued within their forEach scope (e.g. system and code within a forEachOrNull of code.coding) are flagged as potentially multi-valued. False positive with the same root cause as 07; verified against the current example set. See https://chat.fhir.org/#narrow/channel/179219-analytics-on-FHIR/topic/Validation.20errors.20for.20additional.20resources/with/615144653.
 %might return multiple values for the column%

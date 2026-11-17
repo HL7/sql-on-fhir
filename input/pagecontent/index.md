@@ -1,6 +1,6 @@
 <div class="stu-note" markdown="1">
-This is version 3.0.0-ballot. The canonical base of this specification changed
-in this cycle, from `https://sql-on-fhir.org/ig` to
+This is version 3.1.0-draft. The canonical base of this specification changed
+in version 3.0.0, from `https://sql-on-fhir.org/ig` to
 `http://hl7.org/fhir/uv/sql-on-fhir`, and its package identifier from
 `org.sql-on-fhir.ig` to `hl7.fhir.uv.sql-on-fhir`. Version 2.0.0 remains
 available at [its original location](https://sql-on-fhir.org/ig/2.0.0). See
