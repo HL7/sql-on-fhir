@@ -418,7 +418,7 @@
       <path value="ViewDefinition.resource"/>
       <short value="Type of resource the view is based upon"/>
       <definition value="The type of resource that the view is based upon, e.g. 'Patient' or 'Observation'. References are URLs that are relative to http://hl7.org/fhir/StructureDefinition, e.g. 'Patient' is a reference to http://hl7.org/fhir/StructureDefinition/Patient. A type whose definition has a canonical URL in that namespace, which includes the resources defined by FHIR and additional resources such as ViewDefinition, SHALL be identified by its relative name. Any other type, such as a logical model, SHALL be identified by the absolute canonical URL of the StructureDefinition that defines it."/>
-      <comment value="The binding is extensible so that a view can be based upon a resource type that is defined in an earlier version of FHIR but was removed or renamed in this version, a resource type added after this specification was published, an additional resource, or a logical model. This follows the approach taken for StructureDefinition.type and CapabilityStatement.rest.resource.type."/>
+      <comment value="The binding is extensible so that a view can be based upon a resource type that is defined in an earlier version of FHIR but was removed or renamed in the version this specification is based upon, a resource type added after this specification was published, an additional resource, or a logical model. This follows the approach taken for StructureDefinition.type and CapabilityStatement.rest.resource.type."/>
       <min value="1"/>
       <max value="1"/>
       <type>
