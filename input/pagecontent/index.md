@@ -266,11 +266,13 @@ do, by design:
 #### A single View Definition will not join different resources in any way
 
 A single View Definition defines a tabular view of exactly one resource type,
-like a view of `Patient` or a view of `Condition` resources. Any joins between
-resources are exclusively in downstream systems, like between database tables
-computed by view definitions. This makes it possible for a wide set of FHIR
-infrastructure to implement this spec, and lets database engines or processing
-pipelines join as needed.
+like a view of `Patient` or a view of `Condition` resources. A View Definition
+does not itself join resources. Joins are applied to the views that View
+Definitions produce, either by the SQL in a
+[SQLQuery](StructureDefinition-SQLQuery.html) or
+[SQLView](StructureDefinition-SQLView.html), or by any database engine or
+processing pipeline. Keeping each View Definition to a single resource type
+makes it possible for a wide set of FHIR infrastructure to implement this spec.
 
 #### View Definitions do not have sorting, aggregation, or limit capabilities
 
