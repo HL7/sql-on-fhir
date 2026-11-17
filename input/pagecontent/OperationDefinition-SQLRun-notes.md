@@ -367,6 +367,7 @@ Content-Type: application/fhir+json
     "name": "subjectResource",
     "resource": {
       "resourceType": "ViewDefinition",
+      "status": "active",
       "resource": "Patient",
       "select": [{
         "column": [
@@ -408,6 +409,7 @@ Content-Type: application/fhir+json
     "name": "subjectResource",
     "resource": {
       "resourceType": "ViewDefinition",
+      "status": "active",
       "resource": "Patient",
       "select": [{
         "column": [
@@ -466,6 +468,7 @@ Content-Type: application/fhir+json
     "name": "subjectResource",
     "resource": {
       "resourceType": "ViewDefinition",
+      "status": "active",
       "resource": "Patient",
       "select": [{
         "column": [

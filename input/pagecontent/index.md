@@ -111,6 +111,7 @@ Let's start with a simple example, defining "patient_demographics" and
 ```json
 {
   "resourceType": "ViewDefinition",
+  "status": "draft",
   "resource": "Patient",
   "name": "patient_demographics",
   "select": [
@@ -146,6 +147,7 @@ Let's start with a simple example, defining "patient_demographics" and
 ```json
 {
   "resourceType": "ViewDefinition",
+  "status": "draft",
   "resource": "Condition",
   "name": "diagnoses_view",
   "select": [
