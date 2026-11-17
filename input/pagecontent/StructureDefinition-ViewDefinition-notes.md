@@ -984,6 +984,7 @@ which is not guaranteed but is common and can simplify analysis in some systems.
 ```json
 {
     "resourceType": "ViewDefinition",
+    "status": "draft",
     "name": "patient_birth_date",
     "resource": "Patient",
     "description": "A view of simple patient birth dates",
