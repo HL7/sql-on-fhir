@@ -298,7 +298,8 @@ attributed. It also marks `url`, `version`, `versionAlgorithm[x]`, `name`,
 `title`, `status`, `experimental`, `publisher` and `description` as Must
 Support, and defines how Must Support is interpreted. Both follow the
 [CRMI Shareable Library](https://hl7.org/fhir/uv/crmi/StructureDefinition-crmi-shareablelibrary.html)
-profile, except that `publisher` is required rather than Must Support only.
+profile, except that `name` and `publisher` are required rather than Must
+Support only.
 ([FHIR-58974](https://jira.hl7.org/browse/FHIR-58974))
 
 ##### Code systems and value sets

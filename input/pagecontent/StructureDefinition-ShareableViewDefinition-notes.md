@@ -16,8 +16,8 @@ following elements:
 
 These requirements follow the
 [CRMI Shareable Library](https://hl7.org/fhir/uv/crmi/StructureDefinition-crmi-shareablelibrary.html)
-profile, with one addition: `publisher` is required here, where CRMI marks it
-as Must Support only. `name` was already required by this profile.
+profile, except that `name` and `publisher` are required here, where CRMI marks
+them as Must Support only. `name` was already required by this profile.
 
 The [Shareable Patient Demographics](ViewDefinition-ShareablePatientDemographics.html)
 example conforms to this profile.
@@ -25,10 +25,10 @@ example conforms to this profile.
 ### Must Support
 
 The elements `url`, `version`, `versionAlgorithm[x]`, `name`, `title`,
-`status`, `experimental`, `publisher` and `description` are marked as Must
-Support. For a ViewDefinition claiming conformance to this profile, Must
-Support is interpreted as follows, adapted from
-[CRMI](https://hl7.org/fhir/uv/crmi/conformance.html):
+`status`, `experimental`, `publisher` and `description` are marked as
+[Must Support](glossary.html#must-support). For a ViewDefinition claiming
+conformance to this profile, Must Support is interpreted as follows, adapted
+from [CRMI](https://hl7.org/fhir/uv/crmi/conformance.html):
 
 - <span class="fhir-conformance" id="shareable-2">Systems that author or
   store ViewDefinitions SHALL be capable of populating all Must Support
@@ -36,15 +36,17 @@ Support is interpreted as follows, adapted from
 - <span class="fhir-conformance" id="shareable-3">Systems that distribute
   ViewDefinitions SHOULD populate all Must Support elements when
   transmitting a view.</span>
-- <span class="fhir-conformance" id="shareable-4">View runners SHALL be
-  capable of processing a ViewDefinition containing any Must Support element
-  without generating an error or failing to run the view.</span>
-- <span class="fhir-conformance" id="shareable-5">Where the value of an
+- <span class="fhir-conformance" id="shareable-4">Where the value of an
   optional Must Support element is not known, systems SHALL omit the element
   rather than populate it with a placeholder value.</span>
-- <span class="fhir-conformance" id="shareable-6">Systems consuming a
-  ViewDefinition SHALL interpret a missing Must Support element as
-  information that is not present for the view.</span>
+- <span class="fhir-conformance" id="shareable-5">Systems consuming a
+  ViewDefinition SHALL NOT infer a value for a missing Must Support element,
+  other than the meaning that the element defines for its absence.</span> For
+  example, a missing `experimental` means that the view is not experimental.
+
+These elements describe the view and do not affect the rows it produces. A
+view runner therefore processes a view that carries them in the same way as any
+other ViewDefinition.
 
 ### Required FHIRPath Expressions/Functions
 
