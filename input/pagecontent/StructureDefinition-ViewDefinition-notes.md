@@ -921,14 +921,6 @@ the empty collection ([viewdef-14](#viewdef-14)). Views that need to be portable
 across implementations should therefore access contained data through FHIRPath
 rather than joining to it.
 
-Implementations may also pre-process the data by extracting contained resources
-into independent resources, which can then be included in views and accessed via
-[getReferenceKey](#getreferencekeyresource-type-specifier--keytype) like any
-other resource. <span class="fhir-conformance" id="viewdef-4">Implementations
-that do this SHOULD normalize these resources appropriately whenever possible,
-such as eliminating duplicate resources contained in many parent
-resources.</span>
-
 ### Generating Schemas
 
 The output format produced by a View Runner will be technology-specific, such as
