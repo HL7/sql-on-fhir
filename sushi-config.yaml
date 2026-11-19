@@ -231,7 +231,7 @@ resources:
   ViewDefinition/PatientAndContactAddressUnion:
     name: Patient and Contact Address Union
     description: >-
-      An example of unnesting patient addresses and contact addresss into multiple
+      An example of unnesting patient addresses and contact address into multiple
       rows, which are unioned together into a single table.
     exampleBoolean: true
   ViewDefinition/PatientNamesWithIndex:
