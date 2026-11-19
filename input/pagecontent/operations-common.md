@@ -101,7 +101,7 @@ the run operation returns the result in that response:
   [Content Negotiation](#content-negotiation)); if neither `_format` nor
   `Accept` selects one, the server SHALL use `ndjson`.</span>
 - **The export operation** (`$sql-export`): <span class="fhir-conformance" id="com-4">the
-  server SHALL use `ndjson`, irrespective of `Accept`.</span> There `Accept`
+  server SHALL use `ndjson`, irrespective of `Accept`.</span> The `Accept`
   governs only the representation of the kick-off, status and result responses;
   it never selects the format of the exported files, which are fetched later
   from the `output.location` URLs as independent HTTP responses.
