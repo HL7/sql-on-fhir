@@ -11,7 +11,7 @@
   <kind value="resource"/>
   <abstract value="false"/>
   <type value="ViewDefinition"/>
-  <baseDefinition value="http://hl7.org/fhir/StructureDefinition/ViewDefinition|3.0.0-ballot"/>
+  <baseDefinition value="http://hl7.org/fhir/StructureDefinition/ViewDefinition|3.1.0-draft"/>
   <derivation value="constraint"/>
   <differential>
     <element id="ViewDefinition">
