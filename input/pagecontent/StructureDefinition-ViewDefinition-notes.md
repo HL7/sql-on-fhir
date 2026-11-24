@@ -1,6 +1,6 @@
 ### FHIRPath Functionality
 
-Columns within a view are defined using the [FHIRPath](https://hl7.org/fhirpath/) language. FHIRPath contains a large number of functions and syntax constructs - not all of these are required to be implemented within a SQL on FHIR view runner.
+Columns within a view are defined using the [FHIRPath](https://hl7.org/fhirpath/STU3/en/) language. FHIRPath contains a large number of functions and syntax constructs - not all of these are required to be implemented within a SQL on FHIR view runner.
 
 <span class="fhir-conformance" id="viewdef-8">View runner implementations SHALL support the
 following required additional FHIRPath functions.</span> In
@@ -12,7 +12,7 @@ execute shared view definitions.</span>
 
 <span class="fhir-conformance" id="viewdef-9">All View Runners SHALL implement these functions
 that extend the FHIRPath specification.</span> Despite not being in the
-[FHIRPath](https://hl7.org/fhirpath/) specification, they are necessary in the
+[FHIRPath](https://hl7.org/fhirpath/STU3/en/) specification, they are necessary in the
 context of defining views:
 
 - [getResourceKey](#getresourcekey--keytype) function
@@ -76,7 +76,7 @@ See the [Joins with Resource and Reference Keys](#joins-with-resource-and-refere
 
 A [select](StructureDefinition-ViewDefinition-definitions.html#diff_ViewDefinition.select)
 specifies the content and names for the columns in the view. The content for
-each column is defined with a [FHIRPath](https://hl7.org/fhirpath/) expression
+each column is defined with a [FHIRPath](https://hl7.org/fhirpath/STU3/en/) expression
 that returns a specific data element from the FHIR resources. More complex views
 can be specified to create resource or reference keys, unnest a collection of
 items returned by a FHIRPath expression, nest or concatenate the results from
@@ -85,7 +85,7 @@ multiple selects, and so on.
 ### Unnesting Semantics
 
 It is often desirable to unroll the collection returned from
-a [FHIRPath](https://hl7.org/fhirpath/) expression into a separate row for each
+a [FHIRPath](https://hl7.org/fhirpath/STU3/en/) expression into a separate row for each
 item in the collection. This is done
 with [forEach](StructureDefinition-ViewDefinition-definitions.html#diff_ViewDefinition.select.forEach)
 or [forEachOrNull](StructureDefinition-ViewDefinition-definitions.html#diff_ViewDefinition.select.forEachOrNull).
@@ -121,10 +121,10 @@ is similar to an `INNER JOIN` supported by many SQL engines,
 a [forEachOrNull](StructureDefinition-ViewDefinition-definitions.html#diff_ViewDefinition.select.forEachOrNull)
 is analogous to
 a `LEFT OUTER JOIN`. [forEach](StructureDefinition-ViewDefinition-definitions.html#diff_ViewDefinition.select.forEach)
-will produce a row only if the [FHIRPath](https://hl7.org/fhirpath/) expression
+will produce a row only if the [FHIRPath](https://hl7.org/fhirpath/STU3/en/) expression
 returns one or more items in the collection. On the other
 hand, [forEachOrNull](StructureDefinition-ViewDefinition-definitions.html#diff_ViewDefinition.select.forEachOrNull)
-will produce a row even if the [FHIRPath](https://hl7.org/fhirpath/) expression
+will produce a row even if the [FHIRPath](https://hl7.org/fhirpath/STU3/en/) expression
 returns an empty collection.
 With [forEachOrNull](StructureDefinition-ViewDefinition-definitions.html#diff_ViewDefinition.select.forEachOrNull),
 all columns will be included but, if nothing is returned by
@@ -192,7 +192,7 @@ flattening hierarchical data to any depth. This is particularly useful for resou
 with recursive nesting patterns like QuestionnaireResponse items, where the depth of
 nesting is not known in advance.
 
-The `repeat` directive takes an array of [FHIRPath](https://hl7.org/fhirpath/)
+The `repeat` directive takes an array of [FHIRPath](https://hl7.org/fhirpath/STU3/en/)
 expressions that define paths to recursively traverse. The view runner will:
 
 1. Start at the current context node
@@ -543,11 +543,11 @@ database-specific type control is needed.
 ### Using Constants
 
 A ViewDefinition may include one or more constants, which are simply values that
-can be reused in [FHIRPath](https://hl7.org/fhirpath/) expressions. This can
+can be reused in [FHIRPath](https://hl7.org/fhirpath/STU3/en/) expressions. This can
 improve readability and reduce redundancy. Constants can be used in `path`
 expressions by simply using `%[name]`. Effectively, these placeholders are
 replaced by the value of the constant before
-the [FHIRPath](https://hl7.org/fhirpath/) expression is evaluated.
+the [FHIRPath](https://hl7.org/fhirpath/STU3/en/) expression is evaluated.
 
 This is an example of a constant used in the `where` constraint of a view:
 
@@ -568,7 +568,7 @@ This is an example of a constant used in the `where` constraint of a view:
 ### Environment Variables
 
 In addition to user-defined constants, SQL on FHIR provides built-in environment
-variables that can be referenced in [FHIRPath](https://hl7.org/fhirpath/)
+variables that can be referenced in [FHIRPath](https://hl7.org/fhirpath/STU3/en/)
 expressions using the `%name` syntax.
 
 #### %rowIndex

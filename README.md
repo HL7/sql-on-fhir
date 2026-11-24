@@ -14,7 +14,7 @@ efficient SQL engines and surrounding ecosystems.
 
 We do this by creating simple, tabular _views_ of the underlying FHIR data that
 are tailored to specific needs. Views are defined
-with [FHIRPath](https://hl7.org/fhirpath/) expressions in a logical structure to
+with [FHIRPath](https://hl7.org/fhirpath/STU3/en/) expressions in a logical structure to
 specify things like column names and unnested items.
 
 [**Read the specification &rarr;**](https://sql-on-fhir.org/)
