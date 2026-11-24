@@ -287,6 +287,13 @@ resources:
       concept at every level. Useful for building concept maps or analysing
       hierarchical terminologies.
     exampleBoolean: true
+  ViewDefinition/VitalSignObservations:
+    name: Vital Sign Observations
+    description: >-
+      Demonstrates the TerminologyDependentViewDefinition profile. The view uses
+      the `memberOf` function to keep Observations whose code is in the vital sign
+      result value set, and to flag each coding as a member or not.
+    exampleBoolean: true
 
 #
 # Groups can control certain aspects of the IG generation.  The IG

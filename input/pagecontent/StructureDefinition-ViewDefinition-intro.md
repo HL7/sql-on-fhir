@@ -48,5 +48,8 @@ chosen tech stack. See [System Layers](index.html#system-layers) for details.
 ViewDefinitions may be profiled to meet specific needs. For instance,
 the [Shareable View Definition](StructureDefinition-ShareableViewDefinition.html)
 profile adds constraints for ViewDefinitions intended to be shared between
-systems. Implementers may create their own ViewDefinition profiles for further
-specialized needs.
+systems, and the
+[Terminology Dependent View Definition](StructureDefinition-TerminologyDependentViewDefinition.html)
+profile identifies ViewDefinitions that test value set membership with the
+`memberOf` function. Implementers may create their own ViewDefinition profiles
+for further specialized needs.
