@@ -343,7 +343,12 @@ discussion that established it.
 ##### Publishing housekeeping
 
 Links to `build.fhir.org` were replaced with links to published versions
-([#386](https://github.com/HL7/sql-on-fhir/pull/386)). Code systems and value
+([#386](https://github.com/HL7/sql-on-fhir/pull/386)). Links to the FHIRPath
+specification now point to the published 3.0.0 (STU 3) release rather than the
+unversioned URL or the continuous build, and the Shareable View Definition
+profile describes `join`, `lowBoundary` and `highBoundary` as trial use content
+in that release
+([#441](https://github.com/HL7/sql-on-fhir/pull/441)). Code systems and value
 sets were assigned OIDs from the root arc registered for this guide
 ([#381](https://github.com/HL7/sql-on-fhir/pull/381)). The repository license
 text was replaced with the verbatim CC0 1.0 Universal dedication, matching the

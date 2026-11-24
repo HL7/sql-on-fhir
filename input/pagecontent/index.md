@@ -49,7 +49,7 @@ challenges:
 A [ViewDefinition](StructureDefinition-ViewDefinition.html) is a standard
 format for defining tabular, use case-specific views of FHIR data. Each
 ViewDefinition is tied to a single FHIR resource type and uses
-[FHIRPath](https://hl7.org/fhirpath/) expressions to define columns, filters,
+[FHIRPath](https://hl7.org/fhirpath/STU3/en/) expressions to define columns, filters,
 and unnesting logic.
 
 These views can be made available to users as an easier way to consume FHIR

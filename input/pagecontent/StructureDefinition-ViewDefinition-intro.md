@@ -1,6 +1,6 @@
 It is the central piece of the [View Layer](index.html#system-layers) and
 represents a tabular projection of FHIR resources with the columns and filtering
-criteria defined by [FHIRPath](https://hl7.org/fhirpath/) expressions. The
+criteria defined by [FHIRPath](https://hl7.org/fhirpath/STU3/en/) expressions. The
 logical model is described below.
 
 ### Key Elements
@@ -20,7 +20,7 @@ table, views of certain types of observations, and so on.
 Each ViewDefinition instance has
 a [select](StructureDefinition-ViewDefinition-definitions.html#diff_ViewDefinition.select)
 that specifies the content and names for the columns in the view. The content
-for each column is defined with [FHIRPath](https://hl7.org/fhirpath/)
+for each column is defined with [FHIRPath](https://hl7.org/fhirpath/STU3/en/)
 expressions that return specific data elements from the FHIR resources.
 
 #### Where
