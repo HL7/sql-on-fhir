@@ -24,9 +24,6 @@ This IG is for FHIR version%
 IG_DEPENDENCY_VERSION_ERROR
 IG_DEPENDENCY_VERSION_WARNING
 
-# 09. ViewDefinition.jurisdiction is copied from MetadataResource with the core binding to the jurisdiction value set, which the core specification marks as experimental; the binding follows the core canonical resource pattern and is not defined by this IG.
-%binds to the value set 'http://hl7.org/fhir/ValueSet/jurisdiction' which is experimental, but this structure is not labeled as experimental%
-
 # 10. These code systems are defined in this IG rather than in THO. A TSMG exemption will be sought in the future (first publication).
 %will need to move to THO later during the process%
 
