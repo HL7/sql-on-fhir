@@ -174,7 +174,7 @@ or in parent/child relationships. This is typically done as different `select`s
 may use different `forEach` or `forEachOrNull`expressions to unroll different
 parts of the resources.
 
-The multiple rows produced using `forEach` or `forEachOrNull` from a `select`are
+The multiple rows produced using `forEach` or `forEachOrNull` from a `select` are
 joined to others with the following rules:
 
 - Parent/child `select`s will repeat values from the parent `select` for each
@@ -773,7 +773,7 @@ the [getResourceKey](#getresourcekey--keytype) and
 [getReferenceKey](#getreferencekeyresource-type-specifier--keytype) functions.
 
 Users may call [getResourceKey](#getresourcekey--keytype) to obtain a
-resources primary key,
+resource's primary key,
 and call [getReferenceKey](#getreferencekeyresource-type-specifier--keytype)to
 get
 the corresponding foreign key from a reference pointing at that resource/row.
@@ -854,7 +854,7 @@ Here are some implementation options to meet different needs:
         </tr>
         <tr>
             <td>Pre-Process to Create or Resolve Keys</td>
-            <td>The most difficult case is systems where the resource <code>id</code> is a not a reliable row key, and resources have multiple <code>identifier</code>s with no clear way to select one for the key.<br><br>In this case, implementations will likely have to fall back to some form of preprocessing to determine appropriate keys. This may be accomplished by:<br><br><ul><li>Pre-processing all data to have clear resource <code>id</code>s or "primary" <code>identifier</code>s and using one of the options above.</li><li>Building some form of cross-link table dynamically within the implementation itself based on the underlying data. For instance, if an implementation's <a href="#getresourcekey--keytype">getResourceKey</a> uses a specific identifier system, <a href="#getreferencekeyresource-type-specifier--keytype">getReferenceKey</a> could use a pre-built cross-link table to find the appropriate identifier-based key to return.</li></ul></td>
+            <td>The most difficult case is systems where the resource <code>id</code> is not a reliable row key, and resources have multiple <code>identifier</code>s with no clear way to select one for the key.<br><br>In this case, implementations will likely have to fall back to some form of preprocessing to determine appropriate keys. This may be accomplished by:<br><br><ul><li>Pre-processing all data to have clear resource <code>id</code>s or "primary" <code>identifier</code>s and using one of the options above.</li><li>Building some form of cross-link table dynamically within the implementation itself based on the underlying data. For instance, if an implementation's <a href="#getresourcekey--keytype">getResourceKey</a> uses a specific identifier system, <a href="#getreferencekeyresource-type-specifier--keytype">getReferenceKey</a> could use a pre-built cross-link table to find the appropriate identifier-based key to return.</li></ul></td>
         </tr>
     </tbody>
 </table>
