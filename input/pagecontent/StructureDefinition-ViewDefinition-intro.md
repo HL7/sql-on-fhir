@@ -15,6 +15,12 @@ instance. [Examples](StructureDefinition-ViewDefinition-examples.html) include
 simple tabular views of patients, unrolling patient addresses into an address
 table, views of certain types of observations, and so on.
 
+A resource defined by FHIR, or an additional resource such as ViewDefinition,
+is named by its type, as in `"resource": "Patient"`. Any other type, such as a
+logical model, is named by the canonical URL of the StructureDefinition that
+defines it, as in
+`"resource": "http://example.org/StructureDefinition/ExternalTable"`.
+
 #### Select
 
 Each ViewDefinition instance has
